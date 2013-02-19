@@ -311,6 +311,7 @@ public class ArmorTools {
                                 //SPGlobal.log("armor copied", armorDupe.getEDID());
                                 armorDupe.setEnchantment(form.getEnchantment());
                                 armorDupe.setName(name);
+                                armorDupe.setTemplate(armor.getForm());
                                 a2.add(armorDupe.getForm());
                                 patch.addRecord(armorDupe);
                             }

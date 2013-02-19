@@ -174,7 +174,7 @@ public class WeaponTools {
                         }
                         if (passed) {
                             //SPGlobal.log("variant found", weapon.getEDID() + " is variant of " + form.getEDID());
-                            FormID template = form.getTemplate();
+                            FormID template = form.getEnchantment();
                             //SPGlobal.log("template", template.getFormStr());
                             if (template.isNull()) {
                                 a2.add(weapon.getForm());
@@ -185,6 +185,8 @@ public class WeaponTools {
                                 WEAP weaponDupe = (WEAP) patch.makeCopy(weapon, "DienesWEAP" + newEdid);
                                 //SPGlobal.log("armor copied", weaponDupe.getEDID());
                                 weaponDupe.setEnchantment(form.getEnchantment());
+                                weaponDupe.setEnchantmentCharge(form.getEnchantmentCharge());
+                                weaponDupe.setTemplate(weapon.getForm());
                                 weaponDupe.setName(name);
                                 a2.add(weaponDupe.getForm());
                                 patch.addRecord(weaponDupe);
