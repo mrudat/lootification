@@ -9,7 +9,7 @@ import skyproc.*;
 
 /**
  *
- * @author David
+ * @author David Tynan
  */
 public class WeaponTools {
 
@@ -51,23 +51,40 @@ public class WeaponTools {
     }
 
     static String generateWeaponEDID(WEAP newWeapon, WEAP weapon) {
+//        String name = newWeapon.getEDID();
+//        String baseName = weapon.getEDID();
+//        String prefix = "";
+//        String suffix = "";
+//        WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
+//        if (template != null) {
+//            int prefixLen = baseName.indexOf(template.getEDID());
+//            if (prefixLen > 0) {
+//                prefix = baseName.substring(0, prefixLen);
+//            }
+//            int suffixLen = baseName.length() - template.getEDID().length() + prefixLen;
+//            if (suffixLen > 0) {
+//                suffix = baseName.substring(template.getEDID().length() + prefixLen);
+//            }
+//        }
+//        String ret = prefix + name + suffix;
+//        return ret;
         String name = newWeapon.getEDID();
         String baseName = weapon.getEDID();
-        String prefix = "";
-        String suffix = "";
+        String templateName;
+        String ret = "";
         WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
         if (template != null) {
-            int prefixLen = baseName.indexOf(template.getEDID());
-            if (prefixLen > 0) {
-                prefix = baseName.substring(0, prefixLen);
-            }
-            int suffixLen = baseName.length() - template.getEDID().length() + prefixLen;
-            if (suffixLen > 0) {
-                suffix = baseName.substring(template.getEDID().length() + prefixLen);
+            templateName = template.getEDID();
+            if (baseName.contains(templateName)) {
+                ret = baseName.replace(templateName, name);
+            } else {
+                String gcs = longestCommonSubstring(baseName, templateName);
+                ret = baseName.replace(gcs, name);
             }
         }
-        String ret = prefix + name + suffix;
+
         return ret;
+
     }
 
     static KYWD getBaseWeapon(KYWD k) {
@@ -163,11 +180,11 @@ public class WeaponTools {
                                     passed = true;
                                 } else if (weaponHasKeyword(weapon, hammer, merger) && (weaponHasKeyword(comp, hammer, merger))) {
                                     passed = true;
-                                } else{
-                                    SPGlobal.log("Error building weapon variants", weapon.getEDID()+
-                                            " cannot tell if axe or hammer");
+                                } else {
+                                    SPGlobal.log("Error building weapon variants", weapon.getEDID()
+                                            + " cannot tell if axe or hammer");
                                 }
-                                    
+
                             } else {
                                 passed = true;
                             }
@@ -199,25 +216,36 @@ public class WeaponTools {
     }
 
     static String generateWeaponName(WEAP newWeapon, WEAP weapon) {
+//        String name = newWeapon.getName();
+//        String baseName = weapon.getName();
+//        String prefix = "";
+//        String suffix = "";
+//        WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
+//        int prefixLen = baseName.indexOf(template.getName());
+//        if (prefixLen > 0) {
+//            prefix = baseName.substring(0, prefixLen);
+//        }
+//        int suffixLen = baseName.length() - template.getName().length() + prefixLen;
+//        if (suffixLen > 0) {
+//            suffix = baseName.substring(template.getName().length() + prefixLen);
+//        }
+//        String ret = prefix + name + suffix;
+//        return ret;
         String name = newWeapon.getName();
         String baseName = weapon.getName();
-        String prefix = "";
-        String suffix = "";
+        String templateName;
+        String ret = "";
         WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
-       // SPGlobal.log(weapon.getName(), template.getName());
-        int prefixLen = baseName.indexOf(template.getName());
-        //SPGlobal.log(name, "" + prefixLen);
-        if (prefixLen > 0) {
-            prefix = baseName.substring(0, prefixLen);
-            //SPGlobal.log(name, "prefix " + prefix);
+        if (template != null) {
+            templateName = template.getName();
+            if (baseName.contains(templateName)) {
+                ret = baseName.replace(templateName, name);
+            } else {
+                String gcs = longestCommonSubstring(baseName, templateName);
+                ret = baseName.replace(gcs, name);
+            }
         }
-        int suffixLen = baseName.length() - template.getName().length() + prefixLen;
-        //SPGlobal.log(name, "" + suffixLen);
-        if (suffixLen > 0) {
-            suffix = baseName.substring(template.getName().length() + prefixLen);
-            //SPGlobal.log(name, "suffix " + suffix);
-        }
-        String ret = prefix + name + suffix;
+
         return ret;
     }
 
@@ -225,7 +253,7 @@ public class WeaponTools {
         FormID f = new FormID("107347", "Skyrim.esm");
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
-        
+
         for (LVLI llist : merger.getLeveledItems()) {
             if (!llist.isEmpty()) {
                 boolean changed = false;
@@ -264,11 +292,19 @@ public class WeaponTools {
     }
 
     static void InsertWeaponVariants(LVLI list, FormID base) {
+        ArrayList<LeveledEntry> listEntries = list.getEntries();
+        ArrayList<FormID> forms = new ArrayList<>(0);
+        for (LeveledEntry e : listEntries) {
+            FormID f = e.getForm();
+            forms.add(f);
+        }
         for (ArrayList a : weaponVariants) {
             if (a.contains(base)) {
                 for (int i = 0; i < a.size(); i++) {
                     FormID f = (FormID) a.get(i);
-                    list.addEntry(new LeveledEntry(f, 1, 1));
+                    if (!forms.contains(f)) {
+                        list.addEntry(new LeveledEntry(f, 1, 1));
+                    }
                 }
             }
         }
@@ -330,10 +366,48 @@ public class WeaponTools {
         boolean ret = false;
         for (ArrayList<FormID> vars : weaponVariants) {
             if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+//            if (vars.contains(base.getForm())) {
                 ret = true;
             }
         }
 
         return ret;
+    }
+
+    public static void modLVLIWeapons() {
+        for (LVLI llist : merger.getLeveledItems()) {
+            String lname = llist.getEDID();
+            if (lname.contains("DienesLVLI")) {
+                WEAP weapon = (WEAP) merger.getMajor(llist.getEntry(0).getForm(), GRUP_TYPE.WEAP);
+                if (weapon != null) {
+                    if (hasVariant(weapon)) {
+                        InsertWeaponVariants(llist, weapon.getForm());
+                        patch.addRecord(llist);
+                    }
+                }
+            }
+        }
+
+    }
+
+    private static String longestCommonSubstring(String S1, String S2) {
+        int Start = 0;
+        int Max = 0;
+        for (int i = 0; i < S1.length(); i++) {
+            for (int j = 0; j < S2.length(); j++) {
+                int x = 0;
+                while (S1.charAt(i + x) == S2.charAt(j + x)) {
+                    x++;
+                    if (((i + x) >= S1.length()) || ((j + x) >= S2.length())) {
+                        break;
+                    }
+                }
+                if (x > Max) {
+                    Max = x;
+                    Start = i;
+                }
+            }
+        }
+        return S1.substring(Start, (Start + Max));
     }
 }

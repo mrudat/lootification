@@ -10,7 +10,7 @@ import skyproc.*;
 
 /**
  *
- * @author David
+ * @author David Tynan
  */
 public class ArmorTools {
 
@@ -53,51 +53,51 @@ public class ArmorTools {
 //    }
     static void buildOutfitsArmors(FLST baseArmorKeysFLST, Mod merger, Mod patch) {
         FormID f = new FormID("107347", "Skyrim.esm");
-        SPGlobal.log("outfits glist", f.toString());
+        //SPGlobal.log("outfits glist", f.toString());
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        SPGlobal.log("outfits glist", glist + "");
+        //SPGlobal.log("outfits glist", glist + "");
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
         for (OTFT lotft : merger.getOutfits()) {
             ArrayList<FormID> a = lotft.getInventoryList();
             boolean changed = false;
-/*            ArrayList<FormID> set = containsArmorSet(a, merger);
-            while (set.size() > 0) {
-                //check if outfitLVLI exists
-                String eid = "DienesLVLI" + getSetName(set) + "level1";
-                LVLI r = (LVLI) merger.getMajor(eid, GRUP_TYPE.LVLI);
-                if (r == null) {
-                    //outfitLVLI not exist create it and add matching
-                    LVLI setList = (LVLI) patch.makeCopy(glist, eid);
-                    for (int index = 0; index < set.size(); index++) {
-                        FormID item = set.get(index);
-                        ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
-                        if (temp != null) {
-                            setList.addEntry(new LeveledEntry(item, 1, 1));
-                            lotft.removeInventoryItem(item);
-                        }
-                        set.remove(item);
-                        index = index - 1;
-                    }
-                    merger.addRecord(setList);
-                    lotft.addInventoryItem(setList.getForm());
-                    matchingSetVariants.add(setList.getForm());
-                    changed = true;
-                } else {
-                    for (int index = 0; index < set.size(); index++) {
-                        FormID item = set.get(index);
-                        //ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
-                        //if(temp != null) {
-                        lotft.removeInventoryItem(item);
-                        set.remove(item);
-                        index = index - 1;
-                        //}
-                    }
-                    lotft.addInventoryItem(r.getForm());
-                    changed = true;
-                }
-                //get next set
-                set = containsArmorSet(a, merger); 
-            } */
+            /*            ArrayList<FormID> set = containsArmorSet(a, merger);
+             while (set.size() > 0) {
+             //check if outfitLVLI exists
+             String eid = "DienesLVLI" + getSetName(set) + "level1";
+             LVLI r = (LVLI) merger.getMajor(eid, GRUP_TYPE.LVLI);
+             if (r == null) {
+             //outfitLVLI not exist create it and add matching
+             LVLI setList = (LVLI) patch.makeCopy(glist, eid);
+             for (int index = 0; index < set.size(); index++) {
+             FormID item = set.get(index);
+             ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
+             if (temp != null) {
+             setList.addEntry(new LeveledEntry(item, 1, 1));
+             lotft.removeInventoryItem(item);
+             }
+             set.remove(item);
+             index = index - 1;
+             }
+             merger.addRecord(setList);
+             lotft.addInventoryItem(setList.getForm());
+             matchingSetVariants.add(setList.getForm());
+             changed = true;
+             } else {
+             for (int index = 0; index < set.size(); index++) {
+             FormID item = set.get(index);
+             //ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
+             //if(temp != null) {
+             lotft.removeInventoryItem(item);
+             set.remove(item);
+             index = index - 1;
+             //}
+             }
+             lotft.addInventoryItem(r.getForm());
+             changed = true;
+             }
+             //get next set
+             set = containsArmorSet(a, merger); 
+             } */
             //matching set armor moved to sublist, link any remaining weapons or armor
             //first refresh whats in the outfit
             a = lotft.getInventoryList();
@@ -106,7 +106,7 @@ public class ArmorTools {
                 if (obj != null) {
                     KYWD baseKey = armorHasAnyKeyword(obj, baseArmorKeysFLST, merger);
 
-                    if ((baseKey != null) &&(hasVariant(obj))) {
+                    if ((baseKey != null) && (hasVariant(obj))) {
                         String eid = "DienesLVLI" + obj.getEDID();
                         MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                         if (r == null) {
@@ -331,7 +331,7 @@ public class ArmorTools {
         KYWD ret = null;
         for (Pair p : armorMatches) {
             KYWD var = (KYWD) p.getVar();
-            SPGlobal.log("getBaseArmor", k.getEDID() + " " + var.getEDID() + " " + var.equals(k));
+            //SPGlobal.log("getBaseArmor", k.getEDID() + " " + var.getEDID() + " " + var.equals(k));
             if (var.equals(k)) {
                 ret = (KYWD) p.getBase();
             }
@@ -346,48 +346,82 @@ public class ArmorTools {
         for (int i = 0; i < bases.size(); i++) {
             KYWD newBase = (KYWD) merger.getMajor(bases.get(i), GRUP_TYPE.KYWD);
             KYWD newVar = (KYWD) merger.getMajor(vars.get(i), GRUP_TYPE.KYWD);
-            SPGlobal.log("Armor pair", newBase.getEDID() + " " + newVar.getEDID());
+            //SPGlobal.log("Armor pair", newBase.getEDID() + " " + newVar.getEDID());
             Pair<KYWD, KYWD> p = new Pair(newBase, newVar);
             armorMatches.add(p);
-            SPGlobal.log("Armor pair", p.getBase().getEDID() + " " + p.getVar().getEDID());
+            //SPGlobal.log("Armor pair", p.getBase().getEDID() + " " + p.getVar().getEDID());
         }
     }
 
     static String generateArmorEDID(ARMO newArmor, ARMO armor, Mod m) {
+//        String name = newArmor.getEDID();
+//        String baseName = armor.getEDID();
+//        String prefix = "";
+//        String suffix = "";
+//        ARMO template = (ARMO) m.getMajor(armor.getTemplate(), GRUP_TYPE.ARMO);
+//        int prefixLen = baseName.indexOf(template.getEDID());
+//        if (prefixLen > 0) {
+//            prefix = baseName.substring(0, prefixLen);
+//        }
+//        int suffixLen = baseName.length() - template.getEDID().length() + prefixLen;
+//        if (suffixLen > 0) {
+//            suffix = baseName.substring(template.getEDID().length() + prefixLen);
+//        }
+//        String ret = prefix + name + suffix;
+//        return ret;
+
         String name = newArmor.getEDID();
         String baseName = armor.getEDID();
-        String prefix = "";
-        String suffix = "";
+        String templateName;
+        String ret = "";
         ARMO template = (ARMO) m.getMajor(armor.getTemplate(), GRUP_TYPE.ARMO);
-        int prefixLen = baseName.indexOf(template.getEDID());
-        if (prefixLen > 0) {
-            prefix = baseName.substring(0, prefixLen);
+        if (template != null) {
+            templateName = template.getEDID();
+            if (baseName.contains(templateName)) {
+                ret = baseName.replace(templateName, name);
+            } else {
+                String gcs = longestCommonSubstring(baseName, templateName);
+                ret = baseName.replace(gcs, name);
+            }
         }
-        int suffixLen = baseName.length() - template.getEDID().length() + prefixLen;
-        if (suffixLen > 0) {
-            suffix = baseName.substring(template.getEDID().length() + prefixLen);
-        }
-        String ret = prefix + name + suffix;
+
         return ret;
     }
 
     static String generateArmorName(ARMO newArmor, ARMO armor, Mod m) {
+//        String name = newArmor.getName();
+//        String baseName = armor.getName();
+//        String prefix = "";
+//        String suffix = "";
+//        ARMO template = (ARMO) m.getMajor(armor.getTemplate(), GRUP_TYPE.ARMO);
+//        SPGlobal.log(armor.getName(), template.getName());
+//        int prefixLen = baseName.indexOf(template.getName());
+//        SPGlobal.log(name, "" + prefixLen);
+//        if (prefixLen > 0) {
+//            prefix = baseName.substring(0, prefixLen);
+//        }
+//        int suffixLen = baseName.length() - template.getName().length() + prefixLen;
+//        if (suffixLen > 0) {
+//            suffix = baseName.substring(template.getName().length() + prefixLen);
+//        }
+//        String ret = prefix + name + suffix;
+//        return ret;
+
         String name = newArmor.getName();
         String baseName = armor.getName();
-        String prefix = "";
-        String suffix = "";
+        String templateName;
+        String ret = "";
         ARMO template = (ARMO) m.getMajor(armor.getTemplate(), GRUP_TYPE.ARMO);
-        SPGlobal.log(armor.getName(), template.getName());
-        int prefixLen = baseName.indexOf(template.getName());
-        SPGlobal.log(name, "" + prefixLen);
-        if (prefixLen > 0) {
-            prefix = baseName.substring(0, prefixLen);
+        if (template != null) {
+            templateName = template.getName();
+            if (baseName.contains(templateName)) {
+                ret = baseName.replace(templateName, name);
+            } else {
+                String gcs = longestCommonSubstring(baseName, templateName);
+                ret = baseName.replace(gcs, name);
+            }
         }
-        int suffixLen = baseName.length() - template.getName().length() + prefixLen;
-        if (suffixLen > 0) {
-            suffix = baseName.substring(template.getName().length() + prefixLen);
-        }
-        String ret = prefix + name + suffix;
+
         return ret;
     }
 
@@ -415,7 +449,7 @@ public class ArmorTools {
         if (!tmp.isNull()) {
             replace = (ARMO) m.getMajor(tmp, GRUP_TYPE.ARMO);
         }
-        SPGlobal.log(replace.getEDID(), varKey.getEDID());
+        //SPGlobal.log(replace.getEDID(), varKey.getEDID());
         KeywordSet k = replace.getKeywordSet();
         a = k.getKeywordRefs();
         for (FormID temp : a) {
@@ -430,13 +464,19 @@ public class ArmorTools {
     }
 
     static private void InsertArmorVariants(LVLI list, FormID base) {
+        ArrayList<LeveledEntry> listEntries = list.getEntries();
+        ArrayList<FormID> forms = new ArrayList<>(0);
+        for (LeveledEntry e : listEntries) {
+            FormID f = e.getForm();
+            forms.add(f);
+        }
         for (ArrayList a : armorVariants) {
-
             if (a.contains(base)) {
                 for (int i = 0; i < a.size(); i++) {
-
                     FormID f = (FormID) a.get(i);
-                    list.addEntry(new LeveledEntry(f, 1, 1));
+                    if (!forms.contains(f)) {
+                        list.addEntry(new LeveledEntry(f, 1, 1));
+                    }
                 }
             }
         }
@@ -493,10 +533,47 @@ public class ArmorTools {
         for (ArrayList<FormID> vars : armorVariants) {
             //SPGlobal.log("hasVariant", base.getForm() + " " + vars.size());
             if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+//            if(vars.contains(base.getForm())) {
                 ret = true;
             }
         }
 
         return ret;
+    }
+
+    public static void modLVLIArmors(Mod merger, Mod patch) {
+        for (LVLI llist : merger.getLeveledItems()) {
+            String lname = llist.getEDID();
+            if (lname.contains("DienesLVLI")) {
+                ARMO armor = (ARMO) merger.getMajor(llist.getEntry(0).getForm(), GRUP_TYPE.ARMO);
+                if (armor != null) {
+                    if (hasVariant(armor)) {
+                        InsertArmorVariants(llist, armor.getForm());
+                        patch.addRecord(llist);
+                    }
+                }
+            }
+        }
+    }
+
+    private static String longestCommonSubstring(String S1, String S2) {
+        int Start = 0;
+        int Max = 0;
+        for (int i = 0; i < S1.length(); i++) {
+            for (int j = 0; j < S2.length(); j++) {
+                int x = 0;
+                while (S1.charAt(i + x) == S2.charAt(j + x)) {
+                    x++;
+                    if (((i + x) >= S1.length()) || ((j + x) >= S2.length())) {
+                        break;
+                    }
+                }
+                if (x > Max) {
+                    Max = x;
+                    Start = i;
+                }
+            }
+        }
+        return S1.substring(Start, (Start + Max));
     }
 }

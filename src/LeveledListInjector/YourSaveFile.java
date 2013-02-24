@@ -15,11 +15,12 @@ public class YourSaveFile extends SkyProcSave {
     @Override
     protected void initSettings() {
 	//  The Setting,	    The default value,	    Whether or not it changing means a new patch should be made
-	Add(Settings.IMPORT_AT_START,		true,	    false);
+	Add(Settings.IMPORT_AT_START,		false,	    false);
         Add(Settings.PROCESS_WEAPONS, false, true);
         Add(Settings.PROCESS_ARMORS, false, true);
         Add(Settings.PROCESS_OUTFITS, false, true);
         Add(Settings.TEST, 0, true);
+        Add(Settings.LOOTIFY_MOD, true, true);
 
     }
 
@@ -48,6 +49,8 @@ public class YourSaveFile extends SkyProcSave {
                 "Process the armors");
         helpInfo.put(Settings.PROCESS_OUTFITS, 
                 "Process the outfits. NOTE: this probably will make them mismatched in game");
+        helpInfo.put(Settings.LOOTIFY_MOD, 
+                "Enchant and distribute weapons and armor from mod");
         
         helpInfo.put(Settings.TEST, 
                 "Test help info");
@@ -61,6 +64,7 @@ public class YourSaveFile extends SkyProcSave {
         PROCESS_WEAPONS,
         PROCESS_ARMORS,
         PROCESS_OUTFITS,
+        LOOTIFY_MOD,
         TEST;
     }
 }

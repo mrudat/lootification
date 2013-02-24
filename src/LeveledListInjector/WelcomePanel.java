@@ -21,6 +21,7 @@ public class WelcomePanel extends SPSettingPanel {
     LCheckBox processWeapons;
     LCheckBox processArmors;
     LCheckBox processOutfits;
+    LCheckBox lootifyMod;
     LComboBox<String> test;
 
     public WelcomePanel(SPMainMenuPanel parent_) {
@@ -39,24 +40,25 @@ public class WelcomePanel extends SPSettingPanel {
         setPlacement(introText);
         Add(introText);
 
-        processWeapons = new LCheckBox("Process weapons", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        processWeapons.tie(YourSaveFile.Settings.PROCESS_WEAPONS, LeveledListInjector.save, SUMGUI.helpPanel, true);
-        setPlacement(processWeapons);
-        AddSetting(processWeapons);
-        
-
-
-
-        processArmors = new LCheckBox("Process armors", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        processArmors.tie(YourSaveFile.Settings.PROCESS_ARMORS, LeveledListInjector.save, SUMGUI.helpPanel, true);
-        setPlacement(processArmors);
-        AddSetting(processArmors);
-        
-        processOutfits = new LCheckBox("Process outfits", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        processOutfits.tie(YourSaveFile.Settings.PROCESS_OUTFITS, LeveledListInjector.save, SUMGUI.helpPanel, true);
-        setPlacement(processOutfits);
-        AddSetting(processOutfits);
-        
+//        processWeapons = new LCheckBox("Process weapons", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+//        processWeapons.tie(YourSaveFile.Settings.PROCESS_WEAPONS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+//        setPlacement(processWeapons);
+//        AddSetting(processWeapons);
+//
+//        processArmors = new LCheckBox("Process armors", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+//        processArmors.tie(YourSaveFile.Settings.PROCESS_ARMORS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+//        setPlacement(processArmors);
+//        AddSetting(processArmors);
+//        
+//        processOutfits = new LCheckBox("Process outfits", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+//        processOutfits.tie(YourSaveFile.Settings.PROCESS_OUTFITS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+//        setPlacement(processOutfits);
+//        AddSetting(processOutfits);
+//        
+//        lootifyMod = new LCheckBox("Lootify mod(s)", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+//        lootifyMod.tie(YourSaveFile.Settings.LOOTIFY_MOD, LeveledListInjector.save, SUMGUI.helpPanel, true);
+//        setPlacement(lootifyMod);
+//        AddSetting(lootifyMod);
         
         //alignRight();
     }

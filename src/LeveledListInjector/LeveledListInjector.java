@@ -35,8 +35,8 @@ public class LeveledListInjector implements SUM {
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
     public static String version = "0.1";
-    public static String welcomeText = "Makes lists";
-    public static String descriptionToShowInSUM = "A SkyProc patcher. Does lots of stuff.";
+    public static String welcomeText = "Lootifies weapons and armors";
+    public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
     public static Color settingsColor = new Color(72, 179, 58);  // Green
     public static Font settingsFont = new Font("Serif", Font.BOLD, 15);
@@ -50,7 +50,7 @@ public class LeveledListInjector implements SUM {
     // at the bottom
     public static void main(String[] args) {
         try {
-            SPGlobal.createGlobalLog();           
+            SPGlobal.createGlobalLog();
             SUMGUI.open(new LeveledListInjector(), args);
         } catch (Exception e) {
             // If a major error happens, print it everywhere and display a message box.
@@ -73,7 +73,7 @@ public class LeveledListInjector implements SUM {
     // multiply the same record type to yeild a huge number of records.
     @Override
     public GRUP_TYPE[] dangerousRecordReport() {
-        return new GRUP_TYPE[]{GRUP_TYPE.ARMO, GRUP_TYPE.WEAP, GRUP_TYPE.LVLI};
+        return new GRUP_TYPE[]{GRUP_TYPE.LVLI};
     }
 
     @Override
@@ -97,8 +97,8 @@ public class LeveledListInjector implements SUM {
     @Override
     public SPMainMenuPanel getStandardMenu() {
         SPMainMenuPanel settingsMenu = new SPMainMenuPanel(getHeaderColor());
-        
-        
+
+
 
         settingsMenu.setWelcomePanel(new WelcomePanel(settingsMenu));
         settingsMenu.addMenu(new OtherSettingsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
@@ -179,9 +179,12 @@ public class LeveledListInjector implements SUM {
         ArrayList<ModListing> activeModListing = importer.getActiveModList();
         ModListing skyrim = new ModListing("Skyrim", true);
         ModListing update = new ModListing("Update", true);
-        ModListing variants = new ModListing("GearVariants", true);
-        gearVariants = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
+        ModListing variants = new ModListing("Lootification", true);
+        gearVariants = importer.importMod(skyrim, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
+        Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
+        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
         
+
         global = new Mod(getName() + "MergerTemp", false);
 //        for (ModListing eachMod : activeModListing) {
 //            merger.
@@ -215,7 +218,7 @@ public class LeveledListInjector implements SUM {
     @Override
     public ArrayList<ModListing> requiredMods() {
         ArrayList<ModListing> req = new ArrayList<>(0);
-        ModListing gearVariants = new ModListing("GearVariants", true);
+        ModListing gearVariants = new ModListing("Lootification", true);
         req.add(gearVariants);
         return req;
     }
@@ -248,34 +251,37 @@ public class LeveledListInjector implements SUM {
 
         //ArmorTools.setMergeAndPatch(merger, patch);
 
-        if (save.getBool(Settings.PROCESS_ARMORS)) {
+//        if (save.getBool(Settings.PROCESS_ARMORS)) {
+//            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
+//            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
+//                ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+//            }
+//            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
+//
+//        }
+//
+//        if (save.getBool(Settings.PROCESS_WEAPONS)) {
+//            WeaponTools.setMergeAndPatch(merger, patch);
+//            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
+//            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
+//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
+//                WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
+//            }
+//            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+//        }
+
+        boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
+        if (lootify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
-            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-                ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
-            }
-            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
-
-        }
-
-        if (save.getBool(Settings.PROCESS_WEAPONS)) {
+            ArmorTools.modLVLIArmors(merger, patch);
+            
             WeaponTools.setMergeAndPatch(merger, patch);
             WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
             WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
-            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-                WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
-            }
-            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+            WeaponTools.modLVLIWeapons();
         }
-
-
-
-
-
-
-
-
-
 
 
 
