@@ -266,6 +266,10 @@ public class ArmorTools {
 
         for (ARMO armor : merger.getArmors()) {
             //SPGlobal.log("armor", armor.getEDID());
+            String debugname = armor.getEDID();
+            if(debugname.contains("WV")){
+                int qwerty = 1;
+            }
             KYWD variantKey = armorHasAnyKeyword(armor, varKeys, merger);
             if (variantKey != null) {
                 //SPGlobal.log(armor.getEDID(), "is variant");
@@ -532,8 +536,8 @@ public class ArmorTools {
         boolean ret = false;
         for (ArrayList<FormID> vars : armorVariants) {
             //SPGlobal.log("hasVariant", base.getForm() + " " + vars.size());
-            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
-//            if(vars.contains(base.getForm())) {
+//            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+            if(vars.contains(base.getForm())) {
                 ret = true;
             }
         }

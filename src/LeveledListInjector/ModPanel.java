@@ -112,9 +112,13 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<FormID> variantArmorKeys = variantArmorKeysFLST.getFormIDEntries();
         ArrayList<String> armorVariantNames = new ArrayList<>(0);
         armorVariantNames.add("None");
+        
+        Mod masters = new Mod("mastersTemp", true);
+        masters.addAsOverrides(LeveledListInjector.gearVariants, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        masters.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
         for (FormID f : variantArmorKeys) {
-            MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
+            MajorRecord maj = masters.getMajor(f, GRUP_TYPE.KYWD);
             armorVariantNames.add(maj.getEDID());
         }
 
@@ -128,7 +132,7 @@ public class ModPanel extends SPSettingPanel {
                 box.addItem(s);
             }
 
-            KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, LeveledListInjector.gearVariants);
+            KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, masters);
             if (k != null) {
                 int index = armorMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
                 box.setSelectedIndex(index);
@@ -149,7 +153,7 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<String> weaponVariantNames = new ArrayList<>(0);
         weaponVariantNames.add("None");
         for (FormID f : variantWeaponKeys) {
-            MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
+            MajorRecord maj = masters.getMajor(f, GRUP_TYPE.KYWD);
             weaponVariantNames.add(maj.getEDID());
         }
 
@@ -163,7 +167,7 @@ public class ModPanel extends SPSettingPanel {
             for (String s : weaponVariantNames) {
                 box.addItem(s);
             }
-            KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, LeveledListInjector.gearVariants);
+            KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, masters);
             if (k != null) {
                 int index = weaponMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
                 box.setSelectedIndex(index);

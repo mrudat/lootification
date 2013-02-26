@@ -179,10 +179,25 @@ public class LeveledListInjector implements SUM {
         ArrayList<ModListing> activeModListing = importer.getActiveModList();
         ModListing skyrim = new ModListing("Skyrim", true);
         ModListing update = new ModListing("Update", true);
-        ModListing variants = new ModListing("Lootification", true);
-        gearVariants = importer.importMod(skyrim, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
-        Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
-        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD);
+        ModListing variants = new ModListing("GearVariants", true);
+        ModListing dawnguard = new ModListing("Dawnguard", true);
+        ModListing hearthfires = new ModListing("Hearthfires", true);
+        ModListing dragonborn = new ModListing("Dragonborn", true);
+        gearVariants = importer.importMod(skyrim, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        if (dawn != null){
+            gearVariants.addAsOverrides(dawn, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        }
+        if (hearth != null){
+            gearVariants.addAsOverrides(hearth, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        }
+        if (born != null){
+            gearVariants.addAsOverrides(born, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        }
+        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         
 
         global = new Mod(getName() + "MergerTemp", false);
@@ -194,7 +209,7 @@ public class LeveledListInjector implements SUM {
         for (ModListing eachMod : activeModListing) {
             SPGlobal.log("active Mod", eachMod.toString());
             if (!(eachMod.equals(skyrim) || eachMod.equals(variants) || eachMod.equals(update))) {
-                Mod m = importer.importMod(eachMod, SPGlobal.pathToData, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+                Mod m = importer.importMod(eachMod, SPGlobal.pathToData, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP, GRUP_TYPE.KYWD);
                 if (m.numRecords() != 0) {
                     activeMods.add(m);
                 }
@@ -218,7 +233,7 @@ public class LeveledListInjector implements SUM {
     @Override
     public ArrayList<ModListing> requiredMods() {
         ArrayList<ModListing> req = new ArrayList<>(0);
-        ModListing gearVariants = new ModListing("Lootification", true);
+        ModListing gearVariants = new ModListing("GearVariants", true);
         req.add(gearVariants);
         return req;
     }
@@ -252,26 +267,26 @@ public class LeveledListInjector implements SUM {
         //ArmorTools.setMergeAndPatch(merger, patch);
 
 //        if (save.getBool(Settings.PROCESS_ARMORS)) {
-//            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
-//            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
+            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
 //            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-//                ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+                ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
 //            }
-//            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
-//
-//        }
-//
-//        if (save.getBool(Settings.PROCESS_WEAPONS)) {
-//            WeaponTools.setMergeAndPatch(merger, patch);
-//            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
-//            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
-//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-//                WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
-//            }
-//            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
+
 //        }
 
-        boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
+//        if (save.getBool(Settings.PROCESS_WEAPONS)) {
+            WeaponTools.setMergeAndPatch(merger, patch);
+            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
+            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
+//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
+                WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
+//            }
+            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+//        }
+
+        boolean lootify = false; //save.getBool(Settings.LOOTIFY_MOD);
         if (lootify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
