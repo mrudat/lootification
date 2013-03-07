@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.net.URL;
 import java.util.ArrayList;
+import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import lev.gui.LSaveFile;
@@ -34,7 +35,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.2";
+    public static String version = "0.3.1";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -187,20 +188,25 @@ public class LeveledListInjector implements SUM {
         Mod up = importer.importMod(update, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         gearVariants.addAsOverrides(up, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-        Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-        Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-        Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-        if (dawn != null){
+
+        File dawnf = new File(SPGlobal.pathToData + "Dawnguard.esm");
+        if (dawnf.isFile()) {
+            Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(dawn, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
-        if (hearth != null){
+        File hearthf = new File(SPGlobal.pathToData + "Hearthfires.esm");
+        if (hearthf.isFile()) {
+            Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(hearth, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
-        if (born != null){
+        File bornf = new File(SPGlobal.pathToData + "Dragonborn.esm");
+        if (bornf.isFile()) {
+            Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(born, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
-        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         
+        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+
 
         global = new Mod(getName() + "MergerTemp", false);
 //        for (ModListing eachMod : activeModListing) {
@@ -268,12 +274,12 @@ public class LeveledListInjector implements SUM {
 
         //ArmorTools.setMergeAndPatch(merger, patch);
         boolean buildLootification = false;
-        if (buildLootification){
+        if (buildLootification) {
 //        if (save.getBool(Settings.PROCESS_ARMORS)) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
 //            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-                ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+            ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
 //            }
             ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
@@ -284,7 +290,7 @@ public class LeveledListInjector implements SUM {
             WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
             WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
 //            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-                WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
+            WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
 //            }
             WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
 //        }
@@ -295,7 +301,7 @@ public class LeveledListInjector implements SUM {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
             ArmorTools.modLVLIArmors(merger, patch);
-            
+
             WeaponTools.setMergeAndPatch(merger, patch);
             WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
             WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);

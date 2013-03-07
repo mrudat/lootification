@@ -139,7 +139,7 @@ public class ModPanel extends SPSettingPanel {
             }
             box.addEnterButton("Set", new ArmorListener(armor, box, armorName));
 
-            box.setSize(150, 30);
+            box.setSize(250, 30);
             panel.add(armorName, BorderLayout.WEST);
             panel.add(box);
             panel.setPlacement(box);
@@ -175,7 +175,7 @@ public class ModPanel extends SPSettingPanel {
             
             String set = "set";
             box.addEnterButton(set, new WeaponListener(weapon, box, weaponName));
-            box.setSize(150, 30);
+            box.setSize(250, 30);
             panel.add(weaponName, BorderLayout.WEST);
             panel.add(box);
             panel.setPlacement(box);
