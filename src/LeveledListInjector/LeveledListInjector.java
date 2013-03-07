@@ -34,7 +34,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.1.2";
+    public static String version = "0.2";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -179,11 +179,13 @@ public class LeveledListInjector implements SUM {
         ArrayList<ModListing> activeModListing = importer.getActiveModList();
         ModListing skyrim = new ModListing("Skyrim", true);
         ModListing update = new ModListing("Update", true);
-        ModListing variants = new ModListing("GearVariants", true);
+        ModListing variants = new ModListing("Lootification", true);
         ModListing dawnguard = new ModListing("Dawnguard", true);
         ModListing hearthfires = new ModListing("Hearthfires", true);
         ModListing dragonborn = new ModListing("Dragonborn", true);
         gearVariants = importer.importMod(skyrim, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        Mod up = importer.importMod(update, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        gearVariants.addAsOverrides(up, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
@@ -233,7 +235,7 @@ public class LeveledListInjector implements SUM {
     @Override
     public ArrayList<ModListing> requiredMods() {
         ArrayList<ModListing> req = new ArrayList<>(0);
-        ModListing gearVariants = new ModListing("GearVariants", true);
+        ModListing gearVariants = new ModListing("Lootification", true);
         req.add(gearVariants);
         return req;
     }
@@ -265,7 +267,8 @@ public class LeveledListInjector implements SUM {
 
 
         //ArmorTools.setMergeAndPatch(merger, patch);
-
+        boolean buildLootification = false;
+        if (buildLootification){
 //        if (save.getBool(Settings.PROCESS_ARMORS)) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
@@ -285,8 +288,9 @@ public class LeveledListInjector implements SUM {
 //            }
             WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
 //        }
+        }
 
-        boolean lootify = false; //save.getBool(Settings.LOOTIFY_MOD);
+        boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
         if (lootify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);

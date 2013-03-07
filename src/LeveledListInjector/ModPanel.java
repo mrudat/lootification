@@ -113,18 +113,18 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<String> armorVariantNames = new ArrayList<>(0);
         armorVariantNames.add("None");
         
-        Mod masters = new Mod("mastersTemp", true);
-        masters.addAsOverrides(LeveledListInjector.gearVariants, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-        masters.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+//        Mod masters = new Mod("mastersTemp", true);
+//        masters.addAsOverrides(LeveledListInjector.gearVariants, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+        LeveledListInjector.gearVariants.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
         for (FormID f : variantArmorKeys) {
-            MajorRecord maj = masters.getMajor(f, GRUP_TYPE.KYWD);
+            MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
             armorVariantNames.add(maj.getEDID());
         }
 
         for (ARMO armor : myMod.getArmors()) {
             LPanel panel = new LPanel(275, 200);
-            panel.setSize(200, 60);
+            panel.setSize(300, 60);
             LLabel armorName = new LLabel(armor.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
 
             LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
@@ -132,7 +132,7 @@ public class ModPanel extends SPSettingPanel {
                 box.addItem(s);
             }
 
-            KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, masters);
+            KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, LeveledListInjector.gearVariants);
             if (k != null) {
                 int index = armorMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
                 box.setSelectedIndex(index);
@@ -153,13 +153,13 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<String> weaponVariantNames = new ArrayList<>(0);
         weaponVariantNames.add("None");
         for (FormID f : variantWeaponKeys) {
-            MajorRecord maj = masters.getMajor(f, GRUP_TYPE.KYWD);
+            MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
             weaponVariantNames.add(maj.getEDID());
         }
 
         for (WEAP weapon : myMod.getWeapons()) {
            LPanel panel = new LPanel(275, 200);
-            panel.setSize(200, 60);
+            panel.setSize(300, 60);
             LLabel weaponName = new LLabel(weapon.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
 
             
@@ -167,7 +167,7 @@ public class ModPanel extends SPSettingPanel {
             for (String s : weaponVariantNames) {
                 box.addItem(s);
             }
-            KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, masters);
+            KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, LeveledListInjector.gearVariants);
             if (k != null) {
                 int index = weaponMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
                 box.setSelectedIndex(index);

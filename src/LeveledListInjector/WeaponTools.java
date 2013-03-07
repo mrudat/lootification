@@ -375,8 +375,8 @@ public class WeaponTools {
     private static boolean hasVariant(WEAP base) {
         boolean ret = false;
         for (ArrayList<FormID> vars : weaponVariants) {
-//            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
-            if (vars.contains(base.getForm())) {
+            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+//            if (vars.contains(base.getForm())) {
                 ret = true;
             }
         }

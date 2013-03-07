@@ -546,8 +546,8 @@ public class ArmorTools {
         boolean ret = false;
         for (ArrayList<FormID> vars : armorVariants) {
             //SPGlobal.log("hasVariant", base.getForm() + " " + vars.size());
-//            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
-            if (vars.contains(base.getForm())) {
+            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+//            if (vars.contains(base.getForm())) {
                 ret = true;
             }
         }
