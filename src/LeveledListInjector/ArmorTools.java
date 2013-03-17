@@ -266,58 +266,57 @@ public class ArmorTools {
 
         for (ARMO armor : merger.getArmors()) {
             //SPGlobal.log("armor", armor.getEDID());
-            String debugname = armor.getEDID();
-            if (debugname.contains("WV")) {
-                int qwerty = 1;
-            }
             KYWD variantKey = armorHasAnyKeyword(armor, varKeys, merger);
             if (variantKey != null) {
                 //SPGlobal.log(armor.getEDID(), "is variant");
-                for (int j = 0; j < armorVariants.size(); j++) {
-                    ArrayList<FormID> a2 = armorVariants.get(j);
-                    ARMO form = (ARMO) merger.getMajor((FormID) a2.get(0), GRUP_TYPE.ARMO);
+                FormID ench = armor.getEnchantment();
+                if (ench.isNull()) {
+                    for (int j = 0; j < armorVariants.size(); j++) {
+                        ArrayList<FormID> a2 = armorVariants.get(j);
+                        ARMO form = (ARMO) merger.getMajor((FormID) a2.get(0), GRUP_TYPE.ARMO);
 
-                    boolean passed = true;
-                    //SPGlobal.log("comparing to", form.getEDID());
+                        boolean passed = true;
+                        //SPGlobal.log("comparing to", form.getEDID());
 
 
-                    if (armorHasKeyword(form, getBaseArmor(variantKey), merger)) {
+                        if (armorHasKeyword(form, getBaseArmor(variantKey), merger)) {
 
-                        //SPGlobal.log(form.getEDID(), "has base keyword");
+                            //SPGlobal.log(form.getEDID(), "has base keyword");
 
-                        ARMO replace = form;
-                        FormID tmp = replace.getTemplate();
-                        if (!tmp.isNull()) {
-                            replace = (ARMO) merger.getMajor(tmp, GRUP_TYPE.ARMO);
-                        }
-                        for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
-                            boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
-                            boolean formFlag = replace.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
-
-                            boolean flagMatch = (armorFlag == formFlag);
-                            //SPGlobal.log("flag match" + c, armorFlag + " " + formFlag + " " + flagMatch);
-                            if (flagMatch == false) {
-                                passed = false;
+                            ARMO replace = form;
+                            FormID tmp = replace.getTemplate();
+                            if (!tmp.isNull()) {
+                                replace = (ARMO) merger.getMajor(tmp, GRUP_TYPE.ARMO);
                             }
-                        }
-                        if (passed) {
-                            //SPGlobal.log("variant found", armor.getEDID() + " is variant of " + form.getEDID());
-                            FormID template = form.getTemplate();
-                            //SPGlobal.log("template", template.getFormStr());
-                            if (template.isNull()) {
-                                a2.add(armor.getForm());
-                                //SPGlobal.log("variant added", a2.contains(armor.getForm()) + " " + a2.size());
-                            } else {
-                                //SPGlobal.log("Enchant found", armor.getEDID() + "  " + form.getEDID());
-                                String name = generateArmorName(armor, form, merger);
-                                String newEdid = generateArmorEDID(armor, form, merger);
-                                ARMO armorDupe = (ARMO) patch.makeCopy(armor, "DienesARMO" + newEdid);
-                                //SPGlobal.log("armor copied", armorDupe.getEDID());
-                                armorDupe.setEnchantment(form.getEnchantment());
-                                armorDupe.setName(name);
-                                armorDupe.setTemplate(armor.getForm());
-                                a2.add(armorDupe.getForm());
-                                patch.addRecord(armorDupe);
+                            for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                                boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                                boolean formFlag = replace.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+
+                                boolean flagMatch = (armorFlag == formFlag);
+                                //SPGlobal.log("flag match" + c, armorFlag + " " + formFlag + " " + flagMatch);
+                                if (flagMatch == false) {
+                                    passed = false;
+                                }
+                            }
+                            if (passed) {
+                                //SPGlobal.log("variant found", armor.getEDID() + " is variant of " + form.getEDID());
+                                FormID template = form.getTemplate();
+                                //SPGlobal.log("template", template.getFormStr());
+                                if (template.isNull()) {
+                                    a2.add(armor.getForm());
+                                    //SPGlobal.log("variant added", a2.contains(armor.getForm()) + " " + a2.size());
+                                } else {
+                                    //SPGlobal.log("Enchant found", armor.getEDID() + "  " + form.getEDID());
+                                    String name = generateArmorName(armor, form, merger);
+                                    String newEdid = generateArmorEDID(armor, form, merger);
+                                    ARMO armorDupe = (ARMO) patch.makeCopy(armor, "DienesARMO" + newEdid);
+                                    //SPGlobal.log("armor copied", armorDupe.getEDID());
+                                    armorDupe.setEnchantment(form.getEnchantment());
+                                    armorDupe.setName(name);
+                                    armorDupe.setTemplate(armor.getForm());
+                                    a2.add(armorDupe.getForm());
+                                    patch.addRecord(armorDupe);
+                                }
                             }
                         }
                     }

@@ -163,55 +163,58 @@ public class WeaponTools {
             KYWD isVariant = weaponHasAnyKeyword(weapon, varKeys, merger);
             if (isVariant != null) {
                 //SPGlobal.log(weapon.getEDID(), "is variant");
-                for (int j = 0; j < weaponVariants.size(); j++) {
-                    ArrayList<FormID> a2 = weaponVariants.get(j);
-                    WEAP form = (WEAP) merger.getMajor((FormID) a2.get(0), GRUP_TYPE.WEAP);
-                    boolean passed = false;
-                    //SPGlobal.log("trying", form.getEDID());
+                FormID ench = weapon.getEnchantment();
+                if (ench.isNull()) {
+                    for (int j = 0; j < weaponVariants.size(); j++) {
+                        ArrayList<FormID> a2 = weaponVariants.get(j);
+                        WEAP form = (WEAP) merger.getMajor((FormID) a2.get(0), GRUP_TYPE.WEAP);
+                        boolean passed = false;
+                        //SPGlobal.log("trying", form.getEDID());
 
-                    if (weaponHasKeyword(form, getBaseWeapon(isVariant), merger)) {
+                        if (weaponHasKeyword(form, getBaseWeapon(isVariant), merger)) {
 
-                        WEAP comp = form;
-                        FormID formBase = form.getTemplate();
-                        if (!formBase.isNull()) {
-                            comp = (WEAP) merger.getMajor(formBase, GRUP_TYPE.WEAP);
-                        }
-                        if (comp.getWeaponType() == weapon.getWeaponType()) {
-                            //SPGlobal.log("weapon type", weapon.getWeaponType() + " " + comp.getWeaponType());
-
-                            //hack to split warhammers and battleaxes
-                            if (weapon.getWeaponType() == WEAP.WeaponType.TwoHBluntAxe) {
-                                if (weaponHasKeyword(weapon, axe, merger) && weaponHasKeyword(comp, axe, merger)) {
-                                    passed = true;
-                                } else if (weaponHasKeyword(weapon, hammer, merger) && (weaponHasKeyword(comp, hammer, merger))) {
-                                    passed = true;
-                                } else {
-                                    SPGlobal.log("Error building weapon variants", weapon.getEDID()
-                                            + " cannot tell if axe or hammer");
-                                }
-
-                            } else {
-                                passed = true;
+                            WEAP comp = form;
+                            FormID formBase = form.getTemplate();
+                            if (!formBase.isNull()) {
+                                comp = (WEAP) merger.getMajor(formBase, GRUP_TYPE.WEAP);
                             }
-                        }
-                        if (passed) {
-                            //SPGlobal.log("variant found", weapon.getEDID() + " is variant of " + form.getEDID());
-                            FormID template = form.getEnchantment();
-                            //SPGlobal.log("template", template.getFormStr());
-                            if (template.isNull()) {
-                                a2.add(weapon.getForm());
-                            } else {
-                                //SPGlobal.log("Enchant found", weapon.getEDID() + "  " + form.getEDID());
-                                String name = generateWeaponName(weapon, form);
-                                String newEdid = generateWeaponEDID(weapon, form);
-                                WEAP weaponDupe = (WEAP) patch.makeCopy(weapon, "DienesWEAP" + newEdid);
-                                //SPGlobal.log("armor copied", weaponDupe.getEDID());
-                                weaponDupe.setEnchantment(form.getEnchantment());
-                                weaponDupe.setEnchantmentCharge(form.getEnchantmentCharge());
-                                weaponDupe.setTemplate(weapon.getForm());
-                                weaponDupe.setName(name);
-                                a2.add(weaponDupe.getForm());
-                                patch.addRecord(weaponDupe);
+                            if (comp.getWeaponType() == weapon.getWeaponType()) {
+                                //SPGlobal.log("weapon type", weapon.getWeaponType() + " " + comp.getWeaponType());
+
+                                //hack to split warhammers and battleaxes
+                                if (weapon.getWeaponType() == WEAP.WeaponType.TwoHBluntAxe) {
+                                    if (weaponHasKeyword(weapon, axe, merger) && weaponHasKeyword(comp, axe, merger)) {
+                                        passed = true;
+                                    } else if (weaponHasKeyword(weapon, hammer, merger) && (weaponHasKeyword(comp, hammer, merger))) {
+                                        passed = true;
+                                    } else {
+                                        SPGlobal.log("Error building weapon variants", weapon.getEDID()
+                                                + " cannot tell if axe or hammer");
+                                    }
+
+                                } else {
+                                    passed = true;
+                                }
+                            }
+                            if (passed) {
+                                //SPGlobal.log("variant found", weapon.getEDID() + " is variant of " + form.getEDID());
+                                FormID template = form.getEnchantment();
+                                //SPGlobal.log("template", template.getFormStr());
+                                if (template.isNull()) {
+                                    a2.add(weapon.getForm());
+                                } else {
+                                    //SPGlobal.log("Enchant found", weapon.getEDID() + "  " + form.getEDID());
+                                    String name = generateWeaponName(weapon, form);
+                                    String newEdid = generateWeaponEDID(weapon, form);
+                                    WEAP weaponDupe = (WEAP) patch.makeCopy(weapon, "DienesWEAP" + newEdid);
+                                    //SPGlobal.log("armor copied", weaponDupe.getEDID());
+                                    weaponDupe.setEnchantment(form.getEnchantment());
+                                    weaponDupe.setEnchantmentCharge(form.getEnchantmentCharge());
+                                    weaponDupe.setTemplate(weapon.getForm());
+                                    weaponDupe.setName(name);
+                                    a2.add(weaponDupe.getForm());
+                                    patch.addRecord(weaponDupe);
+                                }
                             }
                         }
                     }

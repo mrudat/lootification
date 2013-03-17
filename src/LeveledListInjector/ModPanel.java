@@ -12,6 +12,7 @@ import java.awt.event.*;
 import LeveledListInjector.ini.INI;
 import java.awt.BorderLayout;
 import java.io.*;
+import java.awt.Component;
 
 /**
  *
@@ -21,6 +22,7 @@ public class ModPanel extends SPSettingPanel {
 
     private Mod myMod;
     private ArrayList<LComboBox> armorBoxes;
+    private ArrayList<LComboBox> weaponBoxes;
 
     private class ArmorListener implements ActionListener {
 
@@ -84,11 +86,52 @@ public class ModPanel extends SPSettingPanel {
                 box.clearHighlight();
                 title.setText(weapon.getName());
             } else if (pressed.compareTo("None") != 0) {
-                newKey = (KYWD)LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
+                newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
                 keys.addKeywordRef(newKey.getForm());
                 LeveledListInjector.global.addRecord(weapon);
                 box.highlightChanged();
-                title.setText(weapon.getName()+" set as "+newKey.getEDID());
+                title.setText(weapon.getName() + " set as " + newKey.getEDID());
+            }
+        }
+    }
+
+    private class SetAllListener implements ActionListener {
+
+        SetAllListener() {
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (LComboBox box : armorBoxes) {
+                Component[] c = box.getComponents();
+                LButton b = ((LButton) c[2]);
+                MouseEvent e2 = new MouseEvent(box, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis() + 10, 0, b.getX(), b.getY(), 1, false);
+                box.dispatchEvent(e2);
+
+            }
+            for (LComboBox box : weaponBoxes) {
+                box.dispatchEvent(e);
+            }
+        }
+    }
+
+    private class SetNoneListener implements ActionListener {
+
+        FLST armorMatTypes;
+        FLST weaponMatTypes;
+
+        SetNoneListener() {
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (LComboBox box : armorBoxes) {
+                box.setSelectedIndex(0);
+                box.dispatchEvent(e);
+            }
+            for (LComboBox box : weaponBoxes) {
+                box.setSelectedIndex(0);
+                box.dispatchEvent(e);
             }
         }
     }
@@ -112,41 +155,63 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<FormID> variantArmorKeys = variantArmorKeysFLST.getFormIDEntries();
         ArrayList<String> armorVariantNames = new ArrayList<>(0);
         armorVariantNames.add("None");
-        
+
 //        Mod masters = new Mod("mastersTemp", true);
 //        masters.addAsOverrides(LeveledListInjector.gearVariants, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         LeveledListInjector.gearVariants.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+
+        armorBoxes = new ArrayList<>(0);
+        weaponBoxes = new ArrayList<>(0);
 
         for (FormID f : variantArmorKeys) {
             MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
             armorVariantNames.add(maj.getEDID());
         }
 
+        LPanel setReset = new LPanel(300, 60);
+        setReset.setSize(300, 50);
+
+        LButton setAll = new LButton("Set All");
+        setAll.addActionListener(new SetAllListener());
+        LButton setNone = new LButton("set none");
+        setNone.addActionListener(new SetNoneListener());
+
+        setReset.add(setAll, BorderLayout.WEST);
+        setReset.add(setNone);
+        setReset.setPlacement(setNone, 150, 0);
+//        setPlacement(setReset);
+//        Add(setReset);
+
         for (ARMO armor : myMod.getArmors()) {
-            LPanel panel = new LPanel(275, 200);
-            panel.setSize(300, 60);
-            LLabel armorName = new LLabel(armor.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+            boolean non_playable = armor.getBodyTemplate().get(BodyTemplate.GeneralFlags.NonPlayable);
+            FormID enchant = armor.getEnchantment();
+            if (!non_playable && (enchant.isNull())) {
+                LPanel panel = new LPanel(275, 200);
+                panel.setSize(300, 60);
+                LLabel armorName = new LLabel(armor.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
 
-            LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-            for (String s : armorVariantNames) {
-                box.addItem(s);
+                LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+                for (String s : armorVariantNames) {
+                    box.addItem(s);
+                }
+
+                KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, LeveledListInjector.gearVariants);
+                if (k != null) {
+                    int index = armorMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
+                    box.setSelectedIndex(index);
+                }
+                box.addEnterButton("Set", new ArmorListener(armor, box, armorName));
+
+                box.setSize(250, 30);
+                panel.add(armorName, BorderLayout.WEST);
+                panel.add(box);
+                panel.setPlacement(box);
+
+                armorBoxes.add(box);
+
+                setPlacement(panel);
+                Add(panel);
             }
-
-            KYWD k = ArmorTools.armorHasAnyKeyword(armor, armorMatTypes, LeveledListInjector.gearVariants);
-            if (k != null) {
-                int index = armorMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
-                box.setSelectedIndex(index);
-            }
-            box.addEnterButton("Set", new ArmorListener(armor, box, armorName));
-
-            box.setSize(250, 30);
-            panel.add(armorName, BorderLayout.WEST);
-            panel.add(box);
-            panel.setPlacement(box);
-
-            setPlacement(panel);
-            Add(panel);
-
         }
 
         ArrayList<FormID> variantWeaponKeys = variantWeaponKeysFLST.getFormIDEntries();
@@ -158,30 +223,37 @@ public class ModPanel extends SPSettingPanel {
         }
 
         for (WEAP weapon : myMod.getWeapons()) {
-           LPanel panel = new LPanel(275, 200);
-            panel.setSize(300, 60);
-            LLabel weaponName = new LLabel(weapon.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+            boolean non_playable = weapon.get(WEAP.WeaponFlag.NonPlayable);
+            boolean bound = weapon.get(WEAP.WeaponFlag.BoundWeapon);
+            FormID enchant = weapon.getEnchantment();
+            if (!non_playable && !bound && (enchant.isNull())) {
+                LPanel panel = new LPanel(275, 200);
+                panel.setSize(300, 60);
+                LLabel weaponName = new LLabel(weapon.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
 
-            
-            LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-            for (String s : weaponVariantNames) {
-                box.addItem(s);
-            }
-            KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, LeveledListInjector.gearVariants);
-            if (k != null) {
-                int index = weaponMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
-                box.setSelectedIndex(index);
-            }
-            
-            String set = "set";
-            box.addEnterButton(set, new WeaponListener(weapon, box, weaponName));
-            box.setSize(250, 30);
-            panel.add(weaponName, BorderLayout.WEST);
-            panel.add(box);
-            panel.setPlacement(box);
 
-            setPlacement(panel);
-            Add(panel);
+                LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+                for (String s : weaponVariantNames) {
+                    box.addItem(s);
+                }
+                KYWD k = WeaponTools.weaponHasAnyKeyword(weapon, weaponMatTypes, LeveledListInjector.gearVariants);
+                if (k != null) {
+                    int index = weaponMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
+                    box.setSelectedIndex(index);
+                }
+
+                String set = "set";
+                box.addEnterButton(set, new WeaponListener(weapon, box, weaponName));
+                box.setSize(250, 30);
+                panel.add(weaponName, BorderLayout.WEST);
+                panel.add(box);
+                panel.setPlacement(box);
+
+                weaponBoxes.add(box);
+
+                setPlacement(panel);
+                Add(panel);
+            }
         }
 
     }
