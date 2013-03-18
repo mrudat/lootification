@@ -139,14 +139,7 @@ public class WeaponTools {
         return hasKey;
     }
 
-    static void buildWeaponVariants(FLST baseKeys, FLST varKeys) {
-        FormID axeForm = new FormID("06D932", "Skyrim.esm");
-        KYWD axe = (KYWD) merger.getMajor(axeForm, GRUP_TYPE.KYWD);
-
-        FormID hammerForm = new FormID("06D930", "Skyrim.esm");
-        KYWD hammer = (KYWD) merger.getMajor(hammerForm, GRUP_TYPE.KYWD);
-
-        //SPGlobal.log("Build Variants", "Building Base Weapons");
+    static void buildWeaponBases(FLST baseKeys) {
         for (WEAP weapon : merger.getWeapons()) {
             KYWD isBase = weaponHasAnyKeyword(weapon, baseKeys, merger);
             if (isBase != null) {
@@ -156,6 +149,17 @@ public class WeaponTools {
                 weaponVariants.add(alts);
             }
         }
+    }
+
+    static void buildWeaponVariants(FLST baseKeys, FLST varKeys) {
+        FormID axeForm = new FormID("06D932", "Skyrim.esm");
+        KYWD axe = (KYWD) merger.getMajor(axeForm, GRUP_TYPE.KYWD);
+
+        FormID hammerForm = new FormID("06D930", "Skyrim.esm");
+        KYWD hammer = (KYWD) merger.getMajor(hammerForm, GRUP_TYPE.KYWD);
+
+        //SPGlobal.log("Build Variants", "Building Base Weapons");
+        buildWeaponBases(baseKeys);
         //SPGlobal.log("Build Variants", "Building Variant Weapons");
         ArrayList<WEAP> mWeapons = merger.getWeapons().getRecords();
         for (int weaponNum = 0; weaponNum < mWeapons.size(); weaponNum++) {
@@ -268,37 +272,39 @@ public class WeaponTools {
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
 
         for (LVLI llist : merger.getLeveledItems()) {
-            if (!llist.isEmpty()) {
-                boolean changed = false;
-                for (int i = 0; i < llist.numEntries(); i++) {
-                    LeveledEntry entry = llist.getEntry(i);
-                    WEAP obj = (WEAP) merger.getMajor(entry.getForm(), GRUP_TYPE.WEAP);
-                    if (obj != null) {
+            if (!llist.getEDID().startsWith("DienesLVLI")) {
+                if (!llist.isEmpty()) {
+                    boolean changed = false;
+                    for (int i = 0; i < llist.numEntries(); i++) {
+                        LeveledEntry entry = llist.getEntry(i);
+                        WEAP obj = (WEAP) merger.getMajor(entry.getForm(), GRUP_TYPE.WEAP);
+                        if (obj != null) {
 
-                        KYWD isBase = weaponHasAnyKeyword(obj, baseWeaponKeysFLST, merger);
-                        boolean hasVar = hasVariant(obj);
-                        if (hasVar && (isBase != null)) {
-                            String eid = "DienesLVLI" + obj.getEDID();
-                            MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                            if (r == null) {
-                                LVLI subList = (LVLI) patch.makeCopy(glist, eid);
-                                InsertWeaponVariants(subList, entry.getForm());
-                                patch.addRecord(subList);
-                                llist.removeEntry(i);
-                                llist.addEntry(new LeveledEntry(subList.getForm(), entry.getLevel(), entry.getCount()));
-                                i = -1;
-                                changed = true;
-                            } else {
-                                llist.removeEntry(i);
-                                llist.addEntry(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
-                                changed = true;
-                                i = -1;
+                            KYWD isBase = weaponHasAnyKeyword(obj, baseWeaponKeysFLST, merger);
+                            boolean hasVar = hasVariant(obj);
+                            if (hasVar && (isBase != null)) {
+                                String eid = "DienesLVLI" + obj.getEDID();
+                                MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
+                                if (r == null) {
+                                    LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                                    InsertWeaponVariants(subList, entry.getForm());
+                                    patch.addRecord(subList);
+                                    llist.removeEntry(i);
+                                    llist.addEntry(new LeveledEntry(subList.getForm(), entry.getLevel(), entry.getCount()));
+                                    i = -1;
+                                    changed = true;
+                                } else {
+                                    llist.removeEntry(i);
+                                    llist.addEntry(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
+                                    changed = true;
+                                    i = -1;
+                                }
                             }
                         }
                     }
-                }
-                if (changed) {
-                    patch.addRecord(llist);
+                    if (changed) {
+                        patch.addRecord(llist);
+                    }
                 }
             }
         }
@@ -378,7 +384,8 @@ public class WeaponTools {
     private static boolean hasVariant(WEAP base) {
         boolean ret = false;
         for (ArrayList<FormID> vars : weaponVariants) {
-            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+            boolean contains = vars.contains(base.getForm());
+            if (contains && ((vars.size() > 1) || LeveledListInjector.listify)) {
 //            if (vars.contains(base.getForm())) {
                 ret = true;
             }

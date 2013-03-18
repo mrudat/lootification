@@ -18,7 +18,7 @@ import skyproc.gui.SUMGUI;
 public class OtherSettingsPanel extends SPSettingPanel {
 
     LCheckBox importOnStartup;
-
+    LCheckBox lootifyMod;
     
 
     public OtherSettingsPanel(SPMainMenuPanel parent_) {
@@ -36,6 +36,10 @@ public class OtherSettingsPanel extends SPSettingPanel {
 	setPlacement(importOnStartup);
 	AddSetting(importOnStartup);
        
+        lootifyMod = new LCheckBox("Lootify mod(s) instead of making leveled lists", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+        lootifyMod.tie(YourSaveFile.Settings.LOOTIFY_MOD, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        setPlacement(lootifyMod);
+        AddSetting(lootifyMod);
 
 	alignRight();
 

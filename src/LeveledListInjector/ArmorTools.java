@@ -190,6 +190,9 @@ public class ArmorTools {
 
 //            //check if LVLI is one we made
             boolean found = false;
+            if(llist.getEDID().startsWith("DienesLVLI")){
+                found = true;
+            }
 //            for (FormID set : matchingSetVariants) {
 //                if (llist.getForm().equals(set)) {
 //                    found = true;
@@ -224,7 +227,12 @@ public class ArmorTools {
                             //SPGlobal.log(obj.getEDID(), "has keyword" + base);
 
                             String eid = "DienesLVLI" + obj.getEDID();
-                            MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
+                            MajorRecord r;
+                            if(LeveledListInjector.listify){
+                                r = merger.getMajor(eid, GRUP_TYPE.LVLI);
+                            } else {
+                                r = patch.getMajor(eid, GRUP_TYPE.LVLI);
+                            }
                             if (r == null) {
                                 //SPGlobal.log(obj.getEDID(), "new sublist needed");
                                 LVLI subList = (LVLI) patch.makeCopy(glist, eid);
@@ -250,9 +258,8 @@ public class ArmorTools {
             }
         }
     }
-
-    static void buildArmorVariants(Mod merger, Mod patch, FLST baseKeys, FLST varKeys) {
-        SPGlobal.log("Build Variants", "Building Base Armors");
+    
+    static void buildArmorBases(Mod merger, FLST baseKeys){
         for (ARMO armor : merger.getArmors()) {
             KYWD baseKey = armorHasAnyKeyword(armor, baseKeys, merger);
             if (baseKey != null) {
@@ -262,6 +269,11 @@ public class ArmorTools {
                 armorVariants.add(alts);
             }
         }
+    }
+
+    static void buildArmorVariants(Mod merger, Mod patch, FLST baseKeys, FLST varKeys) {
+        SPGlobal.log("Build Variants", "Building Base Armors");
+        buildArmorBases(merger, baseKeys);
         SPGlobal.log("Build Variants", "Building Variant Armors");
 
         for (ARMO armor : merger.getArmors()) {
@@ -545,7 +557,8 @@ public class ArmorTools {
         boolean ret = false;
         for (ArrayList<FormID> vars : armorVariants) {
             //SPGlobal.log("hasVariant", base.getForm() + " " + vars.size());
-            if (vars.contains(base.getForm()) && (vars.size() > 1)) {
+            boolean contains = vars.contains(base.getForm());
+            if ((contains) && ((vars.size() > 1) || LeveledListInjector.listify)) {
 //            if (vars.contains(base.getForm())) {
                 ret = true;
             }

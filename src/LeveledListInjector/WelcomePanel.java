@@ -21,7 +21,7 @@ public class WelcomePanel extends SPSettingPanel {
     LCheckBox processWeapons;
     LCheckBox processArmors;
     LCheckBox processOutfits;
-    LCheckBox lootifyMod;
+    
     LComboBox<String> test;
 
     public WelcomePanel(SPMainMenuPanel parent_) {
@@ -55,10 +55,7 @@ public class WelcomePanel extends SPSettingPanel {
 //        setPlacement(processOutfits);
 //        AddSetting(processOutfits);
 //        
-//        lootifyMod = new LCheckBox("Lootify mod(s)", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-//        lootifyMod.tie(YourSaveFile.Settings.LOOTIFY_MOD, LeveledListInjector.save, SUMGUI.helpPanel, true);
-//        setPlacement(lootifyMod);
-//        AddSetting(lootifyMod);
+
         
         //alignRight();
     }

@@ -23,6 +23,8 @@ public class ModPanel extends SPSettingPanel {
     private Mod myMod;
     private ArrayList<LComboBox> armorBoxes;
     private ArrayList<LComboBox> weaponBoxes;
+    private ArrayList<ArmorListener> armorListeners;
+    private ArrayList<WeaponListener> weaponListeners;
 
     private class ArmorListener implements ActionListener {
 
@@ -102,15 +104,20 @@ public class ModPanel extends SPSettingPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (LComboBox box : armorBoxes) {
-                Component[] c = box.getComponents();
-                LButton b = ((LButton) c[2]);
-                MouseEvent e2 = new MouseEvent(box, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis() + 10, 0, b.getX(), b.getY(), 1, false);
-                box.dispatchEvent(e2);
-
+//            for (LComboBox box : armorBoxes) {
+//                Component[] c = box.getComponents();
+//                LButton b = ((LButton) c[2]);
+//                MouseEvent e2 = new MouseEvent(box, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis() + 10, 0, b.getX(), b.getY(), 1, false);
+//                box.dispatchEvent(e2);
+//            }
+//            for (LComboBox box : weaponBoxes) {
+//                box.dispatchEvent(e);
+//            }
+            for (ArmorListener a : armorListeners) {
+                a.actionPerformed(e);
             }
-            for (LComboBox box : weaponBoxes) {
-                box.dispatchEvent(e);
+            for (WeaponListener a : weaponListeners) {
+                a.actionPerformed(e);
             }
         }
     }
@@ -125,13 +132,13 @@ public class ModPanel extends SPSettingPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (LComboBox box : armorBoxes) {
-                box.setSelectedIndex(0);
-                box.dispatchEvent(e);
+            for (ArmorListener a : armorListeners) {
+                a.box.setSelectedIndex(0);
+                a.actionPerformed(e);
             }
-            for (LComboBox box : weaponBoxes) {
-                box.setSelectedIndex(0);
-                box.dispatchEvent(e);
+            for (WeaponListener a : weaponListeners) {
+                a.box.setSelectedIndex(0);
+                a.actionPerformed(e);
             }
         }
     }
@@ -156,12 +163,12 @@ public class ModPanel extends SPSettingPanel {
         ArrayList<String> armorVariantNames = new ArrayList<>(0);
         armorVariantNames.add("None");
 
-//        Mod masters = new Mod("mastersTemp", true);
-//        masters.addAsOverrides(LeveledListInjector.gearVariants, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         LeveledListInjector.gearVariants.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
         armorBoxes = new ArrayList<>(0);
         weaponBoxes = new ArrayList<>(0);
+        armorListeners = new ArrayList<>(0);
+        weaponListeners = new ArrayList<>(0);
 
         for (FormID f : variantArmorKeys) {
             MajorRecord maj = LeveledListInjector.gearVariants.getMajor(f, GRUP_TYPE.KYWD);
@@ -179,8 +186,8 @@ public class ModPanel extends SPSettingPanel {
         setReset.add(setAll, BorderLayout.WEST);
         setReset.add(setNone);
         setReset.setPlacement(setNone, 150, 0);
-//        setPlacement(setReset);
-//        Add(setReset);
+        setPlacement(setReset);
+        Add(setReset);
 
         for (ARMO armor : myMod.getArmors()) {
             boolean non_playable = armor.getBodyTemplate().get(BodyTemplate.GeneralFlags.NonPlayable);
@@ -200,14 +207,16 @@ public class ModPanel extends SPSettingPanel {
                     int index = armorMaterialTypes.indexOf(k.getForm()) + 1; //offset None entry
                     box.setSelectedIndex(index);
                 }
-                box.addEnterButton("Set", new ArmorListener(armor, box, armorName));
+                ArmorListener al = new ArmorListener(armor, box, armorName);
+                armorListeners.add(al);
+                box.addEnterButton("Set", al);
 
                 box.setSize(250, 30);
                 panel.add(armorName, BorderLayout.WEST);
                 panel.add(box);
                 panel.setPlacement(box);
 
-                armorBoxes.add(box);
+//                armorBoxes.add(box);
 
                 setPlacement(panel);
                 Add(panel);
@@ -243,7 +252,9 @@ public class ModPanel extends SPSettingPanel {
                 }
 
                 String set = "set";
-                box.addEnterButton(set, new WeaponListener(weapon, box, weaponName));
+                WeaponListener wl = new WeaponListener(weapon, box, weaponName);
+                weaponListeners.add(wl);
+                box.addEnterButton(set, wl);
                 box.setSize(250, 30);
                 panel.add(weaponName, BorderLayout.WEST);
                 panel.add(box);

@@ -35,7 +35,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.3.2";
+    public static String version = "0.4";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -45,6 +45,7 @@ public class LeveledListInjector implements SUM {
     public static ArrayList<Mod> activeMods = new ArrayList<>(0);
     public static Mod gearVariants;
     public static Mod global;
+    public static boolean listify = false;
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -204,7 +205,7 @@ public class LeveledListInjector implements SUM {
             Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(born, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
-        
+
         gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
 
@@ -256,6 +257,10 @@ public class LeveledListInjector implements SUM {
     // but DO NOT export it.  Exporting is handled internally.
     @Override
     public void runChangesToPatch() throws Exception {
+        if (!save.getBool(Settings.LOOTIFY_MOD)) {
+            listify = true;
+            myPatchName = "Lootification Lists";
+        }
 
         Mod patch = SPGlobal.getGlobalPatch();
 
@@ -297,7 +302,7 @@ public class LeveledListInjector implements SUM {
         }
 
         boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
-        if (lootify) {
+        if (!listify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
             ArmorTools.modLVLIArmors(merger, patch);
@@ -309,6 +314,17 @@ public class LeveledListInjector implements SUM {
         }
 
 
+        if (listify) {
+            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
+            ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
+            ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
+
+            WeaponTools.setMergeAndPatch(merger, patch);
+            WeaponTools.buildWeaponBases(baseWeaponKeysFLST);
+            WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
+            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+        }
 
     }
 }
