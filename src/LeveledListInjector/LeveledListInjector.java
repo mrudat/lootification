@@ -317,6 +317,7 @@ public class LeveledListInjector implements SUM {
         if (listify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
+            ArmorTools.setupSets(merger, patch);
             ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
             ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 

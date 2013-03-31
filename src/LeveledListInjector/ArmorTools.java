@@ -16,7 +16,7 @@ public class ArmorTools {
 
     public static ArrayList<Pair<KYWD, KYWD>> armorMatches;
     private static ArrayList<ArrayList<FormID>> armorVariants = new ArrayList<>(0);
-    private static ArrayList<FormID> matchingSetVariants = new ArrayList<>(0);
+    private static ArrayList<Pair<KYWD, ArrayList<ARMO>>> matchingSets = new ArrayList<>(0);
     //private static Mod merger;
     //private static Mod patch;
 
@@ -56,76 +56,97 @@ public class ArmorTools {
         //SPGlobal.log("outfits glist", f.toString());
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
         //SPGlobal.log("outfits glist", glist + "");
+        setupSets(merger, patch);
+
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
         for (OTFT lotft : merger.getOutfits()) {
-            ArrayList<FormID> a = lotft.getInventoryList();
-            boolean changed = false;
-            /*            ArrayList<FormID> set = containsArmorSet(a, merger);
-             while (set.size() > 0) {
-             //check if outfitLVLI exists
-             String eid = "DienesLVLI" + getSetName(set) + "level1";
-             LVLI r = (LVLI) merger.getMajor(eid, GRUP_TYPE.LVLI);
-             if (r == null) {
-             //outfitLVLI not exist create it and add matching
-             LVLI setList = (LVLI) patch.makeCopy(glist, eid);
-             for (int index = 0; index < set.size(); index++) {
-             FormID item = set.get(index);
-             ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
-             if (temp != null) {
-             setList.addEntry(new LeveledEntry(item, 1, 1));
-             lotft.removeInventoryItem(item);
-             }
-             set.remove(item);
-             index = index - 1;
-             }
-             merger.addRecord(setList);
-             lotft.addInventoryItem(setList.getForm());
-             matchingSetVariants.add(setList.getForm());
-             changed = true;
-             } else {
-             for (int index = 0; index < set.size(); index++) {
-             FormID item = set.get(index);
-             //ARMO temp = (ARMO) merger.getMajor(item, GRUP_TYPE.ARMO);
-             //if(temp != null) {
-             lotft.removeInventoryItem(item);
-             set.remove(item);
-             index = index - 1;
-             //}
-             }
-             lotft.addInventoryItem(r.getForm());
-             changed = true;
-             }
-             //get next set
-             set = containsArmorSet(a, merger); 
-             } */
-            //matching set armor moved to sublist, link any remaining weapons or armor
-            //first refresh whats in the outfit
-            a = lotft.getInventoryList();
-            for (FormID form : a) {
-                ARMO obj = (ARMO) merger.getMajor(form, GRUP_TYPE.ARMO);
-                if (obj != null) {
-                    KYWD baseKey = armorHasAnyKeyword(obj, baseArmorKeysFLST, merger);
+            String lotftName = lotft.getEDID();
+            boolean tiered = isTiered(lotftName);
+            if (tiered) {
+                lotft.clearInventoryItems();
+                LVLI subList = (LVLI) patch.makeCopy(glist, lotftName + "List");
+                String tierKey = getTierKey(lotftName);
+                String bits = getBits(lotftName);
+                insertTieredArmors(subList, tierKey, bits, merger, patch);
+                lotft.addInventoryItem(subList.getForm());
 
-                    if ((baseKey != null) && (hasVariant(obj))) {
-                        String eid = "DienesLVLI" + obj.getEDID();
-                        MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                        if (r == null) {
-                            LVLI subList = (LVLI) patch.makeCopy(glist, eid);
-                            InsertArmorVariants(subList, form);
-                            patch.addRecord(subList);
-                            lotft.removeInventoryItem(form);
-                            lotft.addInventoryItem(subList.getForm());
-                            changed = true;
-                        } else {
-                            lotft.removeInventoryItem(form);
-                            lotft.addInventoryItem(r.getForm());
-                            changed = true;
+                if (needsShield(lotftName)) {
+                    lotft.addInventoryItem(shieldForm(lotftName));
+                }
+
+                patch.addRecord(subList);
+                patch.addRecord(lotft);
+            } else {
+                ArrayList<FormID> a = lotft.getInventoryList();
+                boolean changed = false;
+                FormID form1;
+                for (int i = 0; i < a.size(); i++) {
+                    form1 = a.get(i);
+                    ARMO arm = (ARMO) merger.getMajor(form1, GRUP_TYPE.ARMO);
+                    if (arm != null) {
+                        KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
+                        if (k != null) {
+                            ArrayList<ARMO> b = getAllWithKey(k, a, merger);
+                            if (b.size() > 1) {
+                                String lvliName = getNameFromArrayWithKey(b, k, merger);
+                                LVLI list = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
+                                if (list != null) {
+                                    for (ARMO arm2 : b) {
+                                        lotft.removeInventoryItem(arm2.getForm());
+                                    }
+                                    lotft.addInventoryItem(list.getForm());
+                                } else {
+                                    for (ARMO arm2 : b) {
+                                        lotft.removeInventoryItem(arm2.getForm());
+                                    }
+                                    LVLI newList = (LVLI) patch.makeCopy(glist, lvliName);
+//                                LVLI subList = (LVLI) patch.makeCopy(glist, lvliName.replace("Outfit", "OutfitSublist"));
+//                                addArmorFromArray(subList, b);
+//                                patch.addRecord(subList);
+//                                newList.addEntry(subList.getForm(), 1, 1);
+                                    addAlternateSets(newList, b, merger, patch);
+
+                                    lotft.addInventoryItem(newList.getForm());
+                                    patch.addRecord(newList);
+
+                                }
+                                changed = true;
+                                i = -1;
+                                a = lotft.getInventoryList();
+                            }
                         }
                     }
                 }
-            }
-            if (changed) {
-                patch.addRecord(lotft);
+
+                //matching set armor moved to sublist, link any remaining weapons or armor
+                //first refresh whats in the outfit
+                a = lotft.getInventoryList();
+                for (FormID form : a) {
+                    ARMO obj = (ARMO) merger.getMajor(form, GRUP_TYPE.ARMO);
+                    if (obj != null) {
+                        KYWD baseKey = armorHasAnyKeyword(obj, baseArmorKeysFLST, merger);
+
+                        if ((baseKey != null) && (hasVariant(obj))) {
+                            String eid = "DienesLVLI" + obj.getEDID();
+                            MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
+                            if (r == null) {
+                                LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                                InsertArmorVariants(subList, form);
+                                patch.addRecord(subList);
+                                lotft.removeInventoryItem(form);
+                                lotft.addInventoryItem(subList.getForm());
+                                changed = true;
+                            } else {
+                                lotft.removeInventoryItem(form);
+                                lotft.addInventoryItem(r.getForm());
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+                if (changed) {
+                    patch.addRecord(lotft);
+                }
             }
         }
     }
@@ -190,7 +211,7 @@ public class ArmorTools {
 
 //            //check if LVLI is one we made
             boolean found = false;
-            if(llist.getEDID().startsWith("DienesLVLI")){
+            if (llist.getEDID().startsWith("DienesLVLI")) {
                 found = true;
             }
 //            for (FormID set : matchingSetVariants) {
@@ -228,7 +249,7 @@ public class ArmorTools {
 
                             String eid = "DienesLVLI" + obj.getEDID();
                             MajorRecord r;
-                            if(LeveledListInjector.listify){
+                            if (LeveledListInjector.listify) {
                                 r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                             } else {
                                 r = patch.getMajor(eid, GRUP_TYPE.LVLI);
@@ -258,8 +279,8 @@ public class ArmorTools {
             }
         }
     }
-    
-    static void buildArmorBases(Mod merger, FLST baseKeys){
+
+    static void buildArmorBases(Mod merger, FLST baseKeys) {
         for (ARMO armor : merger.getArmors()) {
             KYWD baseKey = armorHasAnyKeyword(armor, baseKeys, merger);
             if (baseKey != null) {
@@ -533,7 +554,7 @@ public class ArmorTools {
             }
             merger.addRecord(setList);
             llist.addEntry(setList.getForm(), 1, 1);
-            matchingSetVariants.add(setList.getForm());
+            //matchingSetVariants.add(setList.getForm());
 
         } else {
             for (int index = 0; index < set.size(); index++) {
@@ -634,5 +655,568 @@ public class ArmorTools {
         }
 
         return sb.reverse().toString();
+    }
+
+    static void setupSets(Mod merger, Mod patch) {
+        for (ARMO armor : merger.getArmors()) {
+            if (armor.getTemplate().equals(FormID.NULL)) {
+                KYWD outfitKey = hasKeyStartsWith(armor, "dienes_outfit", merger);
+                if (outfitKey != null) {
+                    boolean found = false;
+                    for (Pair<KYWD, ArrayList<ARMO>> p : matchingSets) {
+                        if (p.getBase().equals(outfitKey)) {
+                            p.getVar().add(armor);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found == false) {
+                        Pair q = new Pair<>(outfitKey, new ArrayList<ARMO>(0));
+                        matchingSets.add(q);
+                    }
+                }
+            }
+        }
+    }
+
+    static KYWD hasKeyStartsWith(ARMO armor, String start, Mod merger) {
+        KYWD ret = null;
+
+        ArrayList<FormID> a;
+
+        ARMO replace = armor;
+        FormID tmp = replace.getTemplate();
+        //SPGlobal.log("hasKeyword", varKey.getEDID() + " " + replace.getEDID() + " " + tmp.getFormStr());
+        if (!tmp.isNull()) {
+            replace = (ARMO) merger.getMajor(tmp, GRUP_TYPE.ARMO);
+        }
+        //SPGlobal.log(replace.getEDID(), varKey.getEDID());
+        KeywordSet k = replace.getKeywordSet();
+        a = k.getKeywordRefs();
+        for (FormID temp : a) {
+            KYWD refKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
+            //SPGlobal.log("formid", temp.toString());
+            //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (varKey.equals(refKey)));
+
+            if (refKey.getEDID().startsWith(start)) {
+                ret = refKey;
+            }
+        }
+
+        return ret;
+    }
+
+    static ArrayList<ARMO> getAllWithKey(KYWD key, ArrayList<FormID> a, Mod merger) {
+        ArrayList<ARMO> ret = new ArrayList<>(0);
+        for (FormID f : a) {
+            ARMO arm = (ARMO) merger.getMajor(f, GRUP_TYPE.ARMO);
+            if (arm != null) {
+                if (armorHasKeyword(arm, key, merger)) {
+                    ret.add(arm);
+                }
+            }
+        }
+        return ret;
+    }
+
+    static String getNameFromArrayWithKey(ArrayList<ARMO> a, KYWD k, Mod merger) {
+        String ret = "DienesLVLIOutfit" + k.getEDID().substring(13);
+        KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+        boolean h = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, helm, merger)) {
+                h = true;
+                break;
+            }
+        }
+        KYWD cuirass = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
+        boolean c = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, cuirass, merger)) {
+                c = true;
+                break;
+            }
+        }
+        KYWD gauntlets = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
+        boolean g = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, gauntlets, merger)) {
+                g = true;
+                break;
+            }
+        }
+        KYWD boots = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
+        boolean b = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, boots, merger)) {
+                b = true;
+                break;
+            }
+        }
+        KYWD shield = (KYWD) merger.getMajor("ArmorShield", GRUP_TYPE.KYWD);
+        boolean s = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, shield, merger)) {
+                s = true;
+                break;
+            }
+        }
+        if (h) {
+            ret = ret + "H";
+        }
+        if (c) {
+            ret = ret + "C";
+        }
+        if (g) {
+            ret = ret + "G";
+        }
+        if (b) {
+            ret = ret + "B";
+        }
+        if (s) {
+            ret = ret + "S";
+        }
+
+        return ret;
+    }
+
+    static void addArmorFromArray(LVLI list, ArrayList<ARMO> a) {
+        for (ARMO arm : a) {
+            list.addEntry(arm.getForm(), 1, 1);
+        }
+    }
+
+    static void addAlternateSets(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
+        FormID f = new FormID("107347", "Skyrim.esm");
+        //SPGlobal.log("outfits glist", f.toString());
+        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+
+        ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
+        for (ARMO arm : a) {
+            KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
+            for (ARMO armor : merger.getArmors()) {
+
+                boolean key = armorHasKeyword(armor, k, merger);
+
+                if (key) {
+                    boolean passed = true;
+                    for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                        boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                        boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+
+                        boolean flagMatch = (armorFlag == formFlag);
+
+                        if (flagMatch == false) {
+                            passed = false;
+                        }
+                    }
+                    if (passed) {
+                        boolean found = false;
+                        for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+                            if (p.getBase().equals(k)) {
+                                ArrayList<ARMO> q = p.getVar();
+                                q.add(armor);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found == false) {
+                            Pair<KYWD, ArrayList<ARMO>> p = new Pair(k, new ArrayList<ARMO>(0));
+                            p.getVar().add(armor);
+                            varSets.add(p);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+            int size = p.getVar().size();
+            if (size == a.size()) {
+                String lvliName = getNameFromArrayWithKey(p.getVar(), p.getBase(), merger).replace("Outfit", "OutfitSublist");
+                LVLI list2 = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
+                if (list2 != null) {
+                    list.addEntry(list2.getForm(), 1, 1);
+                } else {
+                    LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
+                    subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    addArmorFromArray(subList, p.getVar());
+                    patch.addRecord(subList);
+                    list.addEntry(subList.getForm(), 1, 1);
+                    patch.addRecord(list);
+                }
+            }
+        }
+    }
+
+    static void insertTieredArmors(LVLI list, String keyPrefix, String bits, Mod merger, Mod patch) {
+        FormID f = new FormID("107347", "Skyrim.esm");
+        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+        boolean changed = false;
+
+        if (keyPrefix.contains("Boss") || keyPrefix.contains("Thalmor")) {
+            list.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+        }
+
+        for (int lev = 1; lev < 100; lev++) {
+            int tier = lev / 3;
+            String tierName = keyPrefix + String.valueOf(tier);
+            KYWD key = (KYWD) merger.getMajor(tierName, GRUP_TYPE.KYWD);
+            if (key != null) {
+                ArrayList<ArrayList<ARMO>> array = getArrayOfTieredArmorSetsByKeyword(key, merger);
+                String edid = "DienesLVLI_" + keyPrefix + String.valueOf(tier);
+                for (ArrayList<ARMO> ar : array) {
+                    if (arrayHasBits(ar, bits, merger)) {
+
+                        LVLI subList = (LVLI) patch.getMajor(edid, GRUP_TYPE.LVLI);
+                        if (subList == null) {
+                            //SPGlobal.logError("LLI Error:", "Could not find LVLI " + edid);
+                            subList = (LVLI) patch.makeCopy(glist, edid);
+                            subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                            patch.addRecord(subList);
+                        }
+                        boolean change = addListIfNotLevel(list, subList, lev);
+                        if (change) {
+                            changed = true;
+                        }
+                        String setListName = "DienesLVLI_" + hasKeyStartsWith(ar.get(0), "dienes_outfit", merger).getEDID().substring(14) + bits;
+                        LVLI setList = (LVLI) merger.getMajor(setListName, GRUP_TYPE.LVLI);
+                        LVLI setList2 = (LVLI) patch.getMajor(setListName, GRUP_TYPE.LVLI);
+                        if (setList == null) {
+                            setList = setList2;
+                        }
+                        if (setList != null) {
+                            change = addListIfNotLevel(subList, setList, 1);
+                            if (change) {
+                                changed = true;
+                            }
+                        } else {
+                            LVLI set = (LVLI) patch.makeCopy(glist, setListName);
+                            set.set(LeveledRecord.LVLFlag.UseAll, true);
+                            addArmorByBit(set, ar, bits, merger);
+                            patch.addRecord(set);
+                            subList.addEntry(set.getForm(), 1, 1);
+                            patch.addRecord(subList);
+                            changed = true;
+                        }
+
+                    }
+                }
+                if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Thalmor_Tier_9"))) {
+                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    FormID boots = new FormID("01391a", "Skyrim.esm");
+                    FormID helm = new FormID("01391d", "Skyrim.esm");
+                    FormID cuirass = new FormID("01392a", "Skyrim.esm");
+                    FormID gloves = new FormID("01391c", "Skyrim.esm");
+                    subList.addEntry(boots, 1, 1);
+                    subList.addEntry(helm, 1, 1);
+                    subList.addEntry(cuirass, 1, 1);
+                    subList.addEntry(gloves, 1, 1);
+                    
+                    addListIfNotLevel(list, subList, lev);
+                    patch.addRecord(subList);
+                    changed = true;
+                }
+                if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Necromancer_Tier_0"))) {
+                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    FormID boots = new FormID("0c36e8", "Skyrim.esm");
+                    FormID robesList = new FormID("105251", "Skyrim.esm");
+                    subList.addEntry(boots, 1, 1);
+                    subList.addEntry(robesList, 1, 1);
+                    
+                    addListIfNotLevel(list, subList, lev);
+                    patch.addRecord(subList);
+                    changed = true;
+                }
+                if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Warlock_Tier_0"))) {
+                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    FormID boots = new FormID("0c5d12", "Skyrim.esm");
+                    FormID robesList = new FormID("105ef9", "Skyrim.esm");
+                    subList.addEntry(boots, 1, 1);
+                    subList.addEntry(robesList, 1, 1);
+                    
+                    addListIfNotLevel(list, subList, lev);
+                    patch.addRecord(subList);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            patch.addRecord(list);
+        }
+    }
+
+    static ArrayList getArrayOfTieredArmorSetsByKeyword(KYWD key, Mod merger) {
+        ArrayList<ArrayList<ARMO>> ret = new ArrayList<>(0);
+        for (Pair<KYWD, ArrayList<ARMO>> p : matchingSets) {
+            if (armorHasKeyword(p.getVar().get(0), key, merger)) {
+                ret.add(p.getVar());
+            }
+        }
+
+        return ret;
+    }
+
+    static boolean arrayHasBits(ArrayList<ARMO> ar, String bits, Mod merger) {
+        boolean ret = true;
+        if (bits.contains("H")) {
+            boolean passed = false;
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorHelmet", merger);
+                if (k != null) {
+                    passed = true;
+                }
+            }
+            if (passed == false) {
+                ret = false;
+            }
+        }
+        if (bits.contains("C")) {
+            boolean passed = false;
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorCuirass", merger);
+                if (k != null) {
+                    passed = true;
+                }
+            }
+            if (passed == false) {
+                ret = false;
+            }
+        }
+        if (bits.contains("G")) {
+            boolean passed = false;
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorGauntlets", merger);
+                if (k != null) {
+                    passed = true;
+                }
+            }
+            if (passed == false) {
+                ret = false;
+            }
+        }
+        if (bits.contains("B")) {
+            boolean passed = false;
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorBoots", merger);
+                if (k != null) {
+                    passed = true;
+                }
+            }
+            if (passed == false) {
+                ret = false;
+            }
+        }
+        if (bits.contains("S")) {
+            boolean passed = false;
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorShield", merger);
+                if (k != null) {
+                    passed = true;
+                }
+            }
+            if (passed == false) {
+                ret = false;
+            }
+        }
+
+        return ret;
+    }
+
+    static boolean addListIfNotLevel(LVLI list, LVLI subList, int level) {
+        boolean added = false;
+        boolean found = false;
+        ArrayList<LeveledEntry> ar = list.getEntries();
+        for (LeveledEntry l : ar) {
+            if (l.getLevel() == level) {
+                if (l.getForm().equals(subList.getForm())) {
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            added = true;
+            list.addEntry(subList.getForm(), level, 1);
+        }
+        return added;
+    }
+
+    static void addArmorByBit(LVLI set, ArrayList<ARMO> ar, String bits, Mod merger) {
+        if (bits.contains("H")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorHelmet", merger);
+                if (k != null) {
+                    set.addEntry(a.getForm(), 1, 1);
+                    break;
+                }
+            }
+        }
+        if (bits.contains("C")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorCuirass", merger);
+                if (k != null) {
+                    set.addEntry(a.getForm(), 1, 1);
+                    break;
+                }
+            }
+        }
+        if (bits.contains("G")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorGauntlets", merger);
+                if (k != null) {
+                    set.addEntry(a.getForm(), 1, 1);
+                    break;
+                }
+            }
+        }
+        if (bits.contains("B")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorBoots", merger);
+                if (k != null) {
+                    set.addEntry(a.getForm(), 1, 1);
+                    break;
+                }
+            }
+        }
+        if (bits.contains("S")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorShield", merger);
+                if (k != null) {
+                    set.addEntry(a.getForm(), 1, 1);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    static boolean isTiered(String name) {
+        boolean ret = false;
+        ArrayList<String> names = new ArrayList<>();
+        names.add("BanditArmorMeleeHeavyOutfit");
+        names.add("BanditArmorMeleeHeavyNoShieldOutfit");
+        names.add("BanditArmorHeavyBossOutfit");
+        names.add("BanditArmorHeavyBossNoShieldOutfit");
+        names.add("BanditArmorMeleeShield20Outfit");
+        names.add("ThalmorArmorWithHelmetOutfit");
+        names.add("WarlockOutfitLeveled");
+        names.add("NecromancerOutfit");
+        names.add("NecromancerOutfitHood50");
+
+        for (String s : names) {
+            if (name.contentEquals(s)) {
+                ret = true;
+            }
+        }
+
+        return ret;
+    }
+
+    static String getTierKey(String name) {
+        String ret = null;
+
+        if (name.startsWith("BanditArmorMeleeHeavyOutfit")) {
+            ret = "BanditHeavy_Tier_";
+        }
+        if (name.startsWith("BanditArmorMeleeShield20Outfit")) {
+            ret = "BanditLight_Tier_";
+        }
+        if (name.startsWith("BanditArmorMeleeHeavyNoShieldOutfit")) {
+            ret = "BanditHeavy_Tier_";
+        }
+        if (name.startsWith("BanditArmorHeavyBossOutfit")) {
+            ret = "BanditBoss_Tier_";
+        }
+        if (name.startsWith("BanditArmorHeavyBossNoShieldOutfit")) {
+            ret = "BanditBoss_Tier_";
+        }
+        if (name.startsWith("BanditArmorMeleeNoShieldOutfit")) {
+            ret = "BanditLight_Tier_";
+        }
+        if (name.startsWith("ThalmorArmorWithHelmetOutfit")) {
+            ret = "Thalmor_Tier_";
+        }
+        if (name.startsWith("WarlockOutfitLeveled")) {
+            ret = "Warlock_Tier_";
+        }
+        if (name.contentEquals("NecromancerOutfit")) {
+            ret = "Necromancer_Tier_";
+        }
+        if (name.contentEquals("NecromancerOutfitHood50")) {
+            ret = "Necromancer_Tier_";
+        }
+
+        return ret;
+    }
+
+    static String getBits(String name) {
+        String ret = null;
+        if (name.startsWith("BanditArmorMeleeHeavyOutfit")) {
+            ret = "HCGB";
+        }
+        if (name.startsWith("BanditArmorMeleeHeavyNoShieldOutfit")) {
+            ret = "HCGB";
+        }
+        if (name.startsWith("BanditArmorHeavyBossOutfit")) {
+            ret = "HCGB";
+        }
+        if (name.startsWith("BanditArmorHeavyBossNoShieldOutfit")) {
+            ret = "HCGB";
+        }
+        if (name.startsWith("BanditArmorMeleeShield20Outfit")) {
+            ret = "HCBG";
+        }
+        if (name.startsWith("BanditArmorMeleeNoShieldOutfit")) {
+            ret = "CBG";
+        }
+        if (name.startsWith("ThalmorArmorWithHelmetOutfit")) {
+            ret = "HCBG";
+        }
+        if (name.startsWith("WarlockOutfitLeveled")) {
+            ret = "HCBG";
+        }
+        if (name.contentEquals("NecromancerOutfit")) {
+            ret = "HCGB";
+        }
+        if (name.contentEquals("NecromancerOutfitHood50")) {
+            ret = "HCGB";
+        }
+
+
+        return ret;
+    }
+
+    static boolean needsShield(String name) {
+        boolean ret = false;
+        if (name.startsWith("BanditArmorMeleeHeavyOutfit")) {
+            ret = true;
+        }
+        if (name.startsWith("BanditArmorHeavyBossOutfit")) {
+            ret = true;
+        }
+        if (name.startsWith("BanditArmorMeleeShield20Outfit")) {
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    static FormID shieldForm(String name) {
+        FormID ret = FormID.NULL;
+        if (name.startsWith("BanditArmorMeleeHeavyOutfit")) {
+            ret = new FormID("039d2d", "Skyrim.esm");
+        }
+        if (name.startsWith("BanditArmorHeavyBossOutfit")) {
+            ret = new FormID("03df22", "Skyrim.esm");
+        }
+        if (name.startsWith("BanditArmorMeleeShield20Outfit")) {
+            ret = new FormID("0c0196", "Skyrim.esm");
+        }
+
+        return ret;
     }
 }
