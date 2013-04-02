@@ -331,6 +331,12 @@ public class ArmorTools {
                                     passed = false;
                                 }
                             }
+                            if (!passed) {
+                                KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+                                if (armorHasKeyword(replace, helm, merger) && armorHasKeyword(armor, helm, merger)) {
+                                    passed = true;
+                                }
+                            }
                             if (passed) {
                                 //SPGlobal.log("variant found", armor.getEDID() + " is variant of " + form.getEDID());
                                 FormID template = form.getTemplate();
@@ -719,6 +725,18 @@ public class ArmorTools {
         return ret;
     }
 
+    static ArrayList<ARMO> getAllWithKeyARMO(KYWD key, ArrayList<ARMO> a, Mod merger) {
+        ArrayList<ARMO> ret = new ArrayList<>(0);
+        for (ARMO arm : a) {
+
+            if (armorHasKeyword(arm, key, merger)) {
+                ret.add(arm);
+            }
+
+        }
+        return ret;
+    }
+
     static String getNameFromArrayWithKey(ArrayList<ARMO> a, KYWD k, Mod merger) {
         String ret = "DienesLVLIOutfit" + k.getEDID().substring(13);
         KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
@@ -780,10 +798,112 @@ public class ArmorTools {
         return ret;
     }
 
-    static void addArmorFromArray(LVLI list, ArrayList<ARMO> a) {
-        for (ARMO arm : a) {
-            list.addEntry(arm.getForm(), 1, 1);
+    static void addArmorFromArray(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
+        FormID f = new FormID("107347", "Skyrim.esm");
+        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+
+        ArrayList<ARMO> h = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD), a, merger);
+        ArrayList<ARMO> c = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD), a, merger);
+        ArrayList<ARMO> g = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD), a, merger);
+        ArrayList<ARMO> b = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD), a, merger);
+        ArrayList<ARMO> s = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorShield", GRUP_TYPE.KYWD), a, merger);
+
+        if (h.size() > 1) {
+            String name = "DienesLVLI_" + hasKeyStartsWith(h.get(0), "dienes_outfit", merger).getEDID() + "HelmetsSublist";
+            LVLI subList = (LVLI) merger.getMajor(name, GRUP_TYPE.LVLI);
+            if (subList == null) {
+                subList = (LVLI) patch.getMajor(name, GRUP_TYPE.LVLI);
+            }
+            if (subList != null) {
+                list.addEntry(subList.getForm(), 1, 1);
+            } else {
+                subList = (LVLI) patch.makeCopy(glist, name);
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                for(ARMO arm : h){
+                    subList.addEntry(arm.getForm(), 1, 1);
+                }
+                patch.addRecord(subList);
+            }
+        } else if (h.size()==1){
+            list.addEntry(h.get(0).getForm(), 1, 1);
         }
+        if (c.size() > 1) {
+            String name = "DienesLVLI_" + hasKeyStartsWith(c.get(0), "dienes_outfit", merger).getEDID() + "CuirassesSublist";
+            LVLI subList = (LVLI) merger.getMajor(name, GRUP_TYPE.LVLI);
+            if (subList == null) {
+                subList = (LVLI) patch.getMajor(name, GRUP_TYPE.LVLI);
+            }
+            if (subList != null) {
+                list.addEntry(subList.getForm(), 1, 1);
+            } else {
+                subList = (LVLI) patch.makeCopy(glist, name);
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                for(ARMO arm : c){
+                    subList.addEntry(arm.getForm(), 1, 1);
+                }
+                patch.addRecord(subList);
+            }
+        } else if (c.size()==1){
+            list.addEntry(c.get(0).getForm(), 1, 1);
+        }
+        if (g.size() > 1) {
+            String name = "DienesLVLI_" + hasKeyStartsWith(g.get(0), "dienes_outfit", merger).getEDID() + "GauntletsSublist";
+            LVLI subList = (LVLI) merger.getMajor(name, GRUP_TYPE.LVLI);
+            if (subList == null) {
+                subList = (LVLI) patch.getMajor(name, GRUP_TYPE.LVLI);
+            }
+            if (subList != null) {
+                list.addEntry(subList.getForm(), 1, 1);
+            } else {
+                subList = (LVLI) patch.makeCopy(glist, name);
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                for(ARMO arm : g){
+                    subList.addEntry(arm.getForm(), 1, 1);
+                }
+                patch.addRecord(subList);
+            }
+        } else if (g.size()==1){
+            list.addEntry(g.get(0).getForm(), 1, 1);
+        }
+        if (b.size() > 1) {
+            String name = "DienesLVLI_" + hasKeyStartsWith(b.get(0), "dienes_outfit", merger).getEDID() + "BootsSublist";
+            LVLI subList = (LVLI) merger.getMajor(name, GRUP_TYPE.LVLI);
+            if (subList == null) {
+                subList = (LVLI) patch.getMajor(name, GRUP_TYPE.LVLI);
+            }
+            if (subList != null) {
+                list.addEntry(subList.getForm(), 1, 1);
+            } else {
+                subList = (LVLI) patch.makeCopy(glist, name);
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                for(ARMO arm : b){
+                    subList.addEntry(arm.getForm(), 1, 1);
+                }
+                patch.addRecord(subList);
+            }
+        } else if (b.size()==1){
+            list.addEntry(b.get(0).getForm(), 1, 1);
+        }
+        if (s.size() > 1) {
+            String name = "DienesLVLI_" + hasKeyStartsWith(s.get(0), "dienes_outfit", merger).getEDID() + "ShieldsSublist";
+            LVLI subList = (LVLI) merger.getMajor(name, GRUP_TYPE.LVLI);
+            if (subList == null) {
+                subList = (LVLI) patch.getMajor(name, GRUP_TYPE.LVLI);
+            }
+            if (subList != null) {
+                list.addEntry(subList.getForm(), 1, 1);
+            } else {
+                subList = (LVLI) patch.makeCopy(glist, name);
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                for(ARMO arm : s){
+                    subList.addEntry(arm.getForm(), 1, 1);
+                }
+                patch.addRecord(subList);
+            }
+        } else if (s.size()==1){
+            list.addEntry(s.get(0).getForm(), 1, 1);
+        }
+
     }
 
     static void addAlternateSets(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
@@ -794,46 +914,54 @@ public class ArmorTools {
         ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
         for (ARMO arm : a) {
             KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
-            for (ARMO armor : merger.getArmors()) {
+            for (Pair<KYWD, ArrayList<ARMO>> p1 : matchingSets) {
 
-                boolean key = armorHasKeyword(armor, k, merger);
+                boolean key = k.equals(p1.getBase());
 
                 if (key) {
-                    boolean passed = true;
-                    for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
-                        boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
-                        boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                    for (ARMO armor : p1.getVar()) {
+                        boolean passed = true;
+                        for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                            boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                            boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
 
-                        boolean flagMatch = (armorFlag == formFlag);
+                            boolean flagMatch = (armorFlag == formFlag);
 
-                        if (flagMatch == false) {
-                            passed = false;
-                        }
-                    }
-                    if (passed) {
-                        boolean found = false;
-                        for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
-                            if (p.getBase().equals(k)) {
-                                ArrayList<ARMO> q = p.getVar();
-                                q.add(armor);
-                                found = true;
-                                break;
+                            if (flagMatch == false) {
+                                passed = false;
                             }
                         }
-                        if (found == false) {
-                            Pair<KYWD, ArrayList<ARMO>> p = new Pair(k, new ArrayList<ARMO>(0));
-                            p.getVar().add(armor);
-                            varSets.add(p);
+                        if (!passed) {
+                            KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+                            if (armorHasKeyword(arm, helm, merger) && armorHasKeyword(armor, helm, merger)) {
+                                passed = true;
+                            }
+                        }
+                        if (passed) {
+                            boolean found = false;
+                            for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+                                if (p.getBase().equals(k)) {
+                                    ArrayList<ARMO> q = p.getVar();
+                                    q.add(armor);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found == false) {
+                                Pair<KYWD, ArrayList<ARMO>> p = new Pair(k, new ArrayList<ARMO>(0));
+                                p.getVar().add(armor);
+                                varSets.add(p);
+                            }
                         }
                     }
-
                 }
             }
         }
 
+        String bits = getBitsFromArray(a, merger);
         for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
-            int size = p.getVar().size();
-            if (size == a.size()) {
+
+            if (arrayHasBits(p.getVar(), bits, merger)) {
                 String lvliName = getNameFromArrayWithKey(p.getVar(), p.getBase(), merger).replace("Outfit", "OutfitSublist");
                 LVLI list2 = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
                 if (list2 != null) {
@@ -841,7 +969,7 @@ public class ArmorTools {
                 } else {
                     LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
-                    addArmorFromArray(subList, p.getVar());
+                    addArmorFromArray(subList, p.getVar(), merger, patch);
                     patch.addRecord(subList);
                     list.addEntry(subList.getForm(), 1, 1);
                     patch.addRecord(list);
@@ -914,7 +1042,7 @@ public class ArmorTools {
                     subList.addEntry(helm, 1, 1);
                     subList.addEntry(cuirass, 1, 1);
                     subList.addEntry(gloves, 1, 1);
-                    
+
                     addListIfNotLevel(list, subList, lev);
                     patch.addRecord(subList);
                     changed = true;
@@ -926,7 +1054,7 @@ public class ArmorTools {
                     FormID robesList = new FormID("105251", "Skyrim.esm");
                     subList.addEntry(boots, 1, 1);
                     subList.addEntry(robesList, 1, 1);
-                    
+
                     addListIfNotLevel(list, subList, lev);
                     patch.addRecord(subList);
                     changed = true;
@@ -938,7 +1066,7 @@ public class ArmorTools {
                     FormID robesList = new FormID("105ef9", "Skyrim.esm");
                     subList.addEntry(boots, 1, 1);
                     subList.addEntry(robesList, 1, 1);
-                    
+
                     addListIfNotLevel(list, subList, lev);
                     patch.addRecord(subList);
                     changed = true;
@@ -1022,6 +1150,67 @@ public class ArmorTools {
             if (passed == false) {
                 ret = false;
             }
+        }
+
+        return ret;
+    }
+
+    static String getBitsFromArray(ArrayList<ARMO> a, Mod merger) {
+        String ret = "";
+        KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+        boolean h = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, helm, merger)) {
+                h = true;
+                break;
+            }
+        }
+        KYWD cuirass = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
+        boolean c = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, cuirass, merger)) {
+                c = true;
+                break;
+            }
+        }
+        KYWD gauntlets = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
+        boolean g = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, gauntlets, merger)) {
+                g = true;
+                break;
+            }
+        }
+        KYWD boots = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
+        boolean b = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, boots, merger)) {
+                b = true;
+                break;
+            }
+        }
+        KYWD shield = (KYWD) merger.getMajor("ArmorShield", GRUP_TYPE.KYWD);
+        boolean s = false;
+        for (ARMO arm : a) {
+            if (armorHasKeyword(arm, shield, merger)) {
+                s = true;
+                break;
+            }
+        }
+        if (h) {
+            ret = ret + "H";
+        }
+        if (c) {
+            ret = ret + "C";
+        }
+        if (g) {
+            ret = ret + "G";
+        }
+        if (b) {
+            ret = ret + "B";
+        }
+        if (s) {
+            ret = ret + "S";
         }
 
         return ret;

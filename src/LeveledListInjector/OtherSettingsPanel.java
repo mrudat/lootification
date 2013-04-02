@@ -41,7 +41,9 @@ public class OtherSettingsPanel extends SPSettingPanel {
         setPlacement(lootifyMod);
         AddSetting(lootifyMod);
 
-	alignRight();
+//	alignRight();
+        
+        
 
     }
 }

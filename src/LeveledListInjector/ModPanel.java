@@ -143,6 +143,54 @@ public class ModPanel extends SPSettingPanel {
         }
     }
 
+    private class OutfitListener implements ActionListener {
+
+        LTextField field;
+        ARMO armor;
+        String setKey;
+
+        OutfitListener(LTextField ltf, ARMO a) {
+            field = ltf;
+            armor = a;
+            setKey = null;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String key = field.getText();
+            if (setKey != null || key.contentEquals("")) {
+                for (LeveledListInjector.Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
+                    if (p.getBase().contentEquals(setKey)) {
+                        p.getVar().remove(armor);
+                    }
+                }
+            }
+
+            if (!key.contentEquals("")) {
+                boolean found = false;
+                if (setKey != null) {
+                    for (LeveledListInjector.Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
+                        if (p.getBase().contentEquals(setKey)) {
+                            if (!p.getVar().contains(armor)) {
+                                p.getVar().add(armor);
+                            }
+                            found = true;
+                        }
+                    }
+                }
+                if (!found) {
+                    LeveledListInjector.Pair<String, ArrayList<ARMO>> q = new LeveledListInjector.Pair<>(key, new ArrayList<ARMO>(0));
+                    q.getVar().add(armor);
+                    LeveledListInjector.outfits.add(q);
+                }
+            }
+
+
+            field.highlightChanged();
+            setKey = key;
+        }
+    }
+
     public ModPanel(SPMainMenuPanel parent_, Mod m, Mod g) {
         super(parent_, m.toString(), LeveledListInjector.headerColor);
         myMod = m;
@@ -194,7 +242,7 @@ public class ModPanel extends SPSettingPanel {
             FormID enchant = armor.getEnchantment();
             if (!non_playable && (enchant.isNull())) {
                 LPanel panel = new LPanel(275, 200);
-                panel.setSize(300, 60);
+                panel.setSize(300, 80);
                 LLabel armorName = new LLabel(armor.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
 
                 LComboBox box = new LComboBox("", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
@@ -216,7 +264,13 @@ public class ModPanel extends SPSettingPanel {
                 panel.add(box);
                 panel.setPlacement(box);
 
-//                armorBoxes.add(box);
+                LTextField outfitField = new LTextField("Outfit name");
+                outfitField.addEnterButton("set", new OutfitListener(outfitField, armor));
+                outfitField.setSize(250, 30);
+                outfitField.setText(armor.getEDID());
+
+                panel.Add(outfitField);
+                panel.setPlacement(outfitField);
 
                 setPlacement(panel);
                 Add(panel);

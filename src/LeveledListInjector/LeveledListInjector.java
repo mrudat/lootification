@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.net.URL;
 import java.util.ArrayList;
 import java.io.File;
+import java.nio.file.Files;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import lev.gui.LSaveFile;
@@ -13,6 +14,9 @@ import skyproc.gui.SPMainMenuPanel;
 import skyproc.gui.SUM;
 import skyproc.gui.SUMGUI;
 import LeveledListInjector.YourSaveFile.Settings;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.util.List;
 
 /**
  *
@@ -25,7 +29,32 @@ public class LeveledListInjector implements SUM {
      * - getStandardMenu(), where you set up the GUI
      * - runChangesToPatch(), where you put all the processing code and add records to the output patch.
      */
+    public static class Pair<L, R> {
 
+        private L l;
+        private R r;
+
+        public Pair(L l, R r) {
+            this.l = l;
+            this.r = r;
+        }
+
+        public L getBase() {
+            return l;
+        }
+
+        public R getVar() {
+            return r;
+        }
+
+        public void setBase(L l) {
+            this.l = l;
+        }
+
+        public void setVar(R r) {
+            this.r = r;
+        }
+    }
     /*
      * The types of records you want your patcher to import. Change this to
      * customize the import to what you need.
@@ -35,7 +64,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.4";
+    public static String version = "0.5";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -45,6 +74,8 @@ public class LeveledListInjector implements SUM {
     public static ArrayList<Mod> activeMods = new ArrayList<>(0);
     public static Mod gearVariants;
     public static Mod global;
+    public static ArrayList<Pair<String, ArrayList<ARMO>>> outfits = new ArrayList<>(0);
+    public static ArrayList<Pair<String, ArrayList<String>>> tiers = new ArrayList<>(0);
     public static boolean listify = false;
 
     // Do not write the bulk of your program here
@@ -104,9 +135,12 @@ public class LeveledListInjector implements SUM {
 
         settingsMenu.setWelcomePanel(new WelcomePanel(settingsMenu));
         settingsMenu.addMenu(new OtherSettingsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
+
         for (Mod m : activeMods) {
             settingsMenu.addMenu(new ModPanel(settingsMenu, m, global));
         }
+
+        settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
         return settingsMenu;
     }
@@ -190,18 +224,20 @@ public class LeveledListInjector implements SUM {
         gearVariants.addAsOverrides(up, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
+        List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
+
         File dawnf = new File(SPGlobal.pathToData + "Dawnguard.esm");
-        if (dawnf.isFile()) {
+        if (lines.contains("Dawnguard.esm")) {
             Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(dawn, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
         File hearthf = new File(SPGlobal.pathToData + "Hearthfires.esm");
-        if (hearthf.isFile()) {
+        if (lines.contains("Hearthfires.esm")) {
             Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(hearth, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
         File bornf = new File(SPGlobal.pathToData + "Dragonborn.esm");
-        if (bornf.isFile()) {
+        if (lines.contains("Dragonborn.esm")) {
             Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
             gearVariants.addAsOverrides(born, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
         }
@@ -267,6 +303,31 @@ public class LeveledListInjector implements SUM {
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
         merger.addAsOverrides(global, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
+//        merger.addAsOverrides(tempPatch, GRUP_TYPE.KYWD);
+
+        for (Pair<String, ArrayList<ARMO>> p : outfits) {
+            KYWD k2 = new KYWD(patch, "dienes_outfit_" + p.getBase());
+            patch.addRecord(k2);
+            merger.addRecord(k2);
+            for (ARMO arm : p.getVar()) {
+                KeywordSet keys = arm.getKeywordSet();
+                keys.addKeywordRef(k2.getForm());
+
+                for (Pair<String, ArrayList<String>> q : tiers) {
+                    if (p.getBase().contentEquals(q.getBase())){
+                        for(String s : q.getVar()){
+                            KYWD tierKey = (KYWD) merger.getMajor(s, GRUP_TYPE.KYWD);
+                            keys.addKeywordRef(tierKey.getForm());
+                        }
+                    }
+                }
+
+                merger.addRecord(arm);
+                patch.addRecord(arm);
+            }
+        }
+
+
 
 
         FLST baseArmorKeysFLST = (FLST) merger.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
