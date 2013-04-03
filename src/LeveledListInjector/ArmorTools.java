@@ -56,17 +56,17 @@ public class ArmorTools {
         //SPGlobal.log("outfits glist", f.toString());
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
         //SPGlobal.log("outfits glist", glist + "");
-        setupSets(merger, patch);
+        //setupSets(merger, patch);
 
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
         for (OTFT lotft : merger.getOutfits()) {
             String lotftName = lotft.getEDID();
             boolean tiered = isTiered(lotftName);
             if (tiered) {
-                lotft.clearInventoryItems();
-                LVLI subList = (LVLI) patch.makeCopy(glist, lotftName + "List");
-                String tierKey = getTierKey(lotftName);
                 String bits = getBits(lotftName);
+                LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
+                String tierKey = getTierKey(lotftName);
+
                 insertTieredArmors(subList, tierKey, bits, merger, patch);
                 lotft.addInventoryItem(subList.getForm());
 
@@ -671,13 +671,16 @@ public class ArmorTools {
                     boolean found = false;
                     for (Pair<KYWD, ArrayList<ARMO>> p : matchingSets) {
                         if (p.getBase().equals(outfitKey)) {
-                            p.getVar().add(armor);
-                            found = true;
-                            break;
+                            if (!p.getVar().contains(armor)) {
+                                p.getVar().add(armor);
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if (found == false) {
-                        Pair q = new Pair<>(outfitKey, new ArrayList<ARMO>(0));
+                        Pair<KYWD, ArrayList<ARMO>> q = new Pair<>(outfitKey, new ArrayList<ARMO>(0));
+                        q.getVar().add(armor);
                         matchingSets.add(q);
                     }
                 }
@@ -738,35 +741,38 @@ public class ArmorTools {
     }
 
     static String getNameFromArrayWithKey(ArrayList<ARMO> a, KYWD k, Mod merger) {
-        String ret = "DienesLVLIOutfit" + k.getEDID().substring(13);
-        KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+        String ret = null;
+        if (k.getEDID().contains("dienes_outfit")) {
+            ret = "DienesLVLIOutfit" + k.getEDID().substring(13);
+        } else {
+            ret = "DienesLVLIOutfit" + k.getEDID();
+        }
         boolean h = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, helm, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
                 h = true;
                 break;
             }
         }
-        KYWD cuirass = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
         boolean c = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, cuirass, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
                 c = true;
                 break;
             }
         }
-        KYWD gauntlets = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
         boolean g = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, gauntlets, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
                 g = true;
                 break;
             }
         }
-        KYWD boots = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
         boolean b = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, boots, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
                 b = true;
                 break;
             }
@@ -819,12 +825,12 @@ public class ArmorTools {
             } else {
                 subList = (LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                for(ARMO arm : h){
+                for (ARMO arm : h) {
                     subList.addEntry(arm.getForm(), 1, 1);
                 }
                 patch.addRecord(subList);
             }
-        } else if (h.size()==1){
+        } else if (h.size() == 1) {
             list.addEntry(h.get(0).getForm(), 1, 1);
         }
         if (c.size() > 1) {
@@ -838,12 +844,12 @@ public class ArmorTools {
             } else {
                 subList = (LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                for(ARMO arm : c){
+                for (ARMO arm : c) {
                     subList.addEntry(arm.getForm(), 1, 1);
                 }
                 patch.addRecord(subList);
             }
-        } else if (c.size()==1){
+        } else if (c.size() == 1) {
             list.addEntry(c.get(0).getForm(), 1, 1);
         }
         if (g.size() > 1) {
@@ -857,12 +863,12 @@ public class ArmorTools {
             } else {
                 subList = (LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                for(ARMO arm : g){
+                for (ARMO arm : g) {
                     subList.addEntry(arm.getForm(), 1, 1);
                 }
                 patch.addRecord(subList);
             }
-        } else if (g.size()==1){
+        } else if (g.size() == 1) {
             list.addEntry(g.get(0).getForm(), 1, 1);
         }
         if (b.size() > 1) {
@@ -876,12 +882,12 @@ public class ArmorTools {
             } else {
                 subList = (LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                for(ARMO arm : b){
+                for (ARMO arm : b) {
                     subList.addEntry(arm.getForm(), 1, 1);
                 }
                 patch.addRecord(subList);
             }
-        } else if (b.size()==1){
+        } else if (b.size() == 1) {
             list.addEntry(b.get(0).getForm(), 1, 1);
         }
         if (s.size() > 1) {
@@ -895,12 +901,12 @@ public class ArmorTools {
             } else {
                 subList = (LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                for(ARMO arm : s){
+                for (ARMO arm : s) {
                     subList.addEntry(arm.getForm(), 1, 1);
                 }
                 patch.addRecord(subList);
             }
-        } else if (s.size()==1){
+        } else if (s.size() == 1) {
             list.addEntry(s.get(0).getForm(), 1, 1);
         }
 
@@ -911,9 +917,10 @@ public class ArmorTools {
         //SPGlobal.log("outfits glist", f.toString());
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
 
+        KYWD k = null;
         ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
         for (ARMO arm : a) {
-            KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
+            k = hasKeyStartsWith(arm, "dienes_outfit", merger);
             for (Pair<KYWD, ArrayList<ARMO>> p1 : matchingSets) {
 
                 boolean key = k.equals(p1.getBase());
@@ -939,18 +946,23 @@ public class ArmorTools {
                         }
                         if (passed) {
                             boolean found = false;
-                            for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
-                                if (p.getBase().equals(k)) {
-                                    ArrayList<ARMO> q = p.getVar();
-                                    q.add(armor);
-                                    found = true;
-                                    break;
+                            KYWD slotKey = getSlotKYWD(armor, merger);
+                            if (slotKey == null) {
+                                int test = 1;
+                            } else {
+                                for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+                                    if (p.getBase().equals(slotKey)) {
+                                        ArrayList<ARMO> q = p.getVar();
+                                        q.add(armor);
+                                        found = true;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (found == false) {
-                                Pair<KYWD, ArrayList<ARMO>> p = new Pair(k, new ArrayList<ARMO>(0));
-                                p.getVar().add(armor);
-                                varSets.add(p);
+                                if (found == false) {
+                                    Pair<KYWD, ArrayList<ARMO>> p = new Pair(slotKey, new ArrayList<ARMO>(0));
+                                    p.getVar().add(armor);
+                                    varSets.add(p);
+                                }
                             }
                         }
                     }
@@ -959,20 +971,35 @@ public class ArmorTools {
         }
 
         String bits = getBitsFromArray(a, merger);
-        for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+        for (char c : bits.toCharArray()) {
+            for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
 
-            if (arrayHasBits(p.getVar(), bits, merger)) {
-                String lvliName = getNameFromArrayWithKey(p.getVar(), p.getBase(), merger).replace("Outfit", "OutfitSublist");
-                LVLI list2 = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
-                if (list2 != null) {
-                    list.addEntry(list2.getForm(), 1, 1);
-                } else {
-                    LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
-                    subList.set(LeveledRecord.LVLFlag.UseAll, true);
-                    addArmorFromArray(subList, p.getVar(), merger, patch);
-                    patch.addRecord(subList);
-                    list.addEntry(subList.getForm(), 1, 1);
-                    patch.addRecord(list);
+                if (arrayHasBits(p.getVar(), String.valueOf(c), merger)) {
+                    if (p.getVar().size() > 1) {
+                        String lvliName = getNameFromArrayWithKey(p.getVar(), k, merger) + "variants";
+                        LVLI list2 = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
+                        if (list2 != null) {
+                            list.addEntry(list2.getForm(), 1, 1);
+                            patch.addRecord(list);
+                        } else {
+                            LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
+                            subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                            addArmorByBit(subList, p.getVar(), String.valueOf(c), merger);
+                            patch.addRecord(subList);
+                            list.addEntry(subList.getForm(), 1, 1);
+                            patch.addRecord(list);
+                        }
+                    } else {
+                        boolean found = false;
+                        for (LeveledEntry entry : list) {
+                            if (entry.getForm().equals(p.getVar().get(0).getForm())) {
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            list.addEntry(p.getVar().get(0).getForm(), 1, 1);
+                        }
+                    }
                 }
             }
         }
@@ -1022,7 +1049,13 @@ public class ArmorTools {
                         } else {
                             LVLI set = (LVLI) patch.makeCopy(glist, setListName);
                             set.set(LeveledRecord.LVLFlag.UseAll, true);
-                            addArmorByBit(set, ar, bits, merger);
+                            ArrayList<ArrayList<ARMO>> abits = new ArrayList<>(0);
+                            for (char c : bits.toCharArray()) {
+                                abits.add(addArmorByBitToArray(ar, String.valueOf(c), merger));
+                            }
+                            for (ArrayList<ARMO> a : abits) {
+                                addAlternateSets(set, a, merger, patch);
+                            }
                             patch.addRecord(set);
                             subList.addEntry(set.getForm(), 1, 1);
                             patch.addRecord(subList);
@@ -1094,8 +1127,9 @@ public class ArmorTools {
         if (bits.contains("H")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorHelmet", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
                     passed = true;
                 }
             }
@@ -1106,8 +1140,7 @@ public class ArmorTools {
         if (bits.contains("C")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorCuirass", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
                     passed = true;
                 }
             }
@@ -1118,8 +1151,7 @@ public class ArmorTools {
         if (bits.contains("G")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorGauntlets", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
                     passed = true;
                 }
             }
@@ -1130,8 +1162,7 @@ public class ArmorTools {
         if (bits.contains("B")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorBoots", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
                     passed = true;
                 }
             }
@@ -1160,7 +1191,9 @@ public class ArmorTools {
         KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
         boolean h = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, helm, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
                 h = true;
                 break;
             }
@@ -1168,7 +1201,7 @@ public class ArmorTools {
         KYWD cuirass = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
         boolean c = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, cuirass, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
                 c = true;
                 break;
             }
@@ -1176,7 +1209,7 @@ public class ArmorTools {
         KYWD gauntlets = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
         boolean g = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, gauntlets, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
                 g = true;
                 break;
             }
@@ -1184,7 +1217,7 @@ public class ArmorTools {
         KYWD boots = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
         boolean b = false;
         for (ARMO arm : a) {
-            if (armorHasKeyword(arm, boots, merger)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
                 b = true;
                 break;
             }
@@ -1238,36 +1271,31 @@ public class ArmorTools {
         if (bits.contains("H")) {
             for (ARMO a : ar) {
                 KYWD k = hasKeyStartsWith(a, "ArmorHelmet", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
                     set.addEntry(a.getForm(), 1, 1);
-                    break;
                 }
             }
         }
         if (bits.contains("C")) {
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorCuirass", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
                     set.addEntry(a.getForm(), 1, 1);
-                    break;
                 }
             }
         }
         if (bits.contains("G")) {
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorGauntlets", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
                     set.addEntry(a.getForm(), 1, 1);
-                    break;
                 }
             }
         }
         if (bits.contains("B")) {
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorBoots", merger);
-                if (k != null) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
                     set.addEntry(a.getForm(), 1, 1);
-                    break;
                 }
             }
         }
@@ -1276,11 +1304,55 @@ public class ArmorTools {
                 KYWD k = hasKeyStartsWith(a, "ArmorShield", merger);
                 if (k != null) {
                     set.addEntry(a.getForm(), 1, 1);
-                    break;
                 }
             }
         }
 
+    }
+
+    static ArrayList<ARMO> addArmorByBitToArray(ArrayList<ARMO> ar, String bits, Mod merger) {
+        ArrayList<ARMO> ret = new ArrayList<>(0);
+
+        if (bits.contains("H")) {
+            for (ARMO a : ar) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+                    ret.add(a);
+                }
+            }
+        }
+        if (bits.contains("C")) {
+            for (ARMO a : ar) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+                    ret.add(a);
+                }
+            }
+        }
+        if (bits.contains("G")) {
+            for (ARMO a : ar) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+                    ret.add(a);
+                }
+            }
+        }
+        if (bits.contains("B")) {
+            for (ARMO a : ar) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+                    ret.add(a);
+                }
+            }
+        }
+        if (bits.contains("S")) {
+            for (ARMO a : ar) {
+                KYWD k = hasKeyStartsWith(a, "ArmorShield", merger);
+                if (k != null) {
+                    ret.add(a);
+                }
+            }
+        }
+
+        return ret;
     }
 
     static boolean isTiered(String name) {
@@ -1404,6 +1476,35 @@ public class ArmorTools {
         }
         if (name.startsWith("BanditArmorMeleeShield20Outfit")) {
             ret = new FormID("0c0196", "Skyrim.esm");
+        }
+
+        return ret;
+    }
+
+    static KYWD getSlotKYWD(ARMO armor, Mod merger) {
+        KYWD ret = null;
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
+                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
+                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+            ret = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+            ret = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+            ret = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+            ret = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.SHIELD)) {
+            ret = (KYWD) merger.getMajor("ArmorShield", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.RING)) {
+            ret = (KYWD) merger.getMajor("ClothingRing", GRUP_TYPE.KYWD);
+        }
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.AMULET)) {
+            ret = (KYWD) merger.getMajor("ClothingNecklace", GRUP_TYPE.KYWD);
         }
 
         return ret;

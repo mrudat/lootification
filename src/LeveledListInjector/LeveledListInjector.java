@@ -303,7 +303,7 @@ public class LeveledListInjector implements SUM {
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
         merger.addAsOverrides(global, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        merger.addAsOverrides(tempPatch, GRUP_TYPE.KYWD);
+
 
         for (Pair<String, ArrayList<ARMO>> p : outfits) {
             KYWD k2 = new KYWD(patch, "dienes_outfit_" + p.getBase());
