@@ -159,7 +159,7 @@ public class WeaponTools {
         KYWD hammer = (KYWD) merger.getMajor(hammerForm, GRUP_TYPE.KYWD);
 
         //SPGlobal.log("Build Variants", "Building Base Weapons");
-        buildWeaponBases(baseKeys);
+//        buildWeaponBases(baseKeys);
         //SPGlobal.log("Build Variants", "Building Variant Weapons");
         ArrayList<WEAP> mWeapons = merger.getWeapons().getRecords();
         for (int weaponNum = 0; weaponNum < mWeapons.size(); weaponNum++) {

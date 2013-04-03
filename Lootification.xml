@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<lootification>
+	<mod modName="Ivory.esp">
+		<item type="weapon" EDID="IvoryBattleaxe">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryBow">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryDagger">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryGreatsword">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryMace">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvorySword">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryWarAxe">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="weapon" EDID="IvoryWarhammer">
+			<keyword>WEAPON_EBONY</keyword>
+		</item>
+		<item type="armor" EDID="ArmorIvoryBoots">
+			<keyword>ARMOR_EBONY</keyword>
+			<keyword>dienes_outfit_ivory</keyword>
+			<keyword>BanditHeavy_Tier_5</keyword>
+		</item>
+		<item type="armor" EDID="ArmorIvoryCuirass">
+			<keyword>ARMOR_EBONY</keyword>
+			<keyword>dienes_outfit_ivory</keyword>
+			<keyword>BanditHeavy_Tier_5</keyword>
+		</item>
+		<item type="armor" EDID="ArmorIvoryGauntlets">
+			<keyword>ARMOR_EBONY</keyword>
+			<keyword>dienes_outfit_ivory</keyword>
+			<keyword>BanditHeavy_Tier_5</keyword>
+		</item>
+		<item type="armor" EDID="ArmorIvoryHelmet">
+			<keyword>ARMOR_EBONY</keyword>
+			<keyword>dienes_outfit_ivory</keyword>
+			<keyword>BanditHeavy_Tier_5</keyword>
+		</item>
+		<item type="armor" EDID="ArmorIvoryShield">
+			<keyword>ARMOR_EBONY</keyword>
+			<keyword>dienes_outfit_ivory</keyword>
+			<keyword>BanditHeavy_Tier_5</keyword>
+		</item>
+	</mod>
+</lootification>

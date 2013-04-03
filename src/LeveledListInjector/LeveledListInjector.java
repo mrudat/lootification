@@ -17,6 +17,12 @@ import LeveledListInjector.YourSaveFile.Settings;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -293,10 +299,9 @@ public class LeveledListInjector implements SUM {
     // but DO NOT export it.  Exporting is handled internally.
     @Override
     public void runChangesToPatch() throws Exception {
-        if (!save.getBool(Settings.LOOTIFY_MOD)) {
-            listify = true;
-            myPatchName = "Lootification Lists";
-        }
+//        if (!save.getBool(Settings.LOOTIFY_MOD)) {
+//            listify = true;
+//        }
 
         Mod patch = SPGlobal.getGlobalPatch();
 
@@ -314,8 +319,8 @@ public class LeveledListInjector implements SUM {
                 keys.addKeywordRef(k2.getForm());
 
                 for (Pair<String, ArrayList<String>> q : tiers) {
-                    if (p.getBase().contentEquals(q.getBase())){
-                        for(String s : q.getVar()){
+                    if (p.getBase().contentEquals(q.getBase())) {
+                        for (String s : q.getVar()) {
                             KYWD tierKey = (KYWD) merger.getMajor(s, GRUP_TYPE.KYWD);
                             keys.addKeywordRef(tierKey.getForm());
                         }
@@ -327,7 +332,7 @@ public class LeveledListInjector implements SUM {
             }
         }
 
-
+        processXML(merger, patch);
 
 
         FLST baseArmorKeysFLST = (FLST) merger.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
@@ -363,29 +368,92 @@ public class LeveledListInjector implements SUM {
         }
 
         boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
-        if (!listify) {
-            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
-            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
-            ArmorTools.modLVLIArmors(merger, patch);
-
-            WeaponTools.setMergeAndPatch(merger, patch);
-            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
-            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
-            WeaponTools.modLVLIWeapons();
-        }
-
-
-        if (listify) {
+        if (lootify) {
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
             ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
             ArmorTools.setupSets(merger, patch);
+            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+            ArmorTools.modLVLIArmors(merger, patch);
             ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
             ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
             WeaponTools.setMergeAndPatch(merger, patch);
+            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
             WeaponTools.buildWeaponBases(baseWeaponKeysFLST);
+            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
+            WeaponTools.modLVLIWeapons();
             WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
             WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
+        }
+
+    }
+
+    public void processXML(Mod merger, Mod patch) {
+        try {
+            List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
+
+            File fXmlFile = new File("Lootification.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+
+            NodeList nList = doc.getElementsByTagName("mod");
+
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node theMod = nList.item(i);
+                Element eElement = (Element) theMod;
+                if (lines.contains(eElement.getAttribute("modName"))) {
+                    NodeList items = theMod.getChildNodes();
+                    for (int j = 0; j < items.getLength(); j++) {
+                        Node item = items.item(j);
+                        if (item.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eItem = (Element) item;
+                            if (eItem.getAttribute("type").contentEquals("weapon")) {
+                                WEAP weapon = (WEAP) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.WEAP);
+                                if (weapon != null) {
+                                    KeywordSet keys = weapon.getKeywordSet();
+                                    NodeList kList = eItem.getElementsByTagName("keyword");
+                                    for (int k = 0; k < kList.getLength(); k++) {
+                                        Element eKey = (Element) kList.item(k);
+                                        KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
+                                        if (newKey != null) {
+                                            keys.addKeywordRef(newKey.getForm());
+                                            patch.addRecord(weapon);
+                                            merger.addRecord(weapon);
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (eItem.getAttribute("type").contentEquals("armor")) {
+                                    ARMO armor = (ARMO) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.ARMO);
+                                    if (armor != null) {
+                                        KeywordSet keys = armor.getKeywordSet();
+                                        NodeList kList = eItem.getElementsByTagName("keyword");
+                                        for (int k = 0; k < kList.getLength(); k++) {
+                                            Element eKey = (Element) kList.item(k);
+                                            KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
+                                            if (newKey == null) {
+                                                newKey = new KYWD(patch, eKey.getTextContent());
+                                                merger.addRecord(newKey);
+                                            }
+                                            keys.addKeywordRef(newKey.getForm());
+                                            patch.addRecord(armor);
+                                            merger.addRecord(armor);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        } catch (Exception e) {
+            SPGlobal.logException(e);
+            JOptionPane.showMessageDialog(null, "There was an exception thrown during program execution: '" + e + "'  Check the debug logs or contact the author.");
+            SPGlobal.closeDebug();
         }
 
     }

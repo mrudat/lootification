@@ -63,9 +63,12 @@ public class ArmorTools {
             String lotftName = lotft.getEDID();
             boolean tiered = isTiered(lotftName);
             if (tiered) {
+                lotft.clearInventoryItems();
+                
                 String bits = getBits(lotftName);
                 LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
                 String tierKey = getTierKey(lotftName);
+                
 
                 insertTieredArmors(subList, tierKey, bits, merger, patch);
                 lotft.addInventoryItem(subList.getForm());
@@ -249,9 +252,9 @@ public class ArmorTools {
 
                             String eid = "DienesLVLI" + obj.getEDID();
                             MajorRecord r;
-                            if (LeveledListInjector.listify) {
+                            
                                 r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                            } else {
+                            if(r == null){
                                 r = patch.getMajor(eid, GRUP_TYPE.LVLI);
                             }
                             if (r == null) {
@@ -294,7 +297,7 @@ public class ArmorTools {
 
     static void buildArmorVariants(Mod merger, Mod patch, FLST baseKeys, FLST varKeys) {
         SPGlobal.log("Build Variants", "Building Base Armors");
-        buildArmorBases(merger, baseKeys);
+        //buildArmorBases(merger, baseKeys);
         SPGlobal.log("Build Variants", "Building Variant Armors");
 
         for (ARMO armor : merger.getArmors()) {
