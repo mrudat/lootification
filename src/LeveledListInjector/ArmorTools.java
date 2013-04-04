@@ -64,11 +64,11 @@ public class ArmorTools {
             boolean tiered = isTiered(lotftName);
             if (tiered) {
                 lotft.clearInventoryItems();
-                
+
                 String bits = getBits(lotftName);
                 LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
                 String tierKey = getTierKey(lotftName);
-                
+
 
                 insertTieredArmors(subList, tierKey, bits, merger, patch);
                 lotft.addInventoryItem(subList.getForm());
@@ -252,9 +252,9 @@ public class ArmorTools {
 
                             String eid = "DienesLVLI" + obj.getEDID();
                             MajorRecord r;
-                            
-                                r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                            if(r == null){
+
+                            r = merger.getMajor(eid, GRUP_TYPE.LVLI);
+                            if (r == null) {
                                 r = patch.getMajor(eid, GRUP_TYPE.LVLI);
                             }
                             if (r == null) {
@@ -956,7 +956,9 @@ public class ArmorTools {
                                 for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
                                     if (p.getBase().equals(slotKey)) {
                                         ArrayList<ARMO> q = p.getVar();
-                                        q.add(armor);
+                                        if (!q.contains(armor)) {
+                                            q.add(armor);
+                                        }
                                         found = true;
                                         break;
                                     }
@@ -1273,7 +1275,6 @@ public class ArmorTools {
     static void addArmorByBit(LVLI set, ArrayList<ARMO> ar, String bits, Mod merger) {
         if (bits.contains("H")) {
             for (ARMO a : ar) {
-                KYWD k = hasKeyStartsWith(a, "ArmorHelmet", merger);
                 if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
                         || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
                         || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {

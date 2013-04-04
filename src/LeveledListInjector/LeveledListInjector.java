@@ -89,6 +89,7 @@ public class LeveledListInjector implements SUM {
     public static ArrayList<Pair<Mod, ArrayList<Pair<ARMO, KYWD>>>> modArmors = new ArrayList<>(0);
     public static ArrayList<Pair<Mod, ArrayList<Pair<WEAP, KYWD>>>> modWeapons = new ArrayList<>(0);
     public static boolean listify = false;
+    public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -272,12 +273,19 @@ public class LeveledListInjector implements SUM {
                 }
             }
         }
-//        FLST baseArmorKeysFLST = (FLST) gearVariants.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
-//        FLST variantArmorKeysFLST = (FLST) gearVariants.getMajor("LLI_VAR_ARMOR_KEYS", GRUP_TYPE.FLST);
-//        ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, gearVariants);
-//        FLST baseWeaponKeysFLST = (FLST) gearVariants.getMajor("LLI_BASE_WEAPON_KEYS", GRUP_TYPE.FLST);
-//        FLST variantWeaponKeysFLST = (FLST) gearVariants.getMajor("LLI_VAR_WEAPON_KEYS", GRUP_TYPE.FLST);
-//        WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, gearVariants);
+        
+        File fXmlFile = new File("Lootification.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(fXmlFile);
+        doc.getDocumentElement().normalize();
+        
+        NodeList mList = doc.getElementsByTagName("mod");
+        for (int i = 0; i<mList.getLength(); i++){
+            Node nMod =  mList.item(i);
+            Element mod = (Element) nMod;
+            lootifiedMods.add(new Pair<>(mod.getAttribute("modName"), nMod));
+        }
 
     }
 
@@ -398,19 +406,16 @@ public class LeveledListInjector implements SUM {
             File fXmlFile = new File("Lootification.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-            doc.getDocumentElement().normalize();
+            Document lootification = dBuilder.parse(fXmlFile);
+
+
+            Document newDoc = dBuilder.newDocument();
+
 
             ArrayList<Pair<String, Node>> modNodes = new ArrayList<>(0);
-            Element rootElement = doc.getDocumentElement();
+            Element rootElement = newDoc.createElement("lootification");
+            newDoc.appendChild(rootElement);
 
-            NodeList modList = doc.getElementsByTagName("mod");
-            for (int i = 0; i < modList.getLength(); i++) {
-                Node mod = modList.item(i);
-                Element eElement = (Element) mod;
-                Pair<String, Node> p = new Pair<>(eElement.getAttribute("modName"), mod);
-                modNodes.add(p);
-            }
 
             for (Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p : modArmors) {
                 boolean found = false;
@@ -423,7 +428,7 @@ public class LeveledListInjector implements SUM {
                     }
                 }
                 if (!found) {
-                    Element newElement = doc.createElement("mod");
+                    Element newElement = newDoc.createElement("mod");
                     newElement.setAttribute("modName", p.getBase().getName());
                     rootElement.appendChild(newElement);
                     theMod = newElement;
@@ -446,13 +451,13 @@ public class LeveledListInjector implements SUM {
                         }
                     }
                     if (!armorFound) {
-                        Element newElement = doc.createElement("item");
+                        Element newElement = newDoc.createElement("item");
                         newElement.setAttribute("type", "armor");
                         newElement.setAttribute("EDID", akPair.getBase().getEDID());
                         theMod.appendChild(newElement);
                         theArmor = newElement;
                     }
-                    Element key = doc.createElement("keyword");
+                    Element key = newDoc.createElement("keyword");
                     key.setTextContent(akPair.getVar().getEDID());
                     theArmor.appendChild(key);
                 }
@@ -469,7 +474,7 @@ public class LeveledListInjector implements SUM {
                     }
                 }
                 if (!found) {
-                    Element newElement = doc.createElement("mod");
+                    Element newElement = newDoc.createElement("mod");
                     newElement.setAttribute("modName", p.getBase().getName());
                     rootElement.appendChild(newElement);
                     theMod = newElement;
@@ -492,31 +497,33 @@ public class LeveledListInjector implements SUM {
                         }
                     }
                     if (!armorFound) {
-                        Element newElement = doc.createElement("item");
+                        Element newElement = newDoc.createElement("item");
                         newElement.setAttribute("type", "weapon");
                         newElement.setAttribute("EDID", akPair.getBase().getEDID());
                         theMod.appendChild(newElement);
                         theArmor = newElement;
                     }
-                    Element key = doc.createElement("keyword");
+                    Element key = newDoc.createElement("keyword");
                     key.setTextContent(akPair.getVar().getEDID());
                     theArmor.appendChild(key);
                 }
             }
 
             for (Pair<String, ArrayList<ARMO>> p : outfits) {
+                String master = p.getVar().get(0).getFormMaster().print();
+                master = master.substring(0, master.length()-4);
                 for (ARMO arm : p.getVar()) {
-                    NodeList items = doc.getElementsByTagName("item");
+                    NodeList items = newDoc.getElementsByTagName("item");
                     for (int i = 0; i < items.getLength(); i++) {
                         Element eItem = (Element) items.item(i);
                         if (eItem.getAttribute("EDID").contentEquals(arm.getEDID())) {
-                            Element newKey = doc.createElement("keyword");
-                            newKey.setTextContent("dienes_outfit_" + p.getBase());
+                            Element newKey = newDoc.createElement("keyword");
+                            newKey.setTextContent("dienes_outfit_" + master + p.getBase());
                             eItem.appendChild(newKey);
                             for (Pair<String, ArrayList<String>> q : tiers) {
                                 if (q.getBase().contentEquals(p.getBase())) {
                                     for (String s : q.getVar()) {
-                                        Element newTier = doc.createElement("keyword");
+                                        Element newTier = newDoc.createElement("keyword");
                                         newTier.setTextContent(s);
                                         eItem.appendChild(newTier);
                                     }
@@ -526,19 +533,23 @@ public class LeveledListInjector implements SUM {
                     }
                 }
             }
-            doc.getDocumentElement().normalize();
+            newDoc.getDocumentElement().normalize();
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("Lootification.xml"));
-            StreamResult result2 = new StreamResult(new File("out.xml"));
+            DOMSource source = new DOMSource(newDoc);
+
+            StreamResult result = new StreamResult(new File("out.xml"));
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
-
             transformer.transform(source, result);
-            transformer.transform(source, result2);
+
+            Document merged = mergeDocs(lootification, newDoc);
+            DOMSource sourceMerged = new DOMSource(merged);
+            StreamResult resultMerged = new StreamResult(new File("lootification.xml"));
+            transformer.transform(sourceMerged, resultMerged);
+
 
         } catch (Exception e) {
             SPGlobal.logException(e);
@@ -615,5 +626,91 @@ public class LeveledListInjector implements SUM {
             SPGlobal.closeDebug();
         }
 
+    }
+
+    public Document mergeDocs(Document doc1, Document doc2) {
+        Document newDoc = null;
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            newDoc = dBuilder.newDocument();
+
+            ArrayList<Pair<String, Node>> modNodes = new ArrayList<>(0);
+            Element rootElement = newDoc.createElement("lootification");
+            newDoc.appendChild(rootElement);
+
+            NodeList modList = doc1.getElementsByTagName("mod");
+            for (int i = 0; i < modList.getLength(); i++) {
+                Node mod = modList.item(i);
+                Element eElement = (Element) mod;
+                Node newMod = newDoc.importNode(mod, true);
+                rootElement.appendChild(newMod);
+                Pair<String, Node> p = new Pair<>(eElement.getAttribute("modName"), newMod);
+                modNodes.add(p);
+            }
+
+            modList = doc2.getElementsByTagName("mod");
+            for (int i = 0; i < modList.getLength(); i++) {
+                Node mod = modList.item(i);
+                Element eElement = (Element) mod;
+                boolean foundMod = false;
+                for (Pair<String, Node> p : modNodes) {
+                    if (p.getBase().contentEquals(eElement.getAttribute("modName"))) {
+                        foundMod = true;
+                        NodeList newItems = mod.getChildNodes();
+                        NodeList oldItems = p.getVar().getChildNodes();
+                        for (int j = 0; j < newItems.getLength(); j++) {
+                            Node newItem = newItems.item(j);
+                            Element eNewItem = (Element) newItem;
+                            boolean foundItem = false;
+                            if (newItem.getNodeType() == Node.ELEMENT_NODE) {
+                                for (int k = 0; k < oldItems.getLength(); k++) {
+                                    Node oldItem = oldItems.item(j);
+                                    if (oldItem.getNodeType() == Node.ELEMENT_NODE) {
+                                        Element eOldItem = (Element) oldItem;
+                                        if (eNewItem.getAttribute("EDID").contentEquals(eOldItem.getAttribute("EDID"))) {
+                                            foundItem = true;
+                                            NodeList newKeys = newItem.getChildNodes();
+                                            for (int m = 0; m < newKeys.getLength(); m++) {
+                                                Element newKey = (Element) newKeys.item(m);
+                                                if (newKey.getNodeName().contentEquals("keyword")) {
+                                                    boolean foundKey = false;
+                                                    NodeList oldKeys = oldItem.getChildNodes();
+                                                    for (int l = 0; l < oldKeys.getLength(); l++) {
+                                                        Element oldKey = (Element) oldKeys.item(l);
+                                                        if (oldKey.getNodeName().contentEquals("keyword")) {
+                                                            if (oldKey.getTextContent().contentEquals(newKey.getTextContent())) {
+                                                                foundKey = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    if (!foundKey) {
+                                                        newItem.appendChild(newDoc.importNode(newKey, true));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!foundItem) {
+                                    p.getVar().appendChild(newDoc.importNode(newItem, true));
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!foundMod) {
+                    rootElement.appendChild(newDoc.importNode(mod, true));
+                }
+            }
+            newDoc.normalize();
+
+        } catch (Exception e) {
+            SPGlobal.logException(e);
+            JOptionPane.showMessageDialog(null, "There was an exception thrown during program execution: '" + e + "'  Check the debug logs or contact the author.");
+            SPGlobal.closeDebug();
+        }
+        return newDoc;
     }
 }

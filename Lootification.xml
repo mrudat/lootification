@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <lootification>
-
-<mod modName="Ivory.esp">
+  <mod modName="Ivory.esp">
     <item EDID="ArmorIvoryCuirass" type="armor">
       <keyword>ARMOR_EBONY</keyword>
-      <keyword>dienes_outfit_Ivory</keyword>
     </item>
     <item EDID="ArmorIvoryGauntlets" type="armor">
       <keyword>ARMOR_EBONY</keyword>
-      <keyword>dienes_outfit_Ivory</keyword>
     </item>
     <item EDID="ArmorIvoryHelmet" type="armor">
       <keyword>ARMOR_EBONY</keyword>
-      <keyword>dienes_outfit_Ivory</keyword>
     </item>
     <item EDID="ArmorIvoryShield" type="armor">
       <keyword>ARMOR_EBONY</keyword>
-      <keyword>dienes_outfit_Ivory</keyword>
     </item>
     <item EDID="ArmorIvoryBoots" type="armor">
       <keyword>ARMOR_EBONY</keyword>
-      <keyword>dienes_outfit_Ivory</keyword>
     </item>
     <item EDID="IvoryWarAxe" type="weapon">
       <keyword>WEAPON_EBONY</keyword>
@@ -45,6 +39,90 @@
     </item>
     <item EDID="IvoryBattleaxe" type="weapon">
       <keyword>WEAPON_EBONY</keyword>
+    </item>
+  </mod>
+  <mod modName="ThalmorStandalone.esp">
+    <item EDID="ArmorThalmorGildedCuirass" type="armor">
+      <keyword>ARMOR_ELVEN_GILDED</keyword>
+    </item>
+    <item EDID="ArmorThalmorHeavyBoots" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ArmorThalmorHelmet" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ArmorThalmorGauntlets" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ArmorThalmorShield" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ArmorThalmorLCuirass" type="armor">
+      <keyword>ARMOR_ELVEN_LIGHT</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmorLight</keyword>
+      <keyword>Thalmor_Tier_0</keyword>
+    </item>
+    <item EDID="ArmorThalmorLGauntlets" type="armor">
+      <keyword>ARMOR_ELVEN_LIGHT</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmorLight</keyword>
+      <keyword>Thalmor_Tier_0</keyword>
+    </item>
+    <item EDID="ArmorThalmorLHelmet" type="armor">
+      <keyword>ARMOR_ELVEN_LIGHT</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmorLight</keyword>
+      <keyword>Thalmor_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorThalmorLBoots" type="armor">
+      <keyword>ARMOR_ELVEN_LIGHT</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmorLight</keyword>
+      <keyword>Thalmor_Tier_0</keyword>
+    </item>
+    <item EDID="ArmorThalmorMaskedHelmet" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ArmorThalmorLMaskedHelmet" type="armor">
+      <keyword>ARMOR_ELVEN_LIGHT</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmorLight</keyword>
+      <keyword>Thalmor_Tier_0</keyword>
+    </item>
+    <item EDID="ArmorThalmorCuirass" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+      <keyword>dienes_outfit_ThalmorStandaloneThalmor</keyword>
+      <keyword>Thalmor_Tier_4</keyword>
+    </item>
+    <item EDID="ThalmorBattleaxe" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorWarhammer" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorWarAxe" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorSword" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorMace" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorGreatsword" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorDagger" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="ThalmorBow" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
     </item>
   </mod>
 </lootification>
