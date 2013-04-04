@@ -19,6 +19,10 @@ import java.nio.file.FileSystems;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -82,6 +86,8 @@ public class LeveledListInjector implements SUM {
     public static Mod global;
     public static ArrayList<Pair<String, ArrayList<ARMO>>> outfits = new ArrayList<>(0);
     public static ArrayList<Pair<String, ArrayList<String>>> tiers = new ArrayList<>(0);
+    public static ArrayList<Pair<Mod, ArrayList<Pair<ARMO, KYWD>>>> modArmors = new ArrayList<>(0);
+    public static ArrayList<Pair<Mod, ArrayList<Pair<WEAP, KYWD>>>> modWeapons = new ArrayList<>(0);
     public static boolean listify = false;
 
     // Do not write the bulk of your program here
@@ -307,31 +313,30 @@ public class LeveledListInjector implements SUM {
 
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
-        merger.addAsOverrides(global, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
 
-        for (Pair<String, ArrayList<ARMO>> p : outfits) {
-            KYWD k2 = new KYWD(patch, "dienes_outfit_" + p.getBase());
-            patch.addRecord(k2);
-            merger.addRecord(k2);
-            for (ARMO arm : p.getVar()) {
-                KeywordSet keys = arm.getKeywordSet();
-                keys.addKeywordRef(k2.getForm());
-
-                for (Pair<String, ArrayList<String>> q : tiers) {
-                    if (p.getBase().contentEquals(q.getBase())) {
-                        for (String s : q.getVar()) {
-                            KYWD tierKey = (KYWD) merger.getMajor(s, GRUP_TYPE.KYWD);
-                            keys.addKeywordRef(tierKey.getForm());
-                        }
-                    }
-                }
-
-                merger.addRecord(arm);
-                patch.addRecord(arm);
-            }
-        }
-
+//        for (Pair<String, ArrayList<ARMO>> p : outfits) {
+//            KYWD k2 = new KYWD(patch, "dienes_outfit_" + p.getBase());
+//            patch.addRecord(k2);
+//            merger.addRecord(k2);
+//            for (ARMO arm : p.getVar()) {
+//                KeywordSet keys = arm.getKeywordSet();
+//                keys.addKeywordRef(k2.getForm());
+//
+//                for (Pair<String, ArrayList<String>> q : tiers) {
+//                    if (p.getBase().contentEquals(q.getBase())) {
+//                        for (String s : q.getVar()) {
+//                            KYWD tierKey = (KYWD) merger.getMajor(s, GRUP_TYPE.KYWD);
+//                            keys.addKeywordRef(tierKey.getForm());
+//                        }
+//                    }
+//                }
+//
+//                merger.addRecord(arm);
+//                patch.addRecord(arm);
+//            }
+//        }
+        addModsToXML(merger);
         processXML(merger, patch);
 
 
@@ -386,6 +391,160 @@ public class LeveledListInjector implements SUM {
             WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
         }
 
+    }
+
+    public void addModsToXML(Mod merger) {
+        try {
+            File fXmlFile = new File("Lootification.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+
+            ArrayList<Pair<String, Node>> modNodes = new ArrayList<>(0);
+            Element rootElement = doc.getDocumentElement();
+
+            NodeList modList = doc.getElementsByTagName("mod");
+            for (int i = 0; i < modList.getLength(); i++) {
+                Node mod = modList.item(i);
+                Element eElement = (Element) mod;
+                Pair<String, Node> p = new Pair<>(eElement.getAttribute("modName"), mod);
+                modNodes.add(p);
+            }
+
+            for (Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p : modArmors) {
+                boolean found = false;
+                Node theMod = null;
+                for (Pair<String, Node> q : modNodes) {
+                    if (p.getBase().getName().contentEquals(q.getBase())) {
+                        theMod = q.getVar();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Element newElement = doc.createElement("mod");
+                    newElement.setAttribute("modName", p.getBase().getName());
+                    rootElement.appendChild(newElement);
+                    theMod = newElement;
+                    Pair<String, Node> q = new Pair<>(newElement.getAttribute("modName"), theMod);
+                    modNodes.add(q);
+                }
+                for (Pair<ARMO, KYWD> akPair : p.getVar()) {
+                    boolean armorFound = false;
+                    Node theArmor = null;
+                    NodeList items = theMod.getChildNodes();
+                    for (int i = 0; i < items.getLength(); i++) {
+                        Node item = items.item(i);
+                        if (item.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eItem = (Element) item;
+                            if (eItem.getAttribute("EDID").contentEquals(akPair.getBase().getEDID())) {
+                                theArmor = item;
+                                armorFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!armorFound) {
+                        Element newElement = doc.createElement("item");
+                        newElement.setAttribute("type", "armor");
+                        newElement.setAttribute("EDID", akPair.getBase().getEDID());
+                        theMod.appendChild(newElement);
+                        theArmor = newElement;
+                    }
+                    Element key = doc.createElement("keyword");
+                    key.setTextContent(akPair.getVar().getEDID());
+                    theArmor.appendChild(key);
+                }
+            }
+
+            for (Pair<Mod, ArrayList<Pair<WEAP, KYWD>>> p : modWeapons) {
+                boolean found = false;
+                Node theMod = null;
+                for (Pair<String, Node> q : modNodes) {
+                    if (p.getBase().getName().contentEquals(q.getBase())) {
+                        theMod = q.getVar();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Element newElement = doc.createElement("mod");
+                    newElement.setAttribute("modName", p.getBase().getName());
+                    rootElement.appendChild(newElement);
+                    theMod = newElement;
+                    Pair<String, Node> q = new Pair<>(newElement.getAttribute("modName"), theMod);
+                    modNodes.add(q);
+                }
+                for (Pair<WEAP, KYWD> akPair : p.getVar()) {
+                    boolean armorFound = false;
+                    Node theArmor = null;
+                    NodeList items = theMod.getChildNodes();
+                    for (int i = 0; i < items.getLength(); i++) {
+                        Node item = items.item(i);
+                        if (item.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eItem = (Element) item;
+                            if (eItem.getAttribute("EDID").contentEquals(akPair.getBase().getEDID())) {
+                                theArmor = item;
+                                armorFound = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!armorFound) {
+                        Element newElement = doc.createElement("item");
+                        newElement.setAttribute("type", "weapon");
+                        newElement.setAttribute("EDID", akPair.getBase().getEDID());
+                        theMod.appendChild(newElement);
+                        theArmor = newElement;
+                    }
+                    Element key = doc.createElement("keyword");
+                    key.setTextContent(akPair.getVar().getEDID());
+                    theArmor.appendChild(key);
+                }
+            }
+
+            for (Pair<String, ArrayList<ARMO>> p : outfits) {
+                for (ARMO arm : p.getVar()) {
+                    NodeList items = doc.getElementsByTagName("item");
+                    for (int i = 0; i < items.getLength(); i++) {
+                        Element eItem = (Element) items.item(i);
+                        if (eItem.getAttribute("EDID").contentEquals(arm.getEDID())) {
+                            Element newKey = doc.createElement("keyword");
+                            newKey.setTextContent("dienes_outfit_" + p.getBase());
+                            eItem.appendChild(newKey);
+                            for (Pair<String, ArrayList<String>> q : tiers) {
+                                if (q.getBase().contentEquals(p.getBase())) {
+                                    for (String s : q.getVar()) {
+                                        Element newTier = doc.createElement("keyword");
+                                        newTier.setTextContent(s);
+                                        eItem.appendChild(newTier);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            doc.getDocumentElement().normalize();
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("Lootification.xml"));
+            StreamResult result2 = new StreamResult(new File("out.xml"));
+            transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
+
+            transformer.transform(source, result);
+            transformer.transform(source, result2);
+
+        } catch (Exception e) {
+            SPGlobal.logException(e);
+            JOptionPane.showMessageDialog(null, "There was an exception thrown during program execution: '" + e + "'  Check the debug logs or contact the author.");
+            SPGlobal.closeDebug();
+        }
     }
 
     public void processXML(Mod merger, Mod patch) {

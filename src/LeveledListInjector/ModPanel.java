@@ -4,15 +4,12 @@
  */
 package LeveledListInjector;
 
+import java.awt.BorderLayout;
+import java.awt.event.*;
+import java.util.ArrayList;
 import lev.gui.*;
 import skyproc.*;
 import skyproc.gui.*;
-import java.util.ArrayList;
-import java.awt.event.*;
-import LeveledListInjector.ini.INI;
-import java.awt.BorderLayout;
-import java.io.*;
-import java.awt.Component;
 
 /**
  *
@@ -21,7 +18,8 @@ import java.awt.Component;
 public class ModPanel extends SPSettingPanel {
 
     private Mod myMod;
-    private ArrayList<LComboBox> armorBoxes;
+    private ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> armorKeys;
+    private ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> weaponKeys;
     private ArrayList<LComboBox> weaponBoxes;
     private ArrayList<ArmorListener> armorListeners;
     private ArrayList<WeaponListener> weaponListeners;
@@ -31,12 +29,10 @@ public class ModPanel extends SPSettingPanel {
         private ARMO armor;
         private KYWD newKey;
         private LComboBox box;
-        private KeywordSet keys;
         private LLabel label;
 
         ArmorListener(ARMO a, LComboBox b, LLabel l) {
             armor = a;
-            keys = armor.getKeywordSet();
             box = b;
             newKey = null;
             label = l;
@@ -47,15 +43,30 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                keys.removeKeywordRef(newKey.getForm());
+                for (LeveledListInjector.Pair<ARMO, KYWD> p : armorKeys) {
+                    if (p.getBase().getForm().equals(armor.getForm())) {
+                        armorKeys.remove(p);
+                        break;
+                    }
+                }
                 newKey = null;
-                LeveledListInjector.global.addRecord(armor);
                 box.clearHighlight();
                 label.setText(armor.getName());
-            } else if (pressed.compareTo("None") != 0) {
+            } else if ((pressed.compareTo("None") != 0) && (newKey == null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                keys.addKeywordRef(newKey.getForm());
-                LeveledListInjector.global.addRecord(armor);
+                LeveledListInjector.Pair<ARMO, KYWD> p = new LeveledListInjector.Pair<>(armor, newKey);
+                armorKeys.add(p);
+
+                box.highlightChanged();
+                label.setText(armor.getName() + " set " + newKey.getEDID());
+            } else if ((pressed.compareTo("None") != 0) && (newKey != null)) {
+                newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
+                for (LeveledListInjector.Pair<ARMO, KYWD> p : armorKeys) {
+                    if (p.getBase().getForm().equals(armor.getForm())) {
+                        p.setVar(newKey);
+                        break;
+                    }
+                }
                 box.highlightChanged();
                 label.setText(armor.getName() + " set " + newKey.getEDID());
             }
@@ -67,12 +78,10 @@ public class ModPanel extends SPSettingPanel {
         private WEAP weapon;
         private KYWD newKey;
         private LComboBox box;
-        private KeywordSet keys;
         private LLabel title;
 
         WeaponListener(WEAP a, LComboBox b, LLabel l) {
             weapon = a;
-            keys = weapon.getKeywordSet();
             box = b;
             newKey = null;
             title = l;
@@ -82,15 +91,30 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                keys.removeKeywordRef(newKey.getForm());
+                for (LeveledListInjector.Pair<WEAP, KYWD> p : weaponKeys) {
+                    if (p.getBase().getForm().equals(weapon.getForm())) {
+                        weaponKeys.remove(p);
+                        break;
+                    }
+                }
                 newKey = null;
-                LeveledListInjector.global.addRecord(weapon);
                 box.clearHighlight();
                 title.setText(weapon.getName());
-            } else if (pressed.compareTo("None") != 0) {
+            } else if ((pressed.compareTo("None") != 0) && (newKey == null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                keys.addKeywordRef(newKey.getForm());
-                LeveledListInjector.global.addRecord(weapon);
+                LeveledListInjector.Pair<WEAP, KYWD> p = new LeveledListInjector.Pair<>(weapon, newKey);
+                weaponKeys.add(p);
+
+                box.highlightChanged();
+                title.setText(weapon.getName() + " set as " + newKey.getEDID());
+            } else if ((pressed.compareTo("None") != 0) && (newKey != null)) {
+                newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
+                for (LeveledListInjector.Pair<WEAP, KYWD> p : weaponKeys) {
+                    if (p.getBase().getForm().equals(weapon.getForm())) {
+                        p.setVar(newKey);
+                        break;
+                    }
+                }
                 box.highlightChanged();
                 title.setText(weapon.getName() + " set as " + newKey.getEDID());
             }
@@ -213,7 +237,8 @@ public class ModPanel extends SPSettingPanel {
 
         LeveledListInjector.gearVariants.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
-        armorBoxes = new ArrayList<>(0);
+        armorKeys = new ArrayList<>(0);
+        weaponKeys = new ArrayList<>(0);
         weaponBoxes = new ArrayList<>(0);
         armorListeners = new ArrayList<>(0);
         weaponListeners = new ArrayList<>(0);
@@ -323,18 +348,29 @@ public class ModPanel extends SPSettingPanel {
 
     }
 
-    public void setupIni() {
-        File f;
-        f = new File("\\Mod inis\\" + myMod.getName() + ".ini");
-        if (!f.exists()) {
-            {
-                try {
-                    f.createNewFile();
-                } catch (IOException e) {
-                    SPGlobal.logException(e);
-                }
+    @Override
+    public void onClose(SPMainMenuPanel parent) {
+        boolean found = false;
+        for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> > p : LeveledListInjector.modArmors){
+            if (p.getBase().equals(myMod)) {
+                found = true;
+                break;
             }
         }
-
+        if(!found){
+            LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> > p = new LeveledListInjector.Pair<>(myMod, armorKeys);
+            LeveledListInjector.modArmors.add(p);
+        }
+        found = false;
+        for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> > p : LeveledListInjector.modWeapons){
+            if (p.getBase().equals(myMod)) {
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> > p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
+            LeveledListInjector.modWeapons.add(p);
+        }
     }
 }
