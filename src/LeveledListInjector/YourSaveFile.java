@@ -20,7 +20,8 @@ public class YourSaveFile extends SkyProcSave {
         Add(Settings.PROCESS_ARMORS, false, true);
         Add(Settings.PROCESS_OUTFITS, false, true);
         Add(Settings.TEST, 0, true);
-        Add(Settings.LOOTIFY_MOD, true, true);
+        Add(Settings.LOOTIFY_DRAGONBORN, true, true);
+        Add(Settings.SKIP_INACTIVE_MODS, true, true);
 
     }
 
@@ -49,8 +50,13 @@ public class YourSaveFile extends SkyProcSave {
                 "Process the armors");
         helpInfo.put(Settings.PROCESS_OUTFITS, 
                 "Process the outfits. NOTE: this probably will make them mismatched in game");
-        helpInfo.put(Settings.LOOTIFY_MOD, 
-                "Enchant and distribute weapons and armor from mod");
+        helpInfo.put(Settings.LOOTIFY_DRAGONBORN, 
+                "Enchant and distribute weapons and armor from Dragonborn.\n"
+                + "Has no effect if Dragonborn is not present.");
+        helpInfo.put(Settings.SKIP_INACTIVE_MODS, 
+                "Skip mods not active in plugins.txt\n" 
+                + "Disable if you have created custom esps from recognized mods.\n"
+                + "This will slow patch creation somewhat.");
         
         helpInfo.put(Settings.TEST, 
                 "Test help info");
@@ -64,7 +70,8 @@ public class YourSaveFile extends SkyProcSave {
         PROCESS_WEAPONS,
         PROCESS_ARMORS,
         PROCESS_OUTFITS,
-        LOOTIFY_MOD,
+        LOOTIFY_DRAGONBORN,
+        SKIP_INACTIVE_MODS,
         TEST;
     }
 }

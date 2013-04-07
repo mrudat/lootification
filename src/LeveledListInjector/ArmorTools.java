@@ -63,7 +63,13 @@ public class ArmorTools {
             String lotftName = lotft.getEDID();
             boolean tiered = isTiered(lotftName);
             if (tiered) {
-                lotft.clearInventoryItems();
+                //lotft.clearInventoryItems();
+                ArrayList<FormID> inv = lotft.getInventoryList();
+                for (FormID form : inv) {
+                    if (form.getMaster().print().startsWith("Skyrim")) {
+                        lotft.removeInventoryItem(form);
+                    }
+                }
 
                 String bits = getBits(lotftName);
                 LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
@@ -107,7 +113,7 @@ public class ArmorTools {
 //                                addArmorFromArray(subList, b);
 //                                patch.addRecord(subList);
 //                                newList.addEntry(subList.getForm(), 1, 1);
-                                    addAlternateSets(newList, b, merger, patch);
+                                    addAlternateOutfits(newList, b, merger, patch);
 
                                     lotft.addInventoryItem(newList.getForm());
                                     patch.addRecord(newList);
@@ -927,6 +933,120 @@ public class ArmorTools {
             for (Pair<KYWD, ArrayList<ARMO>> p1 : matchingSets) {
 
                 boolean key = k.equals(p1.getBase());
+
+                if (key) {
+                    for (ARMO armor : p1.getVar()) {
+                        boolean passed = true;
+                        for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                            boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                            boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+
+                            boolean flagMatch = (armorFlag == formFlag);
+
+                            if (flagMatch == false) {
+                                passed = false;
+                            }
+                        }
+                        if (!passed) {
+                            KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
+                            if (armorHasKeyword(arm, helm, merger) && armorHasKeyword(armor, helm, merger)) {
+                                passed = true;
+                            }
+                        }
+                        if (passed) {
+                            boolean found = false;
+                            KYWD slotKey = getSlotKYWD(armor, merger);
+                            if (slotKey == null) {
+                                int test = 1;
+                            } else {
+                                for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+                                    if (p.getBase().equals(slotKey)) {
+                                        ArrayList<ARMO> q = p.getVar();
+                                        if (!q.contains(armor)) {
+                                            q.add(armor);
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found == false) {
+                                    Pair<KYWD, ArrayList<ARMO>> p = new Pair(slotKey, new ArrayList<ARMO>(0));
+                                    p.getVar().add(armor);
+                                    varSets.add(p);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        String bits = getBitsFromArray(a, merger);
+        for (char c : bits.toCharArray()) {
+            for (Pair<KYWD, ArrayList<ARMO>> p : varSets) {
+
+                if (arrayHasBits(p.getVar(), String.valueOf(c), merger)) {
+                    if (p.getVar().size() > 1) {
+                        String lvliName = getNameFromArrayWithKey(p.getVar(), k, merger) + "variants";
+                        LVLI list2 = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
+                        if (list2 != null) {
+                            list.addEntry(list2.getForm(), 1, 1);
+                            patch.addRecord(list);
+                        } else {
+                            LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
+                            subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                            addArmorByBit(subList, p.getVar(), String.valueOf(c), merger);
+                            patch.addRecord(subList);
+                            list.addEntry(subList.getForm(), 1, 1);
+                            patch.addRecord(list);
+                        }
+                    } else {
+                        boolean found = false;
+                        for (LeveledEntry entry : list) {
+                            if (entry.getForm().equals(p.getVar().get(0).getForm())) {
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            list.addEntry(p.getVar().get(0).getForm(), 1, 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    static void addAlternateOutfits(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
+        FormID f = new FormID("107347", "Skyrim.esm");
+        //SPGlobal.log("outfits glist", f.toString());
+        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+
+        KYWD k = null;
+        ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
+        for (ARMO arm : a) {
+            k = hasKeyStartsWith(arm, "LLI_BASE", merger);
+            boolean notBase = false;
+            if (k == null) {
+                k = hasKeyStartsWith(arm, "dienes_outfit", merger);
+                notBase = true;
+            }
+
+            for (Pair<KYWD, ArrayList<ARMO>> p1 : matchingSets) {
+
+                boolean key = false;
+                if (notBase) {
+                    key = p1.getBase().equals(k);
+                } else {
+                    KYWD ret = null;
+                    for (Pair p : armorMatches) {
+                        KYWD var = (KYWD) p.getBase();
+                        //SPGlobal.log("getBaseArmor", k.getEDID() + " " + var.getEDID() + " " + var.equals(k));
+                        if (var.equals(k)) {
+                            ret = (KYWD) p.getVar();
+                        }
+                    }
+                    key = armorHasKeyword(p1.getVar().get(0), ret, merger) || armorHasKeyword(p1.getVar().get(0), k, merger);
+                }
 
                 if (key) {
                     for (ARMO armor : p1.getVar()) {

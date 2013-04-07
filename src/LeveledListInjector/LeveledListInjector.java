@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import skyproc.gui.SPProgressBarPlug;
 
 /**
  *
@@ -273,16 +274,16 @@ public class LeveledListInjector implements SUM {
                 }
             }
         }
-        
+
         File fXmlFile = new File("Lootification.xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
         doc.getDocumentElement().normalize();
-        
+
         NodeList mList = doc.getElementsByTagName("mod");
-        for (int i = 0; i<mList.getLength(); i++){
-            Node nMod =  mList.item(i);
+        for (int i = 0; i < mList.getLength(); i++) {
+            Node nMod = mList.item(i);
             Element mod = (Element) nMod;
             lootifiedMods.add(new Pair<>(mod.getAttribute("modName"), nMod));
         }
@@ -313,9 +314,6 @@ public class LeveledListInjector implements SUM {
     // but DO NOT export it.  Exporting is handled internally.
     @Override
     public void runChangesToPatch() throws Exception {
-//        if (!save.getBool(Settings.LOOTIFY_MOD)) {
-//            listify = true;
-//        }
 
         Mod patch = SPGlobal.getGlobalPatch();
 
@@ -344,6 +342,7 @@ public class LeveledListInjector implements SUM {
 //                patch.addRecord(arm);
 //            }
 //        }
+        SPProgressBarPlug.setStatus("Processing XML");
         addModsToXML(merger);
         processXML(merger, patch);
 
@@ -382,20 +381,33 @@ public class LeveledListInjector implements SUM {
 
         boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
         if (lootify) {
+            SPProgressBarPlug.setStatus("Setting up armor matches");
             ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
+            SPProgressBarPlug.setStatus("Building base armors");
             ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
+            SPProgressBarPlug.setStatus("Setting up armor sets");
             ArmorTools.setupSets(merger, patch);
+            SPProgressBarPlug.setStatus("Building armor variants");
             ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+            SPProgressBarPlug.setStatus("Setting up armor leveled lists");
             ArmorTools.modLVLIArmors(merger, patch);
+            SPProgressBarPlug.setStatus("Processing outfit armors");
             ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+            SPProgressBarPlug.setStatus("Linking armor leveled lists");
             ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
             WeaponTools.setMergeAndPatch(merger, patch);
+            SPProgressBarPlug.setStatus("Setting up weapon matches");
             WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
+            SPProgressBarPlug.setStatus("Building base weapons");
             WeaponTools.buildWeaponBases(baseWeaponKeysFLST);
+            SPProgressBarPlug.setStatus("Building weapon variants");
             WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
+            SPProgressBarPlug.setStatus("Setting up weapon leveled lists");
             WeaponTools.modLVLIWeapons();
+            SPProgressBarPlug.setStatus("Processing outfit weapons");
             WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
+            SPProgressBarPlug.setStatus("Linking weapon leveled lists");
             WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
         }
 
@@ -403,10 +415,10 @@ public class LeveledListInjector implements SUM {
 
     public void addModsToXML(Mod merger) {
         try {
-            File fXmlFile = new File("Lootification.xml");
+            File fXmlFile = new File("Custom.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document lootification = dBuilder.parse(fXmlFile);
+            Document custom = dBuilder.parse(fXmlFile);
 
 
             Document newDoc = dBuilder.newDocument();
@@ -511,7 +523,7 @@ public class LeveledListInjector implements SUM {
 
             for (Pair<String, ArrayList<ARMO>> p : outfits) {
                 String master = p.getVar().get(0).getFormMaster().print();
-                master = master.substring(0, master.length()-4);
+                master = master.substring(0, master.length() - 4);
                 for (ARMO arm : p.getVar()) {
                     NodeList items = newDoc.getElementsByTagName("item");
                     for (int i = 0; i < items.getLength(); i++) {
@@ -524,7 +536,7 @@ public class LeveledListInjector implements SUM {
                                 if (q.getBase().contentEquals(p.getBase())) {
                                     for (String s : q.getVar()) {
                                         Element newTier = newDoc.createElement("keyword");
-                                        newTier.setTextContent(s);
+                                        newTier.setTextContent(s.replace(" ", ""));
                                         eItem.appendChild(newTier);
                                     }
                                 }
@@ -545,9 +557,9 @@ public class LeveledListInjector implements SUM {
             transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
             transformer.transform(source, result);
 
-            Document merged = mergeDocs(lootification, newDoc);
+            Document merged = mergeDocs(custom, newDoc);
             DOMSource sourceMerged = new DOMSource(merged);
-            StreamResult resultMerged = new StreamResult(new File("lootification.xml"));
+            StreamResult resultMerged = new StreamResult(new File("Custom.xml"));
             transformer.transform(sourceMerged, resultMerged);
 
 
@@ -563,9 +575,16 @@ public class LeveledListInjector implements SUM {
             List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
 
             File fXmlFile = new File("Lootification.xml");
+            File customXmlFile = new File("Custom.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
+            Document loot = dBuilder.parse(fXmlFile);
+            Document custom = dBuilder.parse(customXmlFile);
+
+            loot.getDocumentElement().normalize();
+            custom.getDocumentElement().normalize();
+
+            Document doc = mergeDocs(loot, custom);
             doc.getDocumentElement().normalize();
 
             NodeList nList = doc.getElementsByTagName("mod");
@@ -573,43 +592,45 @@ public class LeveledListInjector implements SUM {
             for (int i = 0; i < nList.getLength(); i++) {
                 Node theMod = nList.item(i);
                 Element eElement = (Element) theMod;
-                if (lines.contains(eElement.getAttribute("modName"))) {
-                    NodeList items = theMod.getChildNodes();
-                    for (int j = 0; j < items.getLength(); j++) {
-                        Node item = items.item(j);
-                        if (item.getNodeType() == Node.ELEMENT_NODE) {
-                            Element eItem = (Element) item;
-                            if (eItem.getAttribute("type").contentEquals("weapon")) {
-                                WEAP weapon = (WEAP) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.WEAP);
-                                if (weapon != null) {
-                                    KeywordSet keys = weapon.getKeywordSet();
-                                    NodeList kList = eItem.getElementsByTagName("keyword");
-                                    for (int k = 0; k < kList.getLength(); k++) {
-                                        Element eKey = (Element) kList.item(k);
-                                        KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
-                                        if (newKey != null) {
-                                            keys.addKeywordRef(newKey.getForm());
-                                            patch.addRecord(weapon);
-                                            merger.addRecord(weapon);
-                                        }
-                                    }
-                                }
-                            } else {
-                                if (eItem.getAttribute("type").contentEquals("armor")) {
-                                    ARMO armor = (ARMO) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.ARMO);
-                                    if (armor != null) {
-                                        KeywordSet keys = armor.getKeywordSet();
+                if (lines.contains(eElement.getAttribute("modName")) || !(save.getBool(Settings.SKIP_INACTIVE_MODS))) {
+                    if (!eElement.getAttribute("modName").contentEquals("Dragonborn.esm") || (eElement.getAttribute("modName").contentEquals("Dragonborn.esm") && save.getBool(Settings.LOOTIFY_DRAGONBORN))) {
+                        NodeList items = theMod.getChildNodes();
+                        for (int j = 0; j < items.getLength(); j++) {
+                            Node item = items.item(j);
+                            if (item.getNodeType() == Node.ELEMENT_NODE) {
+                                Element eItem = (Element) item;
+                                if (eItem.getAttribute("type").contentEquals("weapon")) {
+                                    WEAP weapon = (WEAP) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.WEAP);
+                                    if (weapon != null) {
+                                        KeywordSet keys = weapon.getKeywordSet();
                                         NodeList kList = eItem.getElementsByTagName("keyword");
                                         for (int k = 0; k < kList.getLength(); k++) {
                                             Element eKey = (Element) kList.item(k);
                                             KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
-                                            if (newKey == null) {
-                                                newKey = new KYWD(patch, eKey.getTextContent());
-                                                merger.addRecord(newKey);
+                                            if (newKey != null) {
+                                                keys.addKeywordRef(newKey.getForm());
+                                                patch.addRecord(weapon);
+                                                merger.addRecord(weapon);
                                             }
-                                            keys.addKeywordRef(newKey.getForm());
-                                            patch.addRecord(armor);
-                                            merger.addRecord(armor);
+                                        }
+                                    }
+                                } else {
+                                    if (eItem.getAttribute("type").contentEquals("armor")) {
+                                        ARMO armor = (ARMO) merger.getMajor(eItem.getAttribute("EDID"), GRUP_TYPE.ARMO);
+                                        if (armor != null) {
+                                            KeywordSet keys = armor.getKeywordSet();
+                                            NodeList kList = eItem.getElementsByTagName("keyword");
+                                            for (int k = 0; k < kList.getLength(); k++) {
+                                                Element eKey = (Element) kList.item(k);
+                                                KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
+                                                if (newKey == null) {
+                                                    newKey = new KYWD(patch, eKey.getTextContent());
+                                                    merger.addRecord(newKey);
+                                                }
+                                                keys.addKeywordRef(newKey.getForm());
+                                                patch.addRecord(armor);
+                                                merger.addRecord(armor);
+                                            }
                                         }
                                     }
                                 }
@@ -661,9 +682,9 @@ public class LeveledListInjector implements SUM {
                         NodeList oldItems = p.getVar().getChildNodes();
                         for (int j = 0; j < newItems.getLength(); j++) {
                             Node newItem = newItems.item(j);
-                            Element eNewItem = (Element) newItem;
                             boolean foundItem = false;
                             if (newItem.getNodeType() == Node.ELEMENT_NODE) {
+                                Element eNewItem = (Element) newItem;
                                 for (int k = 0; k < oldItems.getLength(); k++) {
                                     Node oldItem = oldItems.item(j);
                                     if (oldItem.getNodeType() == Node.ELEMENT_NODE) {
@@ -672,21 +693,25 @@ public class LeveledListInjector implements SUM {
                                             foundItem = true;
                                             NodeList newKeys = newItem.getChildNodes();
                                             for (int m = 0; m < newKeys.getLength(); m++) {
-                                                Element newKey = (Element) newKeys.item(m);
-                                                if (newKey.getNodeName().contentEquals("keyword")) {
-                                                    boolean foundKey = false;
-                                                    NodeList oldKeys = oldItem.getChildNodes();
-                                                    for (int l = 0; l < oldKeys.getLength(); l++) {
-                                                        Element oldKey = (Element) oldKeys.item(l);
-                                                        if (oldKey.getNodeName().contentEquals("keyword")) {
-                                                            if (oldKey.getTextContent().contentEquals(newKey.getTextContent())) {
-                                                                foundKey = true;
-                                                                break;
+                                                if (newKeys.item(m).getNodeType() == Node.ELEMENT_NODE) {
+                                                    Element newKey = (Element) newKeys.item(m);
+                                                    if (newKey.getNodeName().contentEquals("keyword")) {
+                                                        boolean foundKey = false;
+                                                        NodeList oldKeys = oldItem.getChildNodes();
+                                                        for (int l = 0; l < oldKeys.getLength(); l++) {
+                                                            if (oldKeys.item(l).getNodeType() == Node.ELEMENT_NODE) {
+                                                                Element oldKey = (Element) oldKeys.item(l);
+                                                                if (oldKey.getNodeName().contentEquals("keyword")) {
+                                                                    if (oldKey.getTextContent().contentEquals(newKey.getTextContent())) {
+                                                                        foundKey = true;
+                                                                        break;
+                                                                    }
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                    if (!foundKey) {
-                                                        newItem.appendChild(newDoc.importNode(newKey, true));
+                                                        if (!foundKey) {
+                                                            newItem.appendChild(newDoc.importNode(newKey, true));
+                                                        }
                                                     }
                                                 }
                                             }

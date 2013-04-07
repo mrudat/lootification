@@ -18,7 +18,8 @@ import skyproc.gui.SUMGUI;
 public class OtherSettingsPanel extends SPSettingPanel {
 
     LCheckBox importOnStartup;
-    LCheckBox lootifyMod;
+    LCheckBox LootifyDragonborn;
+    LCheckBox SkipInactiveMods;
     
 
     public OtherSettingsPanel(SPMainMenuPanel parent_) {
@@ -36,10 +37,15 @@ public class OtherSettingsPanel extends SPSettingPanel {
 	setPlacement(importOnStartup);
 	AddSetting(importOnStartup);
        
-        lootifyMod = new LCheckBox("Lootify mod(s) instead of making leveled lists", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        lootifyMod.tie(YourSaveFile.Settings.LOOTIFY_MOD, LeveledListInjector.save, SUMGUI.helpPanel, true);
-        setPlacement(lootifyMod);
-        AddSetting(lootifyMod);
+        LootifyDragonborn = new LCheckBox("Lootify the Dragonborn DLC items", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+        LootifyDragonborn.tie(YourSaveFile.Settings.LOOTIFY_DRAGONBORN, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        setPlacement(LootifyDragonborn);
+        AddSetting(LootifyDragonborn);
+        
+        SkipInactiveMods = new LCheckBox("Don't process inactive mods", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+        SkipInactiveMods.tie(YourSaveFile.Settings.SKIP_INACTIVE_MODS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        setPlacement(SkipInactiveMods);
+        AddSetting(SkipInactiveMods);
 
 //	alignRight();
         
