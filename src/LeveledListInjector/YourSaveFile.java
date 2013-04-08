@@ -22,6 +22,7 @@ public class YourSaveFile extends SkyProcSave {
         Add(Settings.TEST, 0, true);
         Add(Settings.LOOTIFY_DRAGONBORN, true, true);
         Add(Settings.SKIP_INACTIVE_MODS, true, true);
+        Add(Settings.USE_MATCHING_OUTFITS, true, true);
 
     }
 
@@ -58,6 +59,9 @@ public class YourSaveFile extends SkyProcSave {
                 + "Disable if you have created custom esps from recognized mods.\n"
                 + "This will slow patch creation somewhat.");
         
+        helpInfo.put(Settings.USE_MATCHING_OUTFITS, 
+                "Outfits will use matching armor sets if availible. Disabling will also disable tiered outfits.");
+        
         helpInfo.put(Settings.TEST, 
                 "Test help info");
     }
@@ -72,6 +76,7 @@ public class YourSaveFile extends SkyProcSave {
         PROCESS_OUTFITS,
         LOOTIFY_DRAGONBORN,
         SKIP_INACTIVE_MODS,
+        USE_MATCHING_OUTFITS,
         TEST;
     }
 }

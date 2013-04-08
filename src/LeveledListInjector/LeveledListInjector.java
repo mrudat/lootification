@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.5";
+    public static String version = "0.5.5";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -269,7 +269,9 @@ public class LeveledListInjector implements SUM {
             SPGlobal.log("active Mod", eachMod.toString());
             if (!(eachMod.equals(skyrim) || eachMod.equals(variants) || eachMod.equals(update))) {
                 Mod m = importer.importMod(eachMod, SPGlobal.pathToData, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP, GRUP_TYPE.KYWD);
-                if (m.numRecords() != 0) {
+                int numArmors = m.getArmors().size();
+                int numWeapons = m.getWeapons().size();
+                if ( (numArmors != 0) || (numWeapons != 0) ) {
                     activeMods.add(m);
                 }
             }
@@ -287,7 +289,27 @@ public class LeveledListInjector implements SUM {
             Element mod = (Element) nMod;
             lootifiedMods.add(new Pair<>(mod.getAttribute("modName"), nMod));
         }
+        
+        File CustomXmlFile = new File("Custom.xml");
+        Document cDoc = dBuilder.parse(CustomXmlFile);
+        cDoc.getDocumentElement().normalize();
 
+        mList = cDoc.getElementsByTagName("mod");
+        for (int i = 0; i < mList.getLength(); i++){
+            Node nMod = mList.item(i);
+            Element mod = (Element) nMod;
+            Pair<String, Node> p = new Pair<>(mod.getAttribute("modName"), nMod);
+            boolean found = false;
+            for(Pair<String, Node> q : lootifiedMods){
+                if (q.getBase().contentEquals(p.getBase()) ) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                lootifiedMods.add(p);
+            }
+        }
     }
 
     // This function runs right as the program is about to close.

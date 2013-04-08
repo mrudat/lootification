@@ -62,7 +62,7 @@ public class ArmorTools {
         for (OTFT lotft : merger.getOutfits()) {
             String lotftName = lotft.getEDID();
             boolean tiered = isTiered(lotftName);
-            if (tiered) {
+            if (tiered && LeveledListInjector.save.getBool(YourSaveFile.Settings.USE_MATCHING_OUTFITS)) {
                 //lotft.clearInventoryItems();
                 ArrayList<FormID> inv = lotft.getInventoryList();
                 for (FormID form : inv) {
@@ -73,6 +73,7 @@ public class ArmorTools {
 
                 String bits = getBits(lotftName);
                 LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
+                subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 String tierKey = getTierKey(lotftName);
 
 
@@ -88,40 +89,43 @@ public class ArmorTools {
             } else {
                 ArrayList<FormID> a = lotft.getInventoryList();
                 boolean changed = false;
-                FormID form1;
-                for (int i = 0; i < a.size(); i++) {
-                    form1 = a.get(i);
-                    ARMO arm = (ARMO) merger.getMajor(form1, GRUP_TYPE.ARMO);
-                    if (arm != null) {
-                        KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
-                        if (k != null) {
-                            ArrayList<ARMO> b = getAllWithKey(k, a, merger);
-                            if (b.size() > 1) {
-                                String lvliName = getNameFromArrayWithKey(b, k, merger);
-                                LVLI list = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
-                                if (list != null) {
-                                    for (ARMO arm2 : b) {
-                                        lotft.removeInventoryItem(arm2.getForm());
-                                    }
-                                    lotft.addInventoryItem(list.getForm());
-                                } else {
-                                    for (ARMO arm2 : b) {
-                                        lotft.removeInventoryItem(arm2.getForm());
-                                    }
-                                    LVLI newList = (LVLI) patch.makeCopy(glist, lvliName);
+                if (LeveledListInjector.save.getBool(YourSaveFile.Settings.USE_MATCHING_OUTFITS)) {
+                    FormID form1;
+                    for (int i = 0; i < a.size(); i++) {
+                        form1 = a.get(i);
+                        ARMO arm = (ARMO) merger.getMajor(form1, GRUP_TYPE.ARMO);
+                        if (arm != null) {
+                            KYWD k = hasKeyStartsWith(arm, "dienes_outfit", merger);
+                            if (k != null) {
+                                ArrayList<ARMO> b = getAllWithKey(k, a, merger);
+                                if (b.size() > 1) {
+                                    String lvliName = getNameFromArrayWithKey(b, k, merger);
+                                    LVLI list = (LVLI) patch.getMajor(lvliName, GRUP_TYPE.LVLI);
+                                    if (list != null) {
+                                        for (ARMO arm2 : b) {
+                                            lotft.removeInventoryItem(arm2.getForm());
+                                        }
+                                        lotft.addInventoryItem(list.getForm());
+                                    } else {
+                                        for (ARMO arm2 : b) {
+                                            lotft.removeInventoryItem(arm2.getForm());
+                                        }
+                                        LVLI newList = (LVLI) patch.makeCopy(glist, lvliName);
+                                        newList.set(LeveledRecord.LVLFlag.UseAll, true);
 //                                LVLI subList = (LVLI) patch.makeCopy(glist, lvliName.replace("Outfit", "OutfitSublist"));
 //                                addArmorFromArray(subList, b);
 //                                patch.addRecord(subList);
 //                                newList.addEntry(subList.getForm(), 1, 1);
-                                    addAlternateOutfits(newList, b, merger, patch);
+                                        addAlternateOutfits(newList, b, merger, patch);
 
-                                    lotft.addInventoryItem(newList.getForm());
-                                    patch.addRecord(newList);
+                                        lotft.addInventoryItem(newList.getForm());
+                                        patch.addRecord(newList);
 
+                                    }
+                                    changed = true;
+                                    i = -1;
+                                    a = lotft.getInventoryList();
                                 }
-                                changed = true;
-                                i = -1;
-                                a = lotft.getInventoryList();
                             }
                         }
                     }
@@ -1108,7 +1112,6 @@ public class ArmorTools {
                             patch.addRecord(list);
                         } else {
                             LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
-                            subList.set(LeveledRecord.LVLFlag.UseAll, false);
                             addArmorByBit(subList, p.getVar(), String.valueOf(c), merger);
                             patch.addRecord(subList);
                             list.addEntry(subList.getForm(), 1, 1);
@@ -1487,6 +1490,7 @@ public class ArmorTools {
         names.add("BanditArmorHeavyBossOutfit");
         names.add("BanditArmorHeavyBossNoShieldOutfit");
         names.add("BanditArmorMeleeShield20Outfit");
+        names.add("BanditArmorMeleeNoShieldOutfit");
         names.add("ThalmorArmorWithHelmetOutfit");
         names.add("WarlockOutfitLeveled");
         names.add("NecromancerOutfit");

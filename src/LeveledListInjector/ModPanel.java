@@ -224,6 +224,10 @@ public class ModPanel extends SPSettingPanel {
     @Override
     protected void initialize() {
         super.initialize();
+
+        armorKeys = new ArrayList<>(0);
+        weaponKeys = new ArrayList<>(0);
+        
         boolean found = false;
         for (LeveledListInjector.Pair<String, Node> p : LeveledListInjector.lootifiedMods) {
             if (p.getBase().contentEquals(myMod.getName())) {
@@ -254,8 +258,7 @@ public class ModPanel extends SPSettingPanel {
 
             LeveledListInjector.gearVariants.addAsOverrides(myMod, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
 
-            armorKeys = new ArrayList<>(0);
-            weaponKeys = new ArrayList<>(0);
+
             weaponBoxes = new ArrayList<>(0);
             armorListeners = new ArrayList<>(0);
             weaponListeners = new ArrayList<>(0);
@@ -282,7 +285,8 @@ public class ModPanel extends SPSettingPanel {
             for (ARMO armor : myMod.getArmors()) {
                 boolean non_playable = armor.getBodyTemplate().get(BodyTemplate.GeneralFlags.NonPlayable);
                 FormID enchant = armor.getEnchantment();
-                if (!non_playable && (enchant.isNull())) {
+                boolean newItem = armor.getFormMaster().print().contentEquals(myMod.getName());
+                if (!non_playable && (enchant.isNull()) && newItem) {
                     LPanel panel = new LPanel(275, 200);
                     panel.setSize(300, 80);
                     LLabel armorName = new LLabel(armor.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
@@ -331,7 +335,8 @@ public class ModPanel extends SPSettingPanel {
                 boolean non_playable = weapon.get(WEAP.WeaponFlag.NonPlayable);
                 boolean bound = weapon.get(WEAP.WeaponFlag.BoundWeapon);
                 FormID enchant = weapon.getEnchantment();
-                if (!non_playable && !bound && (enchant.isNull())) {
+                boolean newItem = weapon.getFormMaster().print().contentEquals(myMod.getName());
+                if (!non_playable && !bound && (enchant.isNull()) && newItem) {
                     LPanel panel = new LPanel(275, 200);
                     panel.setSize(300, 60);
                     LLabel weaponName = new LLabel(weapon.getName(), LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
@@ -369,26 +374,30 @@ public class ModPanel extends SPSettingPanel {
     @Override
     public void onClose(SPMainMenuPanel parent) {
         boolean found = false;
-        for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
-            if (p.getBase().equals(myMod)) {
-                found = true;
-                break;
+        if (!armorKeys.isEmpty()) {
+            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
+                if (p.getBase().equals(myMod)) {
+                    found = true;
+                    break;
+                }
             }
-        }
-        if (!found) {
-            LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, armorKeys);
-            LeveledListInjector.modArmors.add(p);
+            if (!found) {
+                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, armorKeys);
+                LeveledListInjector.modArmors.add(p);
+            }
         }
         found = false;
-        for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
-            if (p.getBase().equals(myMod)) {
-                found = true;
-                break;
+        if (!weaponKeys.isEmpty()) {
+            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
+                if (p.getBase().equals(myMod)) {
+                    found = true;
+                    break;
+                }
             }
-        }
-        if (!found) {
-            LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
-            LeveledListInjector.modWeapons.add(p);
+            if (!found) {
+                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
+                LeveledListInjector.modWeapons.add(p);
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ public class OtherSettingsPanel extends SPSettingPanel {
     LCheckBox importOnStartup;
     LCheckBox LootifyDragonborn;
     LCheckBox SkipInactiveMods;
+    LCheckBox UseMatchingOutfits;
     
 
     public OtherSettingsPanel(SPMainMenuPanel parent_) {
@@ -46,6 +47,11 @@ public class OtherSettingsPanel extends SPSettingPanel {
         SkipInactiveMods.tie(YourSaveFile.Settings.SKIP_INACTIVE_MODS, LeveledListInjector.save, SUMGUI.helpPanel, true);
         setPlacement(SkipInactiveMods);
         AddSetting(SkipInactiveMods);
+        
+        UseMatchingOutfits = new LCheckBox("Match outfits when possible", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+        UseMatchingOutfits.tie(YourSaveFile.Settings.USE_MATCHING_OUTFITS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        setPlacement(UseMatchingOutfits);
+        AddSetting(UseMatchingOutfits);
 
 //	alignRight();
         
