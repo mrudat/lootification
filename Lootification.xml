@@ -7363,4 +7363,669 @@
       <keyword>BanditBoss_Tier_6</keyword>
     </item>
   </mod>
+  <mod modName="ExpandedJewelryCrafting.esp">
+    <item EDID="JewelryRingDaedricPhil" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDaedric" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceOrcish02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceOrcish" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceGlass02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceGlass" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceElven02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceElven" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbony02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbony" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDwarven02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDwarven" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDragonBone02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDaedric03" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDaedric02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDragonBone" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceDaedric" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceSteel04" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceSteel03" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceSteel02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceGoldRoahm" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceSteel" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDaedricGold" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcish02" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcish" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneS_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneR_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneG_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneE_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneA_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenD_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingOrcishD_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassD_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyD_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneD_FL" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassGlss" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingGlassA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenMoon" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingElvenA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklacePlatinumD" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonySapphire" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonyRuby" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonyGarnet" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonyEmerald" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonyDiamond" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryNecklaceEbonyAmethyst" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryAmuletDragonboneGemD" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyEbn" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyRose" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenD" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingEbonyS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneS" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDwarvenA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneR" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneG" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneE" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonboneA" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDragonbone" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+    <item EDID="JewelryRingDaedricHeart" type="armor">
+      <keyword>ARMOR_JEWELRY</keyword>
+    </item>
+  </mod>
+  <mod modName="LostLongSwords.esp">
+    <item EDID="DaedricLongSword" type="weapon">
+      <keyword>WEAPON_DAEDRIC</keyword>
+    </item>
+    <item EDID="GlassLongSword" type="weapon">
+      <keyword>WEAPON_GLASS</keyword>
+    </item>
+    <item EDID="SteelLongSword" type="weapon">
+      <keyword>WEAPON_STEEL</keyword>
+    </item>
+    <item EDID="OrcishLongSword" type="weapon">
+      <keyword>WEAPON_ORCISH</keyword>
+    </item>
+    <item EDID="DragonboneLongSword" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="SilverLongSword" type="weapon">
+      <keyword>WEAPON_SILVER</keyword>
+    </item>
+    <item EDID="DwarvenLongSword" type="weapon">
+      <keyword>WEAPON_DWARVEN</keyword>
+    </item>
+    <item EDID="ElvenLongSword" type="weapon">
+      <keyword>WEAPON_ELVEN</keyword>
+    </item>
+    <item EDID="IronLongSword" type="weapon">
+      <keyword>WEAPON_IRON</keyword>
+    </item>
+    <item EDID="EbonyLongSword" type="weapon">
+      <keyword>WEAPON_EBONY</keyword>
+    </item>
+    <item EDID="ImperialLongSword" type="weapon">
+      <keyword>WEAPON_IMPERIAL</keyword>
+    </item>
+  </mod>
+  <mod modName="Unexpected Blades.esp">
+    <item EDID="DaedricBattleaxe" type="weapon">
+      <keyword>WEAPON_DAEDRIC</keyword>
+    </item>
+    <item EDID="DaedricSword" type="weapon">
+      <keyword>WEAPON_DAEDRIC</keyword>
+    </item>
+    <item EDID="EbonySword" type="weapon">
+      <keyword>WEAPON_EBONY</keyword>
+    </item>
+  </mod>
+  <mod modName="Insanity's Shields.esp">
+    <item EDID="aaISWoodenShieldImpl02" type="armor">
+      <keyword>ARMOR_IMPERIAL_LIGHT</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldImpl01" type="armor">
+      <keyword>ARMOR_IMPERIAL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield01" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield07" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield06" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield05" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldTrsk02" type="armor">
+      <keyword>ARMOR_DWARVEN</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldTrsk01" type="armor">
+      <keyword>ARMOR_DWARVEN</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldSprl02" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldSprl01" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield20" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield19" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield18" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield17" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield16" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield04" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield30" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield29" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield28" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield27" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield26" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield25" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield24" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield23" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield22" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield21" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield03" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldScrp01" type="armor">
+      <keyword>ARMOR_DWARVEN</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldDrgn01" type="armor">
+      <keyword>ARMOR_ORCISH</keyword>
+    </item>
+    <item EDID="aaISWoodenShield31" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield02" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldNight01" type="armor">
+      <keyword>ARMOR_ELVEN</keyword>
+    </item>
+    <item EDID="aaISWoodenShield15" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShieldWolf01" type="armor">
+      <keyword>ARMOR_ORCISH</keyword>
+    </item>
+    <item EDID="aaISWoodenShield12" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield13" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield14" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield11" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield10" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield09" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield49" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield48" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield47" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield46" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield45" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield44" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield43" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield42" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield41" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield40" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield39" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield38" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield37" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield36" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield35" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield34" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield33" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+    <item EDID="aaISWoodenShield08" type="armor">
+      <keyword>ARMOR_STEEL</keyword>
+    </item>
+    <item EDID="aaISWoodenShield32" type="armor">
+      <keyword>ARMOR_IRON</keyword>
+    </item>
+  </mod>
+  <mod modName="PrvtI_HeavyArmory_DG_Addon.esp">
+    <item EDID="ShDragonboneHammer" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragoneboneStaff" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragonboneHalberd" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragonboneShortspear" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragonboneShortSword" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragoneboneSpear" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="ShDragonboneHatchet" type="weapon">
+      <keyword>WEAPON_DRAGONBONE</keyword>
+    </item>
+  </mod>
+  <mod modName="Brigandage.esp">
+    <item EDID="ArmorBrigand1" type="armor">
+      <keyword>dienes_outfit_hide</keyword>
+	  <keyword>BanditLight_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand2" type="armor">
+      <keyword>ARMOR_FUR</keyword>
+	  <keyword>dienes_outfit_fur</keyword>
+	  <keyword>BanditLight_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand3" type="armor">
+	  <keyword>dienes_outfit_iron</keyword>
+	  <keyword>BanditHeavy_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand4" type="armor">
+	  <keyword>dienes_outfit_leather</keyword>
+	  <keyword>BanditLight_Tier_2</keyword>
+    </item>
+	<item EDID="ArmorBrigand5" type="armor">
+    </item>
+	<item EDID="ArmorBrigand6" type="armor">
+      <keyword>ARMOR_FUR</keyword>
+	  <keyword>dienes_outfit_fur</keyword>
+	  <keyword>BanditLight_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand7" type="armor">
+      <keyword>ARMOR_FUR</keyword>
+	  <keyword>dienes_outfit_fur</keyword>
+	  <keyword>BanditLight_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand8" type="armor">
+    </item>
+	<item EDID="ArmorBrigand9" type="armor">
+      <keyword>ARMOR_HIDE</keyword>
+	  <keyword>dienes_outfit_hide</keyword>
+	  <keyword>BanditLight_Tier_0</keyword>
+    </item>
+	<item EDID="ArmorBrigand10" type="armor">
+    </item>
+	<item EDID="ArmorBrigand11" type="armor">
+    </item>
+	<item EDID="ArmorBrigand12" type="armor">
+    </item>
+  </mod>
+  <mod modName="Dawnguard.esm">
+    <item EDID="DLC1DragonboneBow" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneWarhammer" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneWarAxe" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneSword" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneMace" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneGreatsword" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneDagger" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+    <item EDID="DLC1DragonboneBattleaxe" type="weapon">
+      <keyword>LLI_BASE_WEAPON_DRAGONBONE</keyword>
+    </item>
+  </mod>
 </lootification>

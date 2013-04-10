@@ -112,6 +112,8 @@ public class ArmorTools {
                                         }
                                         LVLI newList = (LVLI) patch.makeCopy(glist, lvliName);
                                         newList.set(LeveledRecord.LVLFlag.UseAll, true);
+                                        newList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                                        newList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
 //                                LVLI subList = (LVLI) patch.makeCopy(glist, lvliName.replace("Outfit", "OutfitSublist"));
 //                                addArmorFromArray(subList, b);
 //                                patch.addRecord(subList);
@@ -1177,6 +1179,8 @@ public class ArmorTools {
                         } else {
                             LVLI set = (LVLI) patch.makeCopy(glist, setListName);
                             set.set(LeveledRecord.LVLFlag.UseAll, true);
+                            set.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                            set.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
                             ArrayList<ArrayList<ARMO>> abits = new ArrayList<>(0);
                             for (char c : bits.toCharArray()) {
                                 abits.add(addArmorByBitToArray(ar, String.valueOf(c), merger));

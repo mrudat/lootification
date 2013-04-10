@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.5.5";
+    public static String version = "0.5.6";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
