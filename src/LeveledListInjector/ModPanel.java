@@ -18,9 +18,9 @@ import skyproc.gui.*;
  */
 public class ModPanel extends SPSettingPanel {
 
-    private Mod myMod;
-    private ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> armorKeys;
-    private ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> weaponKeys;
+    public Mod myMod;
+    public ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> armorKeys = new ArrayList<>(0);
+    public ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> weaponKeys = new ArrayList<>(0);
     private ArrayList<LComboBox> weaponBoxes;
     private ArrayList<ArmorListener> armorListeners;
     private ArrayList<WeaponListener> weaponListeners;
@@ -373,31 +373,31 @@ public class ModPanel extends SPSettingPanel {
 
     @Override
     public void onClose(SPMainMenuPanel parent) {
-        boolean found = false;
-        if (!armorKeys.isEmpty()) {
-            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
-                if (p.getBase().equals(myMod)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, armorKeys);
-                LeveledListInjector.modArmors.add(p);
-            }
-        }
-        found = false;
-        if (!weaponKeys.isEmpty()) {
-            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
-                if (p.getBase().equals(myMod)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
-                LeveledListInjector.modWeapons.add(p);
-            }
-        }
+//        boolean found = false;
+//        if (!armorKeys.isEmpty()) {
+//            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
+//                if (p.getBase().equals(myMod)) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (!found) {
+//                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, armorKeys);
+//                LeveledListInjector.modArmors.add(p);
+//            }
+//        }
+//        found = false;
+//        if (!weaponKeys.isEmpty()) {
+//            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
+//                if (p.getBase().equals(myMod)) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (!found) {
+//                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
+//                LeveledListInjector.modWeapons.add(p);
+//            }
+//        }
     }
 }
