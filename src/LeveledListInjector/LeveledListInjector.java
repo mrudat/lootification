@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.5.7";
+    public static String version = "0.5.8";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -371,6 +371,18 @@ public class LeveledListInjector implements SUM {
                     KYWD key = (KYWD) gearVariants.getMajor(form, GRUP_TYPE.KYWD);
                     if (key == null) {
                         JOptionPane.showMessageDialog(null, weapon.getEDID() + " has an invalid keyword reference. The patch will fail. Clean it in tes5edit and rerun the patcher.");
+                        throw new Exception();
+                    }
+                }
+            }
+            for (OTFT o : gearVariants.getOutfits()) {
+                ArrayList<FormID> items = o.getInventoryList();
+                for (FormID f : items) {
+                    LVLI litem = (LVLI) gearVariants.getMajor(f, GRUP_TYPE.LVLI);
+                    ARMO arm = (ARMO) gearVariants.getMajor(f, GRUP_TYPE.ARMO);
+                    WEAP weapon = (WEAP) gearVariants.getMajor(f, GRUP_TYPE.WEAP);
+                    if( (litem == null)&&(arm==null)&&(weapon==null) ){
+                        JOptionPane.showMessageDialog(null, o.getEDID() + " has an invalid entry. " + f.toString() + " The patch will fail. Clean it in tes5edit and rerun the patcher.");
                         throw new Exception();
                     }
                 }
