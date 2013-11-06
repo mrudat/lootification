@@ -1199,6 +1199,8 @@ public class ArmorTools {
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Thalmor_Tier_9"))) {
                     LVLI subList = (LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                    subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
                     FormID boots = new FormID("01391a", "Skyrim.esm");
                     FormID helm = new FormID("01391d", "Skyrim.esm");
                     FormID cuirass = new FormID("01392a", "Skyrim.esm");
@@ -1215,6 +1217,8 @@ public class ArmorTools {
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Necromancer_Tier_0"))) {
                     LVLI subList = (LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                    subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
                     FormID boots = new FormID("0c36e8", "Skyrim.esm");
                     FormID robesList = new FormID("105251", "Skyrim.esm");
                     subList.addEntry(boots, 1, 1);
@@ -1227,6 +1231,8 @@ public class ArmorTools {
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Warlock_Tier_0"))) {
                     LVLI subList = (LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
+                    subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                    subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
                     FormID boots = new FormID("0c5d12", "Skyrim.esm");
                     FormID robesList = new FormID("105ef9", "Skyrim.esm");
                     subList.addEntry(boots, 1, 1);
