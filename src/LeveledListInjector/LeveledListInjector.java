@@ -392,7 +392,7 @@ public class LeveledListInjector implements SUM {
                 String modName = m.getName();
 
                 if (!(modName.contentEquals("Skyrim.esm") || (modName.contentEquals("Lootification.esm")) || modName.contentEquals("Hearthfires.esm")
-                        || modName.contentEquals("Upgrade.esm") || modName.contentEquals("Dragonborn.esm") || modName.contentEquals("Dawnguard.esm"))) {
+                        || modName.contentEquals("Update.esm") || modName.contentEquals("Dragonborn.esm") || modName.contentEquals("Dawnguard.esm"))) {
                     int numArmors = m.getArmors().size();
                     int numWeapons = m.getWeapons().size();
 
