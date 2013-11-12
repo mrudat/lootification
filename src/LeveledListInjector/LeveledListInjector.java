@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.5.9";
+    public static String version = "0.6";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -481,29 +481,7 @@ public class LeveledListInjector implements SUM {
         FLST variantWeaponKeysFLST = (FLST) merger.getMajor("LLI_VAR_WEAPON_KEYS", GRUP_TYPE.FLST);
 
 
-        //ArmorTools.setMergeAndPatch(merger, patch);
-        boolean buildLootification = false;
-        if (buildLootification) {
-//        if (save.getBool(Settings.PROCESS_ARMORS)) {
-            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
-            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
-//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-            ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
-//            }
-            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
-//        }
-
-//        if (save.getBool(Settings.PROCESS_WEAPONS)) {
-            WeaponTools.setMergeAndPatch(merger, patch);
-            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
-            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
-//            if (save.getBool(Settings.PROCESS_OUTFITS)) {
-            WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
-//            }
-            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
-//        }
-        }
 
         boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
         if (lootify) {
@@ -750,7 +728,7 @@ public class LeveledListInjector implements SUM {
                                                 Element eKey = (Element) kList.item(k);
                                                 KYWD newKey = (KYWD) merger.getMajor(eKey.getTextContent(), GRUP_TYPE.KYWD);
                                                 if (newKey == null) {
-                                                    newKey = new KYWD(patch, eKey.getTextContent());
+                                                    newKey = new KYWD(eKey.getTextContent());
                                                     merger.addRecord(newKey);
                                                 }
                                                 keys.addKeywordRef(newKey.getForm());

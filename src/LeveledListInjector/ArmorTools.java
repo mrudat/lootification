@@ -336,7 +336,7 @@ public class ArmorTools {
                             if (!tmp.isNull()) {
                                 replace = (ARMO) merger.getMajor(tmp, GRUP_TYPE.ARMO);
                             }
-                            for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                            for (skyproc.genenums.FirstPersonFlags c : skyproc.genenums.FirstPersonFlags.values()) {
                                 boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
                                 boolean formFlag = replace.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
 
@@ -764,30 +764,30 @@ public class ArmorTools {
         }
         boolean h = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
                 h = true;
                 break;
             }
         }
         boolean c = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
                 c = true;
                 break;
             }
         }
         boolean g = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
                 g = true;
                 break;
             }
         }
         boolean b = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
                 b = true;
                 break;
             }
@@ -943,7 +943,7 @@ public class ArmorTools {
                 if (key) {
                     for (ARMO armor : p1.getVar()) {
                         boolean passed = true;
-                        for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                        for (skyproc.genenums.FirstPersonFlags c : skyproc.genenums.FirstPersonFlags.values()) {
                             boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
                             boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
 
@@ -1057,7 +1057,7 @@ public class ArmorTools {
                 if (key) {
                     for (ARMO armor : p1.getVar()) {
                         boolean passed = true;
-                        for (BodyTemplate.FirstPersonFlags c : BodyTemplate.FirstPersonFlags.values()) {
+                        for (skyproc.genenums.FirstPersonFlags c : skyproc.genenums.FirstPersonFlags.values()) {
                             boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
                             boolean formFlag = arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
 
@@ -1265,9 +1265,9 @@ public class ArmorTools {
         if (bits.contains("H")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
                     passed = true;
                 }
             }
@@ -1278,7 +1278,7 @@ public class ArmorTools {
         if (bits.contains("C")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
                     passed = true;
                 }
             }
@@ -1289,7 +1289,7 @@ public class ArmorTools {
         if (bits.contains("G")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
                     passed = true;
                 }
             }
@@ -1300,7 +1300,7 @@ public class ArmorTools {
         if (bits.contains("B")) {
             boolean passed = false;
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
                     passed = true;
                 }
             }
@@ -1329,9 +1329,9 @@ public class ArmorTools {
         KYWD helm = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
         boolean h = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                    || arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
                 h = true;
                 break;
             }
@@ -1339,7 +1339,7 @@ public class ArmorTools {
         KYWD cuirass = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
         boolean c = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
                 c = true;
                 break;
             }
@@ -1347,7 +1347,7 @@ public class ArmorTools {
         KYWD gauntlets = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
         boolean g = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
                 g = true;
                 break;
             }
@@ -1355,7 +1355,7 @@ public class ArmorTools {
         KYWD boots = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
         boolean b = false;
         for (ARMO arm : a) {
-            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+            if (arm.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
                 b = true;
                 break;
             }
@@ -1408,30 +1408,30 @@ public class ArmorTools {
     static void addArmorByBit(LVLI set, ArrayList<ARMO> ar, String bits, Mod merger) {
         if (bits.contains("H")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
                     set.addEntry(a.getForm(), 1, 1);
                 }
             }
         }
         if (bits.contains("C")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
                     set.addEntry(a.getForm(), 1, 1);
                 }
             }
         }
         if (bits.contains("G")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
                     set.addEntry(a.getForm(), 1, 1);
                 }
             }
         }
         if (bits.contains("B")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
                     set.addEntry(a.getForm(), 1, 1);
                 }
             }
@@ -1452,30 +1452,30 @@ public class ArmorTools {
 
         if (bits.contains("H")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                        || a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
                     ret.add(a);
                 }
             }
         }
         if (bits.contains("C")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
                     ret.add(a);
                 }
             }
         }
         if (bits.contains("G")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
                     ret.add(a);
                 }
             }
         }
         if (bits.contains("B")) {
             for (ARMO a : ar) {
-                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+                if (a.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
                     ret.add(a);
                 }
             }
@@ -1621,27 +1621,27 @@ public class ArmorTools {
 
     static KYWD getSlotKYWD(ARMO armor, Mod merger) {
         KYWD ret = null;
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.CIRCLET)
-                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HEAD)
-                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HAIR)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.CIRCLET)
+                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HEAD)
+                || armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HAIR)) {
             ret = (KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.BODY)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.BODY)) {
             ret = (KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.HANDS)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.HANDS)) {
             ret = (KYWD) merger.getMajor("ArmorGauntlets", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.FEET)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.FEET)) {
             ret = (KYWD) merger.getMajor("ArmorBoots", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.SHIELD)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.SHIELD)) {
             ret = (KYWD) merger.getMajor("ArmorShield", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.RING)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.RING)) {
             ret = (KYWD) merger.getMajor("ClothingRing", GRUP_TYPE.KYWD);
         }
-        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, BodyTemplate.FirstPersonFlags.AMULET)) {
+        if (armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, skyproc.genenums.FirstPersonFlags.AMULET)) {
             ret = (KYWD) merger.getMajor("ClothingNecklace", GRUP_TYPE.KYWD);
         }
 
