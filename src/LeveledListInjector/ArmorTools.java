@@ -299,7 +299,7 @@ public class ArmorTools {
         for (ARMO armor : merger.getArmors()) {
             KYWD baseKey = armorHasAnyKeyword(armor, baseKeys, merger);
             if (baseKey != null) {
-                SPGlobal.log(armor.getEDID(), "is base armor");
+                //SPGlobal.log(armor.getEDID(), "is base armor");
                 ArrayList<FormID> alts = new ArrayList<>(0);
                 alts.add(0, armor.getForm());
                 armorVariants.add(alts);
@@ -337,6 +337,8 @@ public class ArmorTools {
                                 replace = (ARMO) merger.getMajor(tmp, GRUP_TYPE.ARMO);
                             }
                             for (skyproc.genenums.FirstPersonFlags c : skyproc.genenums.FirstPersonFlags.values()) {
+                                //skyproc.genenums.FirstPersonFlags[] test = skyproc.genenums.FirstPersonFlags.values();
+                                //SPGlobal.log("getFlags", c.toString());
                                 boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
                                 boolean formFlag = replace.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
 
