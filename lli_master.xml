@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<lli_master>
+    <mod ModName="Skyrim.esm">
+        <record EDID="ArmorIronGauntlets" type="armor">
+            <match type="base">ARMOR_IRON</match>
+            <outfit>dienes_outfit_iron</outfit>
+            <set set_name="bandit_heavy">0</set>
+            <set set_name="bandit_boss">0</set>
+        </record>
+    </mod>
+</lli_master>

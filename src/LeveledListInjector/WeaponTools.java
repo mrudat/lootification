@@ -18,33 +18,6 @@ public class WeaponTools {
     private static Mod merger;
     private static Mod patch;
 
-    public static class Pair<L, R> {
-
-        private L l;
-        private R r;
-
-        public Pair(L l, R r) {
-            this.l = l;
-            this.r = r;
-        }
-
-        public L getBase() {
-            return l;
-        }
-
-        public R getVar() {
-            return r;
-        }
-
-        public void setBase(L l) {
-            this.l = l;
-        }
-
-        public void setVar(R r) {
-            this.r = r;
-        }
-    }
-
     public static void setMergeAndPatch(Mod m, Mod p) {
         merger = m;
         patch = p;

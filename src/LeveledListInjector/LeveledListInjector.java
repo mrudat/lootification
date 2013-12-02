@@ -1,33 +1,34 @@
 package LeveledListInjector;
 
+import LeveledListInjector.YourSaveFile.Settings;
 import java.awt.Color;
 import java.awt.Font;
-import java.net.URL;
-import java.util.ArrayList;
 import java.io.File;
-import java.nio.file.Files;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import lev.gui.LSaveFile;
-import skyproc.*;
-import skyproc.gui.SPMainMenuPanel;
-import skyproc.gui.SUM;
-import skyproc.gui.SUMGUI;
-import LeveledListInjector.YourSaveFile.Settings;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import lev.gui.LSaveFile;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import skyproc.*;
+import skyproc.gui.SPMainMenuPanel;
 import skyproc.gui.SPProgressBarPlug;
+import skyproc.gui.SUM;
+import skyproc.gui.SUMGUI;
 
 /**
  *
@@ -40,32 +41,7 @@ public class LeveledListInjector implements SUM {
      * - getStandardMenu(), where you set up the GUI
      * - runChangesToPatch(), where you put all the processing code and add records to the output patch.
      */
-    public static class Pair<L, R> {
 
-        private L l;
-        private R r;
-
-        public Pair(L l, R r) {
-            this.l = l;
-            this.r = r;
-        }
-
-        public L getBase() {
-            return l;
-        }
-
-        public R getVar() {
-            return r;
-        }
-
-        public void setBase(L l) {
-            this.l = l;
-        }
-
-        public void setVar(R r) {
-            this.r = r;
-        }
-    }
     /*
      * The types of records you want your patcher to import. Change this to
      * customize the import to what you need.
@@ -75,7 +51,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6";
+    public static String version = "0.6.1";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -92,6 +68,7 @@ public class LeveledListInjector implements SUM {
     public static boolean listify = false;
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
+    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500);
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -244,56 +221,6 @@ public class LeveledListInjector implements SUM {
     public void onStart() throws Exception {
 
 
-        //get active mods with weapons or armor
-//        SPImporter importer = new SPImporter();
-//        ArrayList<ModListing> activeModListing = importer.getActiveModList();
-//        ModListing skyrim = new ModListing("Skyrim", true);
-//        ModListing update = new ModListing("Update", true);
-//        ModListing variants = new ModListing("Lootification", true);
-//        ModListing dawnguard = new ModListing("Dawnguard", true);
-//        ModListing hearthfires = new ModListing("Hearthfires", true);
-//        ModListing dragonborn = new ModListing("Dragonborn", true);
-//        gearVariants = importer.importMod(skyrim, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        Mod up = importer.importMod(update, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        gearVariants.addAsOverrides(up, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        Mod var = importer.importMod(variants, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//
-//        List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
-//
-//        File dawnf = new File(SPGlobal.pathToData + "Dawnguard.esm");
-//        if (lines.contains("Dawnguard.esm")) {
-//            Mod dawn = importer.importMod(dawnguard, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//            gearVariants.addAsOverrides(dawn, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        }
-//        File hearthf = new File(SPGlobal.pathToData + "Hearthfires.esm");
-//        if (lines.contains("Hearthfires.esm")) {
-//            Mod hearth = importer.importMod(hearthfires, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//            gearVariants.addAsOverrides(hearth, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        }
-//        File bornf = new File(SPGlobal.pathToData + "Dragonborn.esm");
-//        if (lines.contains("Dragonborn.esm")) {
-//            Mod born = importer.importMod(dragonborn, SPGlobal.pathToData, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//            gearVariants.addAsOverrides(born, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//        }
-//
-//        gearVariants.addAsOverrides(var, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP);
-//
-//
-//        global = new Mod(getName() + "MergerTemp", false);
-//
-////        checkMastersSorted();
-//
-//        for (ModListing eachMod : activeModListing) {
-//            SPGlobal.log("active Mod", eachMod.toString());
-//            if (!(eachMod.equals(skyrim) || eachMod.equals(variants) || eachMod.equals(update))) {
-//                Mod m = importer.importMod(eachMod, SPGlobal.pathToData, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP, GRUP_TYPE.KYWD);
-//                int numArmors = m.getArmors().size();
-//                int numWeapons = m.getWeapons().size();
-//                if ( (numArmors != 0) || (numWeapons != 0) ) {
-//                    activeMods.add(m);
-//                }
-//            }
-//        }
 
         Runnable r = new Runnable() {
             @Override
@@ -418,8 +345,8 @@ public class LeveledListInjector implements SUM {
     @Override
     public ArrayList<ModListing> requiredMods() {
         ArrayList<ModListing> req = new ArrayList<>(0);
-        ModListing gearVariants = new ModListing("Lootification", true);
-        req.add(gearVariants);
+        ModListing Lootification = new ModListing("Lootification", true);
+        req.add(Lootification);
         return req;
     }
 
@@ -442,27 +369,27 @@ public class LeveledListInjector implements SUM {
         for (ModPanel mPanel : modPanels) {
             boolean found = false;
             if (!mPanel.armorKeys.isEmpty()) {
-                for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
+                for (Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
                     if (p.getBase().equals(mPanel.myMod)) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(mPanel.myMod, mPanel.armorKeys);
+                    Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p = new Pair<>(mPanel.myMod, mPanel.armorKeys);
                     LeveledListInjector.modArmors.add(p);
                 }
             }
             found = false;
             if (!mPanel.weaponKeys.isEmpty()) {
-                for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
+                for (Pair<Mod, ArrayList<Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
                     if (p.getBase().equals(mPanel.myMod)) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(mPanel.myMod, mPanel.weaponKeys);
+                    Pair<Mod, ArrayList<Pair<WEAP, KYWD>>> p = new Pair<>(mPanel.myMod, mPanel.weaponKeys);
                     LeveledListInjector.modWeapons.add(p);
                 }
             }
@@ -517,6 +444,7 @@ public class LeveledListInjector implements SUM {
 
     }
 
+    @SuppressWarnings("UseSpecificCatch")
     public void addModsToXML(Mod merger) {
         try {
             File fXmlFile = new File("Custom.xml");
@@ -674,6 +602,7 @@ public class LeveledListInjector implements SUM {
         }
     }
 
+    @SuppressWarnings("UseSpecificCatch")
     public void processXML(Mod merger, Mod patch) {
         try {
             List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
@@ -753,6 +682,7 @@ public class LeveledListInjector implements SUM {
 
     }
 
+    @SuppressWarnings("UseSpecificCatch")
     public Document mergeDocs(Document doc1, Document doc2) {
         Document newDoc = null;
         try {
@@ -843,45 +773,4 @@ public class LeveledListInjector implements SUM {
         return newDoc;
     }
 
-    public void checkMastersSorted() throws Exception {
-        ArrayList<ModListing> activeModListing = SPImporter.getActiveModList();
-        for (ModListing mListing : activeModListing) {
-            Mod theMod = SPImporter.importMod(mListing, SPGlobal.pathToData);
-            ArrayList<ModListing> masters = theMod.getMasters();
-            ArrayList<ModListing> foundMasters = new ArrayList<>(0);
-            for (ModListing m : activeModListing) {
-                if (masters.contains(m)) {
-                    foundMasters.add(m);
-                }
-            }
-            if (masters.size() != foundMasters.size()) {
-                throw new missingMaster(mListing.print() + " has an master that is not active");
-            }
-            for (int i = 0; i < masters.size(); i++) {
-                if (!masters.get(i).equals(foundMasters.get(i))) {
-                    throw new outOfOrderMaster(mListing.print() + " has an out of order master. Please sort with tes5edit.");
-                }
-            }
-        }
-    }
-
-    class missingMaster extends Exception {
-
-        public missingMaster() {
-        }
-
-        public missingMaster(String message) {
-            super(message);
-        }
-    }
-
-    class outOfOrderMaster extends Exception {
-
-        public outOfOrderMaster() {
-        }
-
-        public outOfOrderMaster(String message) {
-            super(message);
-        }
-    }
 }

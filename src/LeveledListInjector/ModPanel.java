@@ -19,8 +19,8 @@ import skyproc.gui.*;
 public class ModPanel extends SPSettingPanel {
 
     public Mod myMod;
-    public ArrayList<LeveledListInjector.Pair<ARMO, KYWD>> armorKeys = new ArrayList<>(0);
-    public ArrayList<LeveledListInjector.Pair<WEAP, KYWD>> weaponKeys = new ArrayList<>(0);
+    public ArrayList<Pair<ARMO, KYWD>> armorKeys = new ArrayList<>(0);
+    public ArrayList<Pair<WEAP, KYWD>> weaponKeys = new ArrayList<>(0);
     private ArrayList<LComboBox> weaponBoxes;
     private ArrayList<ArmorListener> armorListeners;
     private ArrayList<WeaponListener> weaponListeners;
@@ -44,7 +44,7 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                for (LeveledListInjector.Pair<ARMO, KYWD> p : armorKeys) {
+                for (Pair<ARMO, KYWD> p : armorKeys) {
                     if (p.getBase().getForm().equals(armor.getForm())) {
                         armorKeys.remove(p);
                         break;
@@ -55,14 +55,14 @@ public class ModPanel extends SPSettingPanel {
                 label.setText(armor.getName());
             } else if ((pressed.compareTo("None") != 0) && (newKey == null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                LeveledListInjector.Pair<ARMO, KYWD> p = new LeveledListInjector.Pair<>(armor, newKey);
+                Pair<ARMO, KYWD> p = new Pair<>(armor, newKey);
                 armorKeys.add(p);
 
                 box.highlightChanged();
                 label.setText(armor.getName() + " set " + newKey.getEDID());
             } else if ((pressed.compareTo("None") != 0) && (newKey != null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                for (LeveledListInjector.Pair<ARMO, KYWD> p : armorKeys) {
+                for (Pair<ARMO, KYWD> p : armorKeys) {
                     if (p.getBase().getForm().equals(armor.getForm())) {
                         p.setVar(newKey);
                         break;
@@ -92,7 +92,7 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                for (LeveledListInjector.Pair<WEAP, KYWD> p : weaponKeys) {
+                for (Pair<WEAP, KYWD> p : weaponKeys) {
                     if (p.getBase().getForm().equals(weapon.getForm())) {
                         weaponKeys.remove(p);
                         break;
@@ -103,14 +103,14 @@ public class ModPanel extends SPSettingPanel {
                 title.setText(weapon.getName());
             } else if ((pressed.compareTo("None") != 0) && (newKey == null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                LeveledListInjector.Pair<WEAP, KYWD> p = new LeveledListInjector.Pair<>(weapon, newKey);
+                Pair<WEAP, KYWD> p = new Pair<>(weapon, newKey);
                 weaponKeys.add(p);
 
                 box.highlightChanged();
                 title.setText(weapon.getName() + " set as " + newKey.getEDID());
             } else if ((pressed.compareTo("None") != 0) && (newKey != null)) {
                 newKey = (KYWD) LeveledListInjector.gearVariants.getMajor(pressed, GRUP_TYPE.KYWD);
-                for (LeveledListInjector.Pair<WEAP, KYWD> p : weaponKeys) {
+                for (Pair<WEAP, KYWD> p : weaponKeys) {
                     if (p.getBase().getForm().equals(weapon.getForm())) {
                         p.setVar(newKey);
                         break;
@@ -184,7 +184,7 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String key = field.getText();
             if (setKey != null || key.contentEquals("")) {
-                for (LeveledListInjector.Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
+                for (Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
                     if (p.getBase().contentEquals(setKey)) {
                         p.getVar().remove(armor);
                     }
@@ -194,7 +194,7 @@ public class ModPanel extends SPSettingPanel {
             if (!key.contentEquals("")) {
                 boolean found = false;
                 if (setKey != null) {
-                    for (LeveledListInjector.Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
+                    for (Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
                         if (p.getBase().contentEquals(setKey)) {
                             if (!p.getVar().contains(armor)) {
                                 p.getVar().add(armor);
@@ -204,7 +204,7 @@ public class ModPanel extends SPSettingPanel {
                     }
                 }
                 if (!found) {
-                    LeveledListInjector.Pair<String, ArrayList<ARMO>> q = new LeveledListInjector.Pair<>(key, new ArrayList<ARMO>(0));
+                    Pair<String, ArrayList<ARMO>> q = new Pair<>(key, new ArrayList<ARMO>(0));
                     q.getVar().add(armor);
                     LeveledListInjector.outfits.add(q);
                 }
@@ -229,7 +229,7 @@ public class ModPanel extends SPSettingPanel {
         weaponKeys = new ArrayList<>(0);
         
         boolean found = false;
-        for (LeveledListInjector.Pair<String, Node> p : LeveledListInjector.lootifiedMods) {
+        for (Pair<String, Node> p : LeveledListInjector.lootifiedMods) {
             if (p.getBase().contentEquals(myMod.getName())) {
                 found = true;
                 break;
@@ -373,31 +373,6 @@ public class ModPanel extends SPSettingPanel {
 
     @Override
     public void onClose(SPMainMenuPanel parent) {
-//        boolean found = false;
-//        if (!armorKeys.isEmpty()) {
-//            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
-//                if (p.getBase().equals(myMod)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            if (!found) {
-//                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<ARMO, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, armorKeys);
-//                LeveledListInjector.modArmors.add(p);
-//            }
-//        }
-//        found = false;
-//        if (!weaponKeys.isEmpty()) {
-//            for (LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
-//                if (p.getBase().equals(myMod)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            if (!found) {
-//                LeveledListInjector.Pair<Mod, ArrayList<LeveledListInjector.Pair<WEAP, KYWD>>> p = new LeveledListInjector.Pair<>(myMod, weaponKeys);
-//                LeveledListInjector.modWeapons.add(p);
-//            }
-//        }
+
     }
 }

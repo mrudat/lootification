@@ -38,7 +38,7 @@ public class OutfitsPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                for (LeveledListInjector.Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
+                for (Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
                     if (p.getBase().contentEquals(set)) {
                         p.getVar().remove(tierName + newKey);
                     }
@@ -47,14 +47,14 @@ public class OutfitsPanel extends SPSettingPanel {
                 box.clearHighlight();
             } else if (pressed.compareTo("None") != 0) {
                 if (newKey != null) {
-                    for (LeveledListInjector.Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
+                    for (Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
                         if (p.getBase().contentEquals(set)) {
                             p.getVar().remove(tierName + newKey);
                         }
                     }
                 }
                 boolean found = false;
-                for (LeveledListInjector.Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
+                for (Pair<String, ArrayList<String>> p : LeveledListInjector.tiers) {
                     if (p.getBase().contentEquals(set)) {
                         if (!p.getVar().contains(tierName + pressed)) {
                             p.getVar().add(tierName + pressed);
@@ -63,7 +63,7 @@ public class OutfitsPanel extends SPSettingPanel {
                     }
                 }
                 if(!found){
-                    LeveledListInjector.Pair<String, ArrayList<String>> q = new LeveledListInjector.Pair<>(set, new ArrayList<String>(0));
+                    Pair<String, ArrayList<String>> q = new Pair<>(set, new ArrayList<String>(0));
                     q.getVar().add(tierName + pressed);
                     LeveledListInjector.tiers.add(q);
                 }
@@ -90,7 +90,7 @@ public class OutfitsPanel extends SPSettingPanel {
 
     @Override
     public void onOpen(SPMainMenuPanel parent) {
-        for (LeveledListInjector.Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
+        for (Pair<String, ArrayList<ARMO>> p : LeveledListInjector.outfits) {
             String key = p.getBase();
             if (!outfitKeys.contains(key)) {
                 outfitKeys.add(key);
