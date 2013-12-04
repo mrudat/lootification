@@ -69,6 +69,8 @@ public class LeveledListInjector implements SUM {
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
     public static final HashMap<String, RecordData> parsedData = new HashMap<>(500);
+    
+
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function

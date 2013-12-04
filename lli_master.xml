@@ -7,7 +7,7 @@ and open the template in the editor.
 
 <lli_master>
     <mod ModName="Skyrim.esm">
-        <record EDID="ArmorIronGauntlets" type="armor">
+        <record EDID="ArmorIronGauntlets" type="armor" master="Skyrim.esm">
             <match type="base">ARMOR_IRON</match>
             <outfit>dienes_outfit_iron</outfit>
             <set set_name="bandit_heavy">0</set>
