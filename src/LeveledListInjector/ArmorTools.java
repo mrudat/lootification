@@ -78,6 +78,9 @@ public class ArmorTools {
 
 
                 insertTieredArmors(subList, tierKey, bits, merger, patch);
+                if (subList.getEntry(0).getLevel() > 1) {
+                    subList.getEntry(0).setLevel(1);
+                }
                 lotft.addInventoryItem(subList.getForm());
 
                 if (needsShield(lotftName)) {
@@ -222,7 +225,7 @@ public class ArmorTools {
         glist.set(LeveledRecord.LVLFlag.UseAll, false);
 
         for (LVLI llist : merger.getLeveledItems()) {
-            SPGlobal.log("Link Armor List", llist.getEDID());
+            //SPGlobal.log("Link Armor List", llist.getEDID());
 
 //            //check if LVLI is one we made
             boolean found = false;
@@ -519,16 +522,24 @@ public class ArmorTools {
             replace = (ARMO) m.getMajor(tmp, GRUP_TYPE.ARMO);
         }
         //SPGlobal.log(replace.getEDID(), varKey.getEDID());
-        KeywordSet k = replace.getKeywordSet();
-        a = k.getKeywordRefs();
-        for (FormID temp : a) {
-            KYWD refKey = (KYWD) m.getMajor(temp, GRUP_TYPE.KYWD);
-            //SPGlobal.log("formid", temp.toString());
-            //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (varKey.equals(refKey)));
-            if (varKey.equals(refKey)) {
-                hasKey = true;
-            }
+
+        KeywordSet k;
+        try {
+            k = replace.getKeywordSet();
+        } catch (Exception e) {
+            String error = "Armor: " + rec.getEDID() + ", from " + rec.getFormMaster().toString() + ", has unresolvable template entry: " + tmp.toString();
+            SPGlobal.logSpecial(LeveledListInjector.lk.err, "Bad Data", error);
+            throw (e);
         }
+            a = k.getKeywordRefs();
+            for (FormID temp : a) {
+                KYWD refKey = (KYWD) m.getMajor(temp, GRUP_TYPE.KYWD);
+                //SPGlobal.log("formid", temp.toString());
+                //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (varKey.equals(refKey)));
+                if (varKey.equals(refKey)) {
+                    hasKey = true;
+                }
+            }
         return hasKey;
     }
 

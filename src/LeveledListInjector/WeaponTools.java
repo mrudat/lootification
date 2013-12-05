@@ -111,7 +111,14 @@ public class WeaponTools {
         if (!tmp.isNull()) {
             replace = (WEAP) merger.getMajor(tmp, GRUP_TYPE.WEAP);
         }
-        KeywordSet k = replace.getKeywordSet();
+        KeywordSet k;
+        try {
+            k = replace.getKeywordSet();
+        } catch (Exception e) {
+            String error = "Weapon: " + rec.getEDID() + ", from " + rec.getFormMaster().toString() + ", has unresolvable template entry: " + tmp.toString();
+            SPGlobal.logSpecial(LeveledListInjector.lk.err, "Bad Data", error);
+            throw (e);
+        }
         a = k.getKeywordRefs();
         for (FormID temp : a) {
             KYWD refKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
@@ -337,7 +344,7 @@ public class WeaponTools {
             //SPGlobal.log("Weapon pair", i+" out of "+bases.size());
             KYWD newBase = (KYWD) m.getMajor(bases.get(i), GRUP_TYPE.KYWD);
             KYWD newVar = (KYWD) m.getMajor(vars.get(i), GRUP_TYPE.KYWD);
-            SPGlobal.log("Weapon pair", newBase.getEDID() + " " + newVar.getEDID());
+            //SPGlobal.log("Weapon pair", newBase.getEDID() + " " + newVar.getEDID());
             Pair<KYWD, KYWD> p = new Pair(newBase, newVar);
             weaponMatches.add(p);
         }

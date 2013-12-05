@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6";
+    public static String version = "0.6 test 4";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -92,6 +92,10 @@ public class LeveledListInjector implements SUM {
     public static boolean listify = false;
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
+    
+    public static enum lk {
+        err;
+    };
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -99,6 +103,7 @@ public class LeveledListInjector implements SUM {
     public static void main(String[] args) {
         try {
             SPGlobal.createGlobalLog();
+            SPGlobal.newSpecialLog(lk.err, "lli_crash.txt");
             SUMGUI.open(new LeveledListInjector(), args);
         } catch (Exception e) {
             // If a major error happens, print it everywhere and display a message box.
