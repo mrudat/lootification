@@ -5,7 +5,9 @@
 package LeveledListInjector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import skyproc.*;
+import skyproc.exceptions.BadParameter;
 
 /**
  *
@@ -13,8 +15,8 @@ import skyproc.*;
  */
 public class WeaponTools {
 
-    private static ArrayList<ArrayList<FormID>> weaponVariants = new ArrayList<>(0);
-    public static ArrayList<Pair<KYWD, KYWD>> weaponMatches;
+    private static HashMap<FormID, ArrayList<WEAP>> weaponMatches = new HashMap<>();
+    private static HashMap<FormID, ArrayList<WEAP>> weaponVariants = new HashMap<>();
     private static Mod merger;
     private static Mod patch;
 
@@ -24,23 +26,6 @@ public class WeaponTools {
     }
 
     static String generateWeaponEDID(WEAP newWeapon, WEAP weapon) {
-//        String name = newWeapon.getEDID();
-//        String baseName = weapon.getEDID();
-//        String prefix = "";
-//        String suffix = "";
-//        WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
-//        if (template != null) {
-//            int prefixLen = baseName.indexOf(template.getEDID());
-//            if (prefixLen > 0) {
-//                prefix = baseName.substring(0, prefixLen);
-//            }
-//            int suffixLen = baseName.length() - template.getEDID().length() + prefixLen;
-//            if (suffixLen > 0) {
-//                suffix = baseName.substring(template.getEDID().length() + prefixLen);
-//            }
-//        }
-//        String ret = prefix + name + suffix;
-//        return ret;
         String name = newWeapon.getEDID();
         String baseName = weapon.getEDID();
         String templateName;
@@ -65,18 +50,18 @@ public class WeaponTools {
 
     }
 
-    static KYWD getBaseWeapon(KYWD k) {
-        KYWD ret = null;
-        for (Pair<KYWD, KYWD> p : weaponMatches) {
-            KYWD var = p.getVar();
-            if (var.equals(k)) {
-                ret = p.getBase();
-            }
-        }
-        return ret;
-    }
+    /*static KYWD getBaseWeapon(KYWD k) {
+     * KYWD ret = null;
+     * for (Pair<KYWD, KYWD> p : weaponMatches) {
+     * KYWD var = p.getVar();
+     * if (var.equals(k)) {
+     * ret = p.getBase();
+     * }
+     * }
+     * return ret;
+     * }*/
 
-    static boolean weaponHasKeyword(WEAP rec, KYWD varKey, Mod merger) {
+    static boolean weaponHasKeyword(WEAP rec, KYWD varKey) {
         ArrayList<FormID> a;
         boolean hasKey = false;
         WEAP replace = rec;
@@ -104,7 +89,7 @@ public class WeaponTools {
         for (FormID temp : a) {
             //SPGlobal.log("Any keyword", temp.getFormStr());
             KYWD weaponKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
-            if (weaponHasKeyword(rec, weaponKey, merger)) {
+            if (weaponHasKeyword(rec, weaponKey)) {
                 hasKey = weaponKey;
                 continue;
             }
@@ -112,88 +97,45 @@ public class WeaponTools {
         return hasKey;
     }
 
-    static void buildWeaponBases(FLST baseKeys) {
-        for (WEAP weapon : merger.getWeapons()) {
-            KYWD isBase = weaponHasAnyKeyword(weapon, baseKeys, merger);
-            if (isBase != null) {
-                //SPGlobal.log("Found", "is base weapon");
-                ArrayList<FormID> alts = new ArrayList<>(0);
-                alts.add(0, weapon.getForm());
-                weaponVariants.add(alts);
+    static void buildWeaponVariants() throws Exception {
+
+        for (WEAP theWeap : merger.getWeapons()) {
+            FormID lookup = theWeap.getForm();
+            if (theWeap.isTemplated()) {
+                //add bad template check
+                lookup = theWeap.getTemplate();
             }
-        }
-    }
 
-    static void buildWeaponVariants(FLST baseKeys, FLST varKeys) {
-        FormID axeForm = new FormID("06D932", "Skyrim.esm");
-        KYWD axe = (KYWD) merger.getMajor(axeForm, GRUP_TYPE.KYWD);
+            ArrayList<WEAP> matches = weaponMatches.get(lookup);
 
-        FormID hammerForm = new FormID("06D930", "Skyrim.esm");
-        KYWD hammer = (KYWD) merger.getMajor(hammerForm, GRUP_TYPE.KYWD);
+            if (matches != null) {
+                // theWeap is a base weapon and has matches
+                ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
+                if (vars != null) {
+                    throw new Exception("Variants already defined");
+                }
 
-        //SPGlobal.log("Build Variants", "Building Base Weapons");
-//        buildWeaponBases(baseKeys);
-        //SPGlobal.log("Build Variants", "Building Variant Weapons");
-        ArrayList<WEAP> mWeapons = merger.getWeapons().getRecords();
-        for (int weaponNum = 0; weaponNum < mWeapons.size(); weaponNum++) {
-            WEAP weapon = mWeapons.get(weaponNum);
-            KYWD isVariant = weaponHasAnyKeyword(weapon, varKeys, merger);
-            if (isVariant != null) {
-                //SPGlobal.log(weapon.getEDID(), "is variant");
-                FormID ench = weapon.getEnchantment();
-                if (ench.isNull()) {
-                    for (int j = 0; j < weaponVariants.size(); j++) {
-                        ArrayList<FormID> a2 = weaponVariants.get(j);
-                        WEAP form = (WEAP) merger.getMajor((FormID) a2.get(0), GRUP_TYPE.WEAP);
-                        boolean passed = false;
-                        //SPGlobal.log("trying", form.getEDID());
+                vars = new ArrayList<>();
+                weaponVariants.put(theWeap.getForm(), vars);
 
-                        if (weaponHasKeyword(form, getBaseWeapon(isVariant), merger)) {
+                FormID enchantment = theWeap.getEnchantment();
+                if (enchantment.isNull()) {
+                    for (WEAP w : matches) {
+                        vars.add(w);
+                    }
+                } else {
+                    for (WEAP w : matches) {
+                        String name = generateWeaponName(w, theWeap);
+                        String newEdid = generateWeaponEDID(w, theWeap);
+                        WEAP weaponDupe = (WEAP) patch.makeCopy(w, "DienesWEAP" + newEdid);
 
-                            WEAP comp = form;
-                            FormID formBase = form.getTemplate();
-                            if (!formBase.isNull()) {
-                                comp = (WEAP) merger.getMajor(formBase, GRUP_TYPE.WEAP);
-                            }
-                            if (comp.getWeaponType() == weapon.getWeaponType()) {
-                                //SPGlobal.log("weapon type", weapon.getWeaponType() + " " + comp.getWeaponType());
+                        weaponDupe.setEnchantment(enchantment);
+                        weaponDupe.setEnchantmentCharge(theWeap.getEnchantmentCharge());
+                        weaponDupe.setTemplate(w.getForm());
+                        weaponDupe.setName(name);
 
-                                //hack to split warhammers and battleaxes
-                                if (weapon.getWeaponType() == WEAP.WeaponType.TwoHBluntAxe) {
-                                    if (weaponHasKeyword(weapon, axe, merger) && weaponHasKeyword(comp, axe, merger)) {
-                                        passed = true;
-                                    } else if (weaponHasKeyword(weapon, hammer, merger) && (weaponHasKeyword(comp, hammer, merger))) {
-                                        passed = true;
-                                    } else {
-                                        SPGlobal.log("Error building weapon variants", weapon.getEDID()
-                                                + " cannot tell if axe or hammer");
-                                    }
-
-                                } else {
-                                    passed = true;
-                                }
-                            }
-                            if (passed) {
-                                //SPGlobal.log("variant found", weapon.getEDID() + " is variant of " + form.getEDID());
-                                FormID template = form.getEnchantment();
-                                //SPGlobal.log("template", template.getFormStr());
-                                if (template.isNull()) {
-                                    a2.add(weapon.getForm());
-                                } else {
-                                    //SPGlobal.log("Enchant found", weapon.getEDID() + "  " + form.getEDID());
-                                    String name = generateWeaponName(weapon, form);
-                                    String newEdid = generateWeaponEDID(weapon, form);
-                                    WEAP weaponDupe = (WEAP) patch.makeCopy(weapon, "DienesWEAP" + newEdid);
-                                    //SPGlobal.log("armor copied", weaponDupe.getEDID());
-                                    weaponDupe.setEnchantment(form.getEnchantment());
-                                    weaponDupe.setEnchantmentCharge(form.getEnchantmentCharge());
-                                    weaponDupe.setTemplate(weapon.getForm());
-                                    weaponDupe.setName(name);
-                                    a2.add(weaponDupe.getForm());
-                                    patch.addRecord(weaponDupe);
-                                }
-                            }
-                        }
+                        vars.add(weaponDupe);
+                        patch.addRecord(weaponDupe);
                     }
                 }
             }
@@ -201,21 +143,6 @@ public class WeaponTools {
     }
 
     static String generateWeaponName(WEAP newWeapon, WEAP weapon) {
-//        String name = newWeapon.getName();
-//        String baseName = weapon.getName();
-//        String prefix = "";
-//        String suffix = "";
-//        WEAP template = (WEAP) merger.getMajor(weapon.getTemplate(), GRUP_TYPE.WEAP);
-//        int prefixLen = baseName.indexOf(template.getName());
-//        if (prefixLen > 0) {
-//            prefix = baseName.substring(0, prefixLen);
-//        }
-//        int suffixLen = baseName.length() - template.getName().length() + prefixLen;
-//        if (suffixLen > 0) {
-//            suffix = baseName.substring(template.getName().length() + prefixLen);
-//        }
-//        String ret = prefix + name + suffix;
-//        return ret;
         String name = newWeapon.getName();
         String baseName = weapon.getName();
         String templateName;
@@ -239,13 +166,10 @@ public class WeaponTools {
         return ret;
     }
 
-    static void linkLVLIWeapons(FLST baseWeaponKeysFLST) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
-
+    static void linkLVLIWeapons() {
+        
         for (LVLI llist : merger.getLeveledItems()) {
-            if (!llist.getEDID().startsWith("DienesLVLI")) {
+            if (!llist.getEDID().startsWith("LLI_vars_")) {
                 if (!llist.isEmpty()) {
                     boolean changed = false;
                     for (int i = 0; i < llist.numEntries(); i++) {
@@ -253,20 +177,11 @@ public class WeaponTools {
                         WEAP obj = (WEAP) merger.getMajor(entry.getForm(), GRUP_TYPE.WEAP);
                         if (obj != null) {
 
-                            KYWD isBase = weaponHasAnyKeyword(obj, baseWeaponKeysFLST, merger);
-                            boolean hasVar = hasVariant(obj);
-                            if (hasVar && (isBase != null)) {
-                                String eid = "DienesLVLI" + obj.getEDID();
+                            boolean hasVar = weaponVariants.containsKey(obj.getForm());
+                            if (hasVar) {
+                                String eid = "LLI_vars_" + obj.getEDID();
                                 MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                                if (r == null) {
-                                    LVLI subList = (LVLI) patch.makeCopy(glist, eid);
-                                    InsertWeaponVariants(subList, entry.getForm());
-                                    patch.addRecord(subList);
-                                    llist.removeEntry(i);
-                                    llist.addEntry(new LeveledEntry(subList.getForm(), entry.getLevel(), entry.getCount()));
-                                    i = -1;
-                                    changed = true;
-                                } else {
+                                if (r != null) {
                                     llist.removeEntry(i);
                                     llist.addEntry(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
                                     changed = true;
@@ -283,43 +198,96 @@ public class WeaponTools {
         }
     }
 
-    static void InsertWeaponVariants(LVLI list, FormID base) {
-        ArrayList<LeveledEntry> listEntries = list.getEntries();
-        ArrayList<FormID> forms = new ArrayList<>(0);
-        for (LeveledEntry e : listEntries) {
-            FormID f = e.getForm();
-            forms.add(f);
+    /*static void InsertWeaponVariants(LVLI list, FormID base) {
+     * ArrayList<LeveledEntry> listEntries = list.getEntries();
+     * ArrayList<FormID> forms = new ArrayList<>(0);
+     * for (LeveledEntry e : listEntries) {
+     * FormID f = e.getForm();
+     * forms.add(f);
+     * }
+     * for (ArrayList a : weaponVariants) {
+     * if (a.contains(base)) {
+     * for (int i = 0; i < a.size(); i++) {
+     * FormID f = (FormID) a.get(i);
+     * if (!forms.contains(f)) {
+     * list.addEntry(new LeveledEntry(f, 1, 1));
+     * }
+     * }
+     * }
+     * }
+     * }*/
+
+    static void setupWeaponMatches() throws Exception {
+        KYWD axekey = (KYWD) merger.getMajor("WeapTypeBattleaxe", GRUP_TYPE.KYWD);
+        KYWD hammerkey = (KYWD) merger.getMajor("WeapTypeWarhammer", GRUP_TYPE.KYWD);
+        HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>();
+        // add all weapons to setup hashmap
+        for (WEAP theWeap : merger.getWeapons()) {
+            String fullID = theWeap.getFormMaster().print() + "_" + theWeap.getEDID();
+            RecordData rec = LeveledListInjector.parsedData.get(fullID);
+            if (rec != null) {
+                ArrayList<Pair<Boolean, String>> matches = rec.getMatches();
+                //if match is defined in xml
+                if (matches != null) {
+                    for (Pair<Boolean, String> p : matches) {
+                        Pair<ArrayList<WEAP>, ArrayList<WEAP>> vars = setup.get(p.getVar());
+                        // if MatchName is not yet entered in setup
+                        if (vars == null) {
+                            ArrayList<WEAP> bases = new ArrayList<>();
+                            ArrayList<WEAP> alts = new ArrayList<>();
+                            if (p.getBase()) {
+                                bases.add(theWeap);
+                            } else {
+                                alts.add(theWeap);
+                            }
+                            Pair<ArrayList<WEAP>, ArrayList<WEAP>> newVar = new Pair<>(bases, alts);
+                            setup.put(p.getVar(), newVar);
+                        } // if MatchName is in setup already
+                        else {
+                            // theWeap declared as base
+                            if (p.getBase()) {
+                                vars.getBase().add(theWeap);
+                            } // if theWeap declared as var
+                            else {
+                                vars.getVar().add(theWeap);
+                            }
+                        }
+                    }
+                }
+            }
         }
-        for (ArrayList a : weaponVariants) {
-            if (a.contains(base)) {
-                for (int i = 0; i < a.size(); i++) {
-                    FormID f = (FormID) a.get(i);
-                    if (!forms.contains(f)) {
-                        list.addEntry(new LeveledEntry(f, 1, 1));
+        // match base weapons to variant weapons in setup andd add them to WeaponMatches
+        for (Pair<ArrayList<WEAP>, ArrayList<WEAP>> p : setup.values()) {
+            //compare each base weapon to each var weapon
+            for (WEAP theBase : p.getBase()) {
+                ArrayList<WEAP> matches = weaponMatches.get(theBase.getForm());
+                for (WEAP theVar : p.getVar()) {
+                    boolean ismatch = false;
+                    if (theBase.getWeaponType().equals(theVar.getWeaponType())) {
+                        // check if 2h axe or hammer
+                        if (theBase.getWeaponType().equals(WEAP.WeaponType.TwoHBluntAxe)) {
+                            // check if both have same keyword
+                            if ((weaponHasKeyword(theBase, axekey) && weaponHasKeyword(theVar, axekey))
+                                    || (weaponHasKeyword(theBase, hammerkey) && weaponHasKeyword(theVar, hammerkey))) {
+                                ismatch = true;
+                            }
+                        } else {
+                            ismatch = true;
+                        }
+                        if (ismatch) {
+                            if (matches == null) {
+                                matches = new ArrayList<>();
+                                weaponMatches.put(theBase.getForm(), matches);
+                            }
+                            matches.add(theVar);
+                        }
                     }
                 }
             }
         }
     }
 
-    static void setupWeaponMatches(FLST base, FLST var, Mod m) {
-        weaponMatches = new ArrayList<>(0);
-        ArrayList<FormID> bases = base.getFormIDEntries();
-        ArrayList<FormID> vars = var.getFormIDEntries();
-        for (int i = 0; i < bases.size(); i++) {
-            //SPGlobal.log("Weapon pair", i+" out of "+bases.size());
-            KYWD newBase = (KYWD) m.getMajor(bases.get(i), GRUP_TYPE.KYWD);
-            KYWD newVar = (KYWD) m.getMajor(vars.get(i), GRUP_TYPE.KYWD);
-            SPGlobal.log("Weapon pair", newBase.getEDID() + " " + newVar.getEDID());
-            Pair<KYWD, KYWD> p = new Pair(newBase, newVar);
-            weaponMatches.add(p);
-        }
-    }
-
-    static void buildOutfitWeapons(FLST baseWeaponKeysFLST) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
+    static void buildOutfitWeapons() {
 
         for (OTFT lotft : merger.getOutfits()) {
             ArrayList<FormID> a = lotft.getInventoryList();
@@ -328,19 +296,12 @@ public class WeaponTools {
 
                 WEAP weapon = (WEAP) merger.getMajor(form, GRUP_TYPE.WEAP);
                 if (weapon != null) {
-                    KYWD baseKey = weaponHasAnyKeyword(weapon, baseWeaponKeysFLST, merger);
+                    boolean isBase = weaponMatches.containsKey(weapon.getForm());
 
-                    if (hasVariant(weapon) && (baseKey != null)) {
-                        String eid = "DienesLVLI" + weapon.getEDID();
-                        MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
-                        if (r == null) {
-                            LVLI subList = (LVLI) patch.makeCopy(glist, eid);
-                            InsertWeaponVariants(subList, form);
-                            patch.addRecord(subList);
-                            lotft.removeInventoryItem(form);
-                            lotft.addInventoryItem(subList.getForm());
-                            changed = true;
-                        } else {
+                    if (isBase) {
+                        String eid = "LLI_vars_" + weapon.getEDID();
+                        MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
+                        if (r != null) {
                             lotft.removeInventoryItem(form);
                             lotft.addInventoryItem(r.getForm());
                             changed = true;
@@ -354,30 +315,25 @@ public class WeaponTools {
         }
     }
 
-    private static boolean hasVariant(WEAP base) {
-        boolean ret = false;
-        for (ArrayList<FormID> vars : weaponVariants) {
-            boolean contains = vars.contains(base.getForm());
-            if (contains && ((vars.size() > 1) || LeveledListInjector.listify)) {
-//            if (vars.contains(base.getForm())) {
-                ret = true;
-            }
-        }
-
-        return ret;
-    }
 
     public static void modLVLIWeapons() {
-        for (LVLI llist : merger.getLeveledItems()) {
-            String lname = llist.getEDID();
-            if (lname.contains("DienesLVLI")) {
-                WEAP weapon = (WEAP) merger.getMajor(llist.getEntry(0).getForm(), GRUP_TYPE.WEAP);
-                if (weapon != null) {
-                    if (hasVariant(weapon)) {
-                        InsertWeaponVariants(llist, weapon.getForm());
-                        patch.addRecord(llist);
-                    }
+        for (WEAP theWeap : merger.getWeapons()) {
+            ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
+            if (vars != null) {
+                LVLI varsList = new LVLI("LLI_vars_" + theWeap.getEDID());
+                try {
+                    varsList.setChanceNone(0);
+                } catch (BadParameter e) {
                 }
+                varsList.set(LeveledRecord.LVLFlag.UseAll, false);
+                varsList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
+                varsList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                varsList.addEntry(theWeap.getForm(), 1, 1);
+                
+                for(WEAP w : vars) {
+                    varsList.addEntry(w.getForm(), 1, 1);
+                }
+                patch.addRecord(varsList);
             }
         }
 

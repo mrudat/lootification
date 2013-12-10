@@ -576,7 +576,7 @@ public class ArmorTools {
         for (ArrayList<FormID> vars : armorVariants) {
             //SPGlobal.log("hasVariant", base.getForm() + " " + vars.size());
             boolean contains = vars.contains(base.getForm());
-            if ((contains) && ((vars.size() > 1) || LeveledListInjector.listify)) {
+            if ((contains) && ((vars.size() > 1) )) {
 //            if (vars.contains(base.getForm())) {
                 ret = true;
             }

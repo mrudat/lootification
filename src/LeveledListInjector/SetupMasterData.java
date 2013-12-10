@@ -26,7 +26,7 @@ import skyproc.*;
  *
  * @author David Tynan
  */
-public class SetupData {
+public class SetupMasterData {
 
     private static String errorHeader;
     private static String curFile;
@@ -63,12 +63,12 @@ public class SetupData {
 
         match(new GRUP_TYPE[]{GRUP_TYPE.ARMO, GRUP_TYPE.WEAP}) {
             @Override
-            public void parse(Element e, RecordData r) throws Exception {
+            public void parse(Element e, RecordData r) throws ParseException {
                 boolean base = e.getAttribute("type").equalsIgnoreCase("base");
                 String s = e.getTextContent();
                 if (s.contentEquals("")) {
                     //no match content
-                    throw new Exception("Match tag empty");
+                    throw new ParseException("Match tag empty");
                 }
                 r.addMatch(base, s);
             }
@@ -76,11 +76,11 @@ public class SetupData {
         },
         outfit(new GRUP_TYPE[]{GRUP_TYPE.ARMO}) {
             @Override
-            public void parse(Element e, RecordData r) throws Exception {
+            public void parse(Element e, RecordData r) throws ParseException {
                 String s = e.getTextContent();
                 if (s.contentEquals("")) {
                     //no outfit content
-                    throw new Exception("Outfit tag empty");
+                    throw new ParseException("Outfit tag empty");
                 }
                 r.addOutfit(s);
             }
@@ -89,24 +89,24 @@ public class SetupData {
         
         set(new GRUP_TYPE[]{GRUP_TYPE.ARMO, GRUP_TYPE.LVLI}) {
             @Override
-            public void parse(Element e, RecordData r) throws Exception {
+            public void parse(Element e, RecordData r) throws ParseException {
                 if (r.getType() == GRUP_TYPE.LVLI) {
                     String name = e.getAttribute("set_name");
                     if (name.contentEquals("")) {
                         //no set name
-                        throw new Exception("Set name empty");
+                        throw new ParseException("Set name empty");
                     }
                     r.addSet(true, name, -1);
                 } else {
                     String name = e.getAttribute("set_name");
                     if (name.contentEquals("")) {
                         //no set name
-                        throw new Exception("Set name empty");
+                        throw new ParseException("Set name empty");
                     }
                     String s = e.getTextContent();
                     if (s.contentEquals("")) {
                         //no set content
-                        throw new Exception("Set tag empty");
+                        throw new ParseException("Set tag empty");
                     }
                     int i = Integer.parseInt(s);
                     r.addSet(false, name, i);
@@ -129,8 +129,15 @@ public class SetupData {
         }
         GRUP_TYPE[] allowed;
 
-        public abstract void parse(Element e, RecordData r) throws Exception;
+        public abstract void parse(Element e, RecordData r) throws ParseException;
     };
+
+    static class ParseException extends Exception {
+
+        ParseException(String s) {
+            super(s);
+        }
+    }
 
     static void setupStart() throws Exception {
         SPGlobal.newSpecialLog(logKey.xmlMaster, "xmlMasterImport");
@@ -161,6 +168,7 @@ public class SetupData {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             String logError = curFile + ", " + e.getMessage();
             SPGlobal.logSpecial(logKey.xmlMaster, errorHeader, logError);
+            throw e;
         }
 
     }
@@ -203,10 +211,6 @@ public class SetupData {
         String fullID = modMaster + "_" + recordEDID;
         curRecord = fullID;
         RecordData theData = LeveledListInjector.parsedData.get(fullID);
-        if (theData == null) {
-            theData = new RecordData(recordEDID, modMaster);
-            LeveledListInjector.parsedData.put(fullID, theData);
-        }
 
         String recordType = eRecord.getAttribute("type");
         if (recordType.contentEquals("")) {
@@ -216,7 +220,11 @@ public class SetupData {
         }
         try {
             types t = types.valueOf(recordType);
-            theData.setType(t.getType());
+            if (theData == null) {
+                theData = new RecordData(recordEDID, modMaster, t.getType());
+                LeveledListInjector.parsedData.put(fullID, theData);
+            }
+
             NodeList recSubNodesList = recNode.getChildNodes();
             for (int k = 0; k < recSubNodesList.getLength(); k++) {
                 Element eRecSub = (Element) recSubNodesList.item(k);
@@ -226,7 +234,7 @@ public class SetupData {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (EnumConstantNotPresentException e) {
             String logError = curFile + ", " + curMod + ", " + ", " + curRecord + ", " + "Record has invalid type: " + recordType;
             SPGlobal.logSpecial(logKey.xmlMaster, errorHeader, logError);
             return false;
@@ -249,7 +257,7 @@ public class SetupData {
             String logError = curFile + ", " + curMod + ", " + ", " + curRecord + ", " + "Record Has invalid tag: " + tagName;
             SPGlobal.logSpecial(logKey.xmlMaster, errorHeader, logError);
             return false;
-        } catch (Exception e) {
+        } catch (ParseException e) {
             String logError = curFile + ", " + curMod + ", " + ", " + curRecord + ", " + tagName + ", " + e.getMessage();
             SPGlobal.logSpecial(logKey.xmlMaster, errorHeader, logError);
             return false;

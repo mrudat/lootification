@@ -65,12 +65,9 @@ public class LeveledListInjector implements SUM {
     public static ArrayList<Pair<String, ArrayList<String>>> tiers = new ArrayList<>(0);
     public static ArrayList<Pair<Mod, ArrayList<Pair<ARMO, KYWD>>>> modArmors = new ArrayList<>(0);
     public static ArrayList<Pair<Mod, ArrayList<Pair<WEAP, KYWD>>>> modWeapons = new ArrayList<>(0);
-    public static boolean listify = false;
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
-    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500);
-    
-
+    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500); //key is ModName.esp_theEDID
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -153,9 +150,6 @@ public class LeveledListInjector implements SUM {
         return settingsMenu;
     }
 
-    public void guiInitFunction() {
-    }
-
     // Usually false unless you want to make your own GUI
     @Override
     public boolean hasCustomMenu() {
@@ -214,6 +208,7 @@ public class LeveledListInjector implements SUM {
     // added or removed.
     @Override
     public boolean needsPatching() {
+        //add xml file checks
         return false;
     }
 
@@ -231,42 +226,9 @@ public class LeveledListInjector implements SUM {
         };
         SUMGUI.startImport(r);
 
+        SetupMasterData.setupStart();
+        SetupUserData.setupStart();
 
-
-
-        File fXmlFile = new File("Lootification.xml");
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(fXmlFile);
-        doc.getDocumentElement().normalize();
-
-        NodeList mList = doc.getElementsByTagName("mod");
-        for (int i = 0; i < mList.getLength(); i++) {
-            Node nMod = mList.item(i);
-            Element mod = (Element) nMod;
-            lootifiedMods.add(new Pair<>(mod.getAttribute("modName"), nMod));
-        }
-
-        File CustomXmlFile = new File("Custom.xml");
-        Document cDoc = dBuilder.parse(CustomXmlFile);
-        cDoc.getDocumentElement().normalize();
-
-        mList = cDoc.getElementsByTagName("mod");
-        for (int i = 0; i < mList.getLength(); i++) {
-            Node nMod = mList.item(i);
-            Element mod = (Element) nMod;
-            Pair<String, Node> p = new Pair<>(mod.getAttribute("modName"), nMod);
-            boolean found = false;
-            for (Pair<String, Node> q : lootifiedMods) {
-                if (q.getBase().contentEquals(p.getBase())) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                lootifiedMods.add(p);
-            }
-        }
     }
 
     public void theInitFunction() {
@@ -310,7 +272,7 @@ public class LeveledListInjector implements SUM {
                     LVLI litem = (LVLI) gearVariants.getMajor(f, GRUP_TYPE.LVLI);
                     ARMO arm = (ARMO) gearVariants.getMajor(f, GRUP_TYPE.ARMO);
                     WEAP weapon = (WEAP) gearVariants.getMajor(f, GRUP_TYPE.WEAP);
-                    if( (litem == null)&&(arm==null)&&(weapon==null) ){
+                    if ((litem == null) && (arm == null) && (weapon == null)) {
                         JOptionPane.showMessageDialog(null, o.getEDID() + " has an invalid entry. " + f.toString() + " The patch will fail. Clean it in tes5edit and rerun the patcher.");
                         throw new Exception();
                     }
@@ -346,10 +308,7 @@ public class LeveledListInjector implements SUM {
     // Add any mods that you REQUIRE to be present in order to patch.
     @Override
     public ArrayList<ModListing> requiredMods() {
-        ArrayList<ModListing> req = new ArrayList<>(0);
-        ModListing Lootification = new ModListing("Lootification", true);
-        req.add(Lootification);
-        return req;
+        return new ArrayList<>(0);
     }
 
     @Override
@@ -368,81 +327,47 @@ public class LeveledListInjector implements SUM {
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
 
-        for (ModPanel mPanel : modPanels) {
-            boolean found = false;
-            if (!mPanel.armorKeys.isEmpty()) {
-                for (Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p : LeveledListInjector.modArmors) {
-                    if (p.getBase().equals(mPanel.myMod)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    Pair<Mod, ArrayList<Pair<ARMO, KYWD>>> p = new Pair<>(mPanel.myMod, mPanel.armorKeys);
-                    LeveledListInjector.modArmors.add(p);
-                }
-            }
-            found = false;
-            if (!mPanel.weaponKeys.isEmpty()) {
-                for (Pair<Mod, ArrayList<Pair<WEAP, KYWD>>> p : LeveledListInjector.modWeapons) {
-                    if (p.getBase().equals(mPanel.myMod)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    Pair<Mod, ArrayList<Pair<WEAP, KYWD>>> p = new Pair<>(mPanel.myMod, mPanel.weaponKeys);
-                    LeveledListInjector.modWeapons.add(p);
-                }
-            }
-        }
-
         SPProgressBarPlug.setStatus("Processing XML");
         addModsToXML(merger);
         processXML(merger, patch);
 
-
         FLST baseArmorKeysFLST = (FLST) merger.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
         FLST variantArmorKeysFLST = (FLST) merger.getMajor("LLI_VAR_ARMOR_KEYS", GRUP_TYPE.FLST);
-//        SPGlobal.log("base armor key formlist", baseArmorKeysFLST.getEDID());
-//        SPGlobal.log("variant armor keywords", variantArmorKeysFLST.getEDID());
+
         FLST baseWeaponKeysFLST = (FLST) merger.getMajor("LLI_BASE_WEAPON_KEYS", GRUP_TYPE.FLST);
         FLST variantWeaponKeysFLST = (FLST) merger.getMajor("LLI_VAR_WEAPON_KEYS", GRUP_TYPE.FLST);
 
 
 
 
-        boolean lootify = true; //save.getBool(Settings.LOOTIFY_MOD);
-        if (lootify) {
-            SPProgressBarPlug.setStatus("Setting up armor matches");
-            ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
-            SPProgressBarPlug.setStatus("Building base armors");
-            ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
-            SPProgressBarPlug.setStatus("Setting up armor sets");
-            ArmorTools.setupSets(merger, patch);
-            SPProgressBarPlug.setStatus("Building armor variants");
-            ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
-            SPProgressBarPlug.setStatus("Setting up armor leveled lists");
-            ArmorTools.modLVLIArmors(merger, patch);
-            SPProgressBarPlug.setStatus("Processing outfit armors");
-            ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
-            SPProgressBarPlug.setStatus("Linking armor leveled lists");
-            ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
-            WeaponTools.setMergeAndPatch(merger, patch);
-            SPProgressBarPlug.setStatus("Setting up weapon matches");
-            WeaponTools.setupWeaponMatches(baseWeaponKeysFLST, variantWeaponKeysFLST, merger);
-            SPProgressBarPlug.setStatus("Building base weapons");
-            WeaponTools.buildWeaponBases(baseWeaponKeysFLST);
-            SPProgressBarPlug.setStatus("Building weapon variants");
-            WeaponTools.buildWeaponVariants(baseWeaponKeysFLST, variantWeaponKeysFLST);
-            SPProgressBarPlug.setStatus("Setting up weapon leveled lists");
-            WeaponTools.modLVLIWeapons();
-            SPProgressBarPlug.setStatus("Processing outfit weapons");
-            WeaponTools.buildOutfitWeapons(baseWeaponKeysFLST);
-            SPProgressBarPlug.setStatus("Linking weapon leveled lists");
-            WeaponTools.linkLVLIWeapons(baseWeaponKeysFLST);
-        }
+        SPProgressBarPlug.setStatus("Setting up armor matches");
+        ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
+        SPProgressBarPlug.setStatus("Building base armors");
+        ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
+        SPProgressBarPlug.setStatus("Setting up armor sets");
+        ArmorTools.setupSets(merger, patch);
+        SPProgressBarPlug.setStatus("Building armor variants");
+        ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+        SPProgressBarPlug.setStatus("Setting up armor leveled lists");
+        ArmorTools.modLVLIArmors(merger, patch);
+        SPProgressBarPlug.setStatus("Processing outfit armors");
+        ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+        SPProgressBarPlug.setStatus("Linking armor leveled lists");
+        ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
+
+        WeaponTools.setMergeAndPatch(merger, patch);
+        SPProgressBarPlug.setStatus("Setting up weapon matches");
+        WeaponTools.setupWeaponMatches();
+        SPProgressBarPlug.setStatus("Building weapon variants");
+        WeaponTools.buildWeaponVariants();
+        SPProgressBarPlug.setStatus("Setting up weapon leveled lists");
+        WeaponTools.modLVLIWeapons();
+        SPProgressBarPlug.setStatus("Processing outfit weapons");
+        WeaponTools.buildOutfitWeapons();
+        SPProgressBarPlug.setStatus("Linking weapon leveled lists");
+        WeaponTools.linkLVLIWeapons();
+
 
     }
 
@@ -774,5 +699,4 @@ public class LeveledListInjector implements SUM {
         }
         return newDoc;
     }
-
 }
