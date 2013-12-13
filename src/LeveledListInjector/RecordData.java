@@ -113,10 +113,10 @@ public class RecordData {
         theSets.add(thisSet);
     }
     
-    public void removeSet(boolean b, String s) {
+    public void removeSet(boolean b, String s, int i) {
         if (theSets != null) {
             for (setInfo set : theSets) {
-                if ( (set.isBase == b) && (set.setName.equalsIgnoreCase(s)) ){
+                if ( (set.isBase == b) && (set.setName.equalsIgnoreCase(s) && (set.tier == i)) ){
                     theSets.remove(set);
                 }
             }

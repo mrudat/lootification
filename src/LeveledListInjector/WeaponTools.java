@@ -19,6 +19,7 @@ public class WeaponTools {
     private static HashMap<FormID, ArrayList<WEAP>> weaponVariants = new HashMap<>();
     private static Mod merger;
     private static Mod patch;
+    private static String lli_prefix = LeveledListInjector.lli_prefix;
 
     public static void setMergeAndPatch(Mod m, Mod p) {
         merger = m;
@@ -50,29 +51,18 @@ public class WeaponTools {
 
     }
 
-    /*static KYWD getBaseWeapon(KYWD k) {
-     * KYWD ret = null;
-     * for (Pair<KYWD, KYWD> p : weaponMatches) {
-     * KYWD var = p.getVar();
-     * if (var.equals(k)) {
-     * ret = p.getBase();
-     * }
-     * }
-     * return ret;
-     * }*/
-
-    static boolean weaponHasKeyword(WEAP rec, KYWD varKey) {
+    static boolean weaponHasKeyword(WEAP rec, KYWD varKey, Mod m) {
         ArrayList<FormID> a;
         boolean hasKey = false;
         WEAP replace = rec;
         FormID tmp = replace.getTemplate();
         if (!tmp.isNull()) {
-            replace = (WEAP) merger.getMajor(tmp, GRUP_TYPE.WEAP);
+            replace = (WEAP) m.getMajor(tmp, GRUP_TYPE.WEAP);
         }
         KeywordSet k = replace.getKeywordSet();
         a = k.getKeywordRefs();
         for (FormID temp : a) {
-            KYWD refKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
+            KYWD refKey = (KYWD) m.getMajor(temp, GRUP_TYPE.KYWD);
             //SPGlobal.log("formid", temp.toString());
             //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (refKey.equals(varKey)));
             if (varKey.equals(refKey)) {
@@ -82,20 +72,20 @@ public class WeaponTools {
         return hasKey;
     }
 
-    static KYWD weaponHasAnyKeyword(WEAP rec, FLST f, Mod merger) {
-        ArrayList<FormID> a = f.getFormIDEntries();
-        KYWD hasKey = null;
-        //SPGlobal.log("Any keyword size", a.size() + "");
-        for (FormID temp : a) {
-            //SPGlobal.log("Any keyword", temp.getFormStr());
-            KYWD weaponKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
-            if (weaponHasKeyword(rec, weaponKey)) {
-                hasKey = weaponKey;
-                continue;
-            }
-        }
-        return hasKey;
-    }
+    /*static KYWD weaponHasAnyKeyword(WEAP rec, FLST f, Mod merger) {
+     * ArrayList<FormID> a = f.getFormIDEntries();
+     * KYWD hasKey = null;
+     * //SPGlobal.log("Any keyword size", a.size() + "");
+     * for (FormID temp : a) {
+     * //SPGlobal.log("Any keyword", temp.getFormStr());
+     * KYWD weaponKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
+     * if (weaponHasKeyword(rec, weaponKey)) {
+     * hasKey = weaponKey;
+     * continue;
+     * }
+     * }
+     * return hasKey;
+     * }*/
 
     static void buildWeaponVariants() throws Exception {
 
@@ -169,7 +159,7 @@ public class WeaponTools {
     static void linkLVLIWeapons() {
         
         for (LVLI llist : merger.getLeveledItems()) {
-            if (!llist.getEDID().startsWith("LLI_vars_")) {
+            if (!llist.getEDID().startsWith(lli_prefix)) {
                 if (!llist.isEmpty()) {
                     boolean changed = false;
                     for (int i = 0; i < llist.numEntries(); i++) {
@@ -179,7 +169,7 @@ public class WeaponTools {
 
                             boolean hasVar = weaponVariants.containsKey(obj.getForm());
                             if (hasVar) {
-                                String eid = "LLI_vars_" + obj.getEDID();
+                                String eid = lli_prefix + obj.getEDID();
                                 MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                                 if (r != null) {
                                     llist.removeEntry(i);
@@ -220,10 +210,11 @@ public class WeaponTools {
     static void setupWeaponMatches() throws Exception {
         KYWD axekey = (KYWD) merger.getMajor("WeapTypeBattleaxe", GRUP_TYPE.KYWD);
         KYWD hammerkey = (KYWD) merger.getMajor("WeapTypeWarhammer", GRUP_TYPE.KYWD);
+        
         HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>();
         // add all weapons to setup hashmap
         for (WEAP theWeap : merger.getWeapons()) {
-            String fullID = theWeap.getFormMaster().print() + "_" + theWeap.getEDID();
+            String fullID = /*theWeap.getFormMaster().print() + "_" +*/ theWeap.getEDID();
             RecordData rec = LeveledListInjector.parsedData.get(fullID);
             if (rec != null) {
                 ArrayList<Pair<Boolean, String>> matches = rec.getMatches();
@@ -267,8 +258,8 @@ public class WeaponTools {
                         // check if 2h axe or hammer
                         if (theBase.getWeaponType().equals(WEAP.WeaponType.TwoHBluntAxe)) {
                             // check if both have same keyword
-                            if ((weaponHasKeyword(theBase, axekey) && weaponHasKeyword(theVar, axekey))
-                                    || (weaponHasKeyword(theBase, hammerkey) && weaponHasKeyword(theVar, hammerkey))) {
+                            if ((weaponHasKeyword(theBase, axekey, merger) && weaponHasKeyword(theVar, axekey, merger))
+                                    || (weaponHasKeyword(theBase, hammerkey, merger) && weaponHasKeyword(theVar, hammerkey, merger))) {
                                 ismatch = true;
                             }
                         } else {
@@ -299,7 +290,7 @@ public class WeaponTools {
                     boolean isBase = weaponMatches.containsKey(weapon.getForm());
 
                     if (isBase) {
-                        String eid = "LLI_vars_" + weapon.getEDID();
+                        String eid = lli_prefix + weapon.getEDID();
                         MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
                         if (r != null) {
                             lotft.removeInventoryItem(form);
@@ -320,7 +311,7 @@ public class WeaponTools {
         for (WEAP theWeap : merger.getWeapons()) {
             ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
             if (vars != null) {
-                LVLI varsList = new LVLI("LLI_vars_" + theWeap.getEDID());
+                LVLI varsList = new LVLI(lli_prefix + theWeap.getEDID());
                 try {
                     varsList.setChanceNone(0);
                 } catch (BadParameter e) {

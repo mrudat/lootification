@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -59,15 +61,26 @@ public class LeveledListInjector implements SUM {
     public static Font settingsFont = new Font("Serif", Font.BOLD, 15);
     public static SkyProcSave save = new YourSaveFile();
     public static ArrayList<Mod> activeMods = new ArrayList<>(0);
+    // ModPanel setup variables
+    public static final HashMap<String, String> armorMatches = new HashMap<>(); // holds matchname and keyword EDID
+    public static final HashMap<String, String> weaponMatches = new HashMap<>();
+    public static final Set<String> tieredSets = new TreeSet<>();
+    public static final HashMap<String, ArrayList<ARMO>> modOutfits = new HashMap<>();
     public static Mod gearVariants;
-    public static Mod global;
+
     public static ArrayList<Pair<String, ArrayList<ARMO>>> outfits = new ArrayList<>(0);
     public static ArrayList<Pair<String, ArrayList<String>>> tiers = new ArrayList<>(0);
     public static ArrayList<Pair<Mod, ArrayList<Pair<ARMO, KYWD>>>> modArmors = new ArrayList<>(0);
     public static ArrayList<Pair<Mod, ArrayList<Pair<WEAP, KYWD>>>> modWeapons = new ArrayList<>(0);
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
-    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500); //key is ModName.esp_theEDID
+    // Processing info holders
+    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500); //key is ModName.esp_theEDID // for now just EDID
+    public static final HashMap<String, RecordData> modPanelData = new HashMap<>();
+    public static final String lli_prefix = "LLI_vars_"; // added as prefix to patcher created records
+    private static enum logKey {
+        xmlMaster, xmlUser;
+    };
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -122,30 +135,36 @@ public class LeveledListInjector implements SUM {
     public SPMainMenuPanel getStandardMenu() {
         final SPMainMenuPanel settingsMenu = new SPMainMenuPanel(getHeaderColor());
 
-
-
         settingsMenu.setWelcomePanel(new WelcomePanel(settingsMenu));
         settingsMenu.addMenu(new OtherSettingsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                theInitFunction();
+        /*Runnable r = new Runnable() {
+         * @Override
+         * public void run() {
+         * theInitFunction();
+         * 
+         * for (Mod m : activeMods) {
+         * ModPanel panel = new ModPanel(settingsMenu, m, global);
+         * modPanels.add(panel);
+         * settingsMenu.addMenu(panel);
+         * }
+         * 
+         * settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
+         * 
+         * settingsMenu.updateUI();
+         * }
+         * };
+         * SUMGUI.startImport(r);*/
 
-                for (Mod m : activeMods) {
-                    ModPanel panel = new ModPanel(settingsMenu, m, global);
-                    modPanels.add(panel);
-                    settingsMenu.addMenu(panel);
-                }
+        for (Mod m : activeMods) {
+            ModPanel panel = new ModPanel(settingsMenu, m);
+            modPanels.add(panel);
+            settingsMenu.addMenu(panel);
+        }
 
-                settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
+        settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
-                settingsMenu.updateUI();
-            }
-        };
-        SUMGUI.startImport(r);
-
-
+        settingsMenu.updateUI();
 
         return settingsMenu;
     }
@@ -217,87 +236,46 @@ public class LeveledListInjector implements SUM {
     @Override
     public void onStart() throws Exception {
 
-
-
         Runnable r = new Runnable() {
             @Override
             public void run() {
+                try {
+                    ArrayList<ModListing> activeModListing = SPImporter.getActiveModList();
+                    ArrayList<Mod> allMods = new ArrayList<>();
+                    for (ModListing listing : activeModListing) {
+                        Mod newMod = new Mod(listing);
+                        allMods.add(newMod);
+                    }
+
+                    gearVariants = new Mod(getName() + "MergerTemp", false);
+                    gearVariants.addAsOverrides(SPGlobal.getDB());
+
+                    for (Mod m : allMods) {
+                        String modName = m.getName();
+
+                        if (!(modName.contentEquals("Skyrim.esm") || modName.contentEquals("HearthFires.esm")
+                                || modName.contentEquals("Update.esm") || modName.contentEquals("Dragonborn.esm")
+                                || modName.contentEquals("Dawnguard.esm"))) {
+                            int numArmors = m.getArmors().size();
+                            int numWeapons = m.getWeapons().size();
+
+                            if (numArmors > 0 || numWeapons > 0) {
+                                activeMods.add(m);
+                            }
+
+                        }
+                    }
+                } catch (Exception e) {
+                }
             }
         };
         SUMGUI.startImport(r);
 
-        SetupMasterData.setupStart();
-        SetupUserData.setupStart();
+        SetupDataMaster setupMaster = new SetupDataMaster(parsedData, armorMatches, weaponMatches, tieredSets, logKey.xmlMaster);
+        setupMaster.setupStart("xmlMasterFile_Errors");
+        SetupUserData setupUser = new SetupUserData(parsedData, armorMatches, weaponMatches, tieredSets, logKey.xmlUser);
+        setupUser.setupStart("xmlUserFile_Errors");
 
-    }
-
-    public void theInitFunction() {
-        try {
-            ArrayList<ModListing> activeModListing = SPImporter.getActiveModList();
-            ArrayList<Mod> allMods = new ArrayList<>(0);
-
-            gearVariants = new Mod(getName() + "MergerTemp", false);
-            gearVariants.addAsOverrides(SPGlobal.getDB());
-
-            for (ModListing listing : activeModListing) {
-                Mod newMod = new Mod(listing);
-                allMods.add(newMod);
-            }
-
-            for (ARMO armor : gearVariants.getArmors()) {
-                allMods.get(activeModListing.indexOf(armor.getFormMaster())).addRecord(armor);
-                KeywordSet keys = armor.getKeywordSet();
-                for (FormID form : keys.getKeywordRefs()) {
-                    KYWD key = (KYWD) gearVariants.getMajor(form, GRUP_TYPE.KYWD);
-                    if (key == null) {
-                        JOptionPane.showMessageDialog(null, armor.getEDID() + " has an invalid keyword reference. The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
-                    }
-                }
-            }
-            for (WEAP weapon : gearVariants.getWeapons()) {
-                allMods.get(activeModListing.indexOf(weapon.getFormMaster())).addRecord(weapon);
-                KeywordSet keys = weapon.getKeywordSet();
-                for (FormID form : keys.getKeywordRefs()) {
-                    KYWD key = (KYWD) gearVariants.getMajor(form, GRUP_TYPE.KYWD);
-                    if (key == null) {
-                        JOptionPane.showMessageDialog(null, weapon.getEDID() + " has an invalid keyword reference. The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
-                    }
-                }
-            }
-            for (OTFT o : gearVariants.getOutfits()) {
-                ArrayList<FormID> items = o.getInventoryList();
-                for (FormID f : items) {
-                    LVLI litem = (LVLI) gearVariants.getMajor(f, GRUP_TYPE.LVLI);
-                    ARMO arm = (ARMO) gearVariants.getMajor(f, GRUP_TYPE.ARMO);
-                    WEAP weapon = (WEAP) gearVariants.getMajor(f, GRUP_TYPE.WEAP);
-                    if ((litem == null) && (arm == null) && (weapon == null)) {
-                        JOptionPane.showMessageDialog(null, o.getEDID() + " has an invalid entry. " + f.toString() + " The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
-                    }
-                }
-            }
-
-            for (Mod m : allMods) {
-                String modName = m.getName();
-
-                if (!(modName.contentEquals("Skyrim.esm") || (modName.contentEquals("Lootification.esm")) || modName.contentEquals("HearthFires.esm")
-                        || modName.contentEquals("Update.esm") || modName.contentEquals("Dragonborn.esm") || modName.contentEquals("Dawnguard.esm"))) {
-                    int numArmors = m.getArmors().size();
-                    int numWeapons = m.getWeapons().size();
-
-                    if (numArmors > 0 || numWeapons > 0) {
-                        activeMods.add(m);
-                    }
-
-                }
-            }
-        } catch (Exception e) {
-            SPGlobal.logException(e);
-            JOptionPane.showMessageDialog(null, "There was an exception thrown during program execution: '" + e + "'  Check the debug logs or contact the author.");
-            SPGlobal.closeDebug();
-        }
     }
 
     // This function runs right as the program is about to close.
@@ -326,19 +304,13 @@ public class LeveledListInjector implements SUM {
 
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
-
+        
         SPProgressBarPlug.setStatus("Processing XML");
         addModsToXML(merger);
         processXML(merger, patch);
 
         FLST baseArmorKeysFLST = (FLST) merger.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
         FLST variantArmorKeysFLST = (FLST) merger.getMajor("LLI_VAR_ARMOR_KEYS", GRUP_TYPE.FLST);
-
-        FLST baseWeaponKeysFLST = (FLST) merger.getMajor("LLI_BASE_WEAPON_KEYS", GRUP_TYPE.FLST);
-        FLST variantWeaponKeysFLST = (FLST) merger.getMajor("LLI_VAR_WEAPON_KEYS", GRUP_TYPE.FLST);
-
-
-
 
 
         SPProgressBarPlug.setStatus("Setting up armor matches");
@@ -356,8 +328,8 @@ public class LeveledListInjector implements SUM {
         SPProgressBarPlug.setStatus("Linking armor leveled lists");
         ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
 
-        WeaponTools.setMergeAndPatch(merger, patch);
         SPProgressBarPlug.setStatus("Setting up weapon matches");
+        WeaponTools.setMergeAndPatch(merger, patch);
         WeaponTools.setupWeaponMatches();
         SPProgressBarPlug.setStatus("Building weapon variants");
         WeaponTools.buildWeaponVariants();
@@ -371,7 +343,6 @@ public class LeveledListInjector implements SUM {
 
     }
 
-    @SuppressWarnings("UseSpecificCatch")
     public void addModsToXML(Mod merger) {
         try {
             File fXmlFile = new File("Custom.xml");
@@ -529,7 +500,6 @@ public class LeveledListInjector implements SUM {
         }
     }
 
-    @SuppressWarnings("UseSpecificCatch")
     public void processXML(Mod merger, Mod patch) {
         try {
             List<String> lines = Files.readAllLines(FileSystems.getDefault().getPath(SPGlobal.getPluginsTxt()), StandardCharsets.UTF_8);
@@ -609,7 +579,6 @@ public class LeveledListInjector implements SUM {
 
     }
 
-    @SuppressWarnings("UseSpecificCatch")
     public Document mergeDocs(Document doc1, Document doc2) {
         Document newDoc = null;
         try {
