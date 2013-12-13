@@ -6,14 +6,14 @@ and open the template in the editor.
 
 <!--
 <mod +ModName="thePlugin.esp">
-    <record +EDID="theEDID" +type:"[armor, weapon, leveledList]" -master="otherMod.esp">
-        <match -type="base">theMatchKey</match> // allowed for ARMO, WEAP. if type != base form is a variant
+    <record +EDID="theEDID" +type:"[armor, weapon, leveledList, outfit]" -master="otherMod.esp">
+        <match -type="base" -key="theKeywordEDID">theMatchKey</match> // allowed for ARMO, WEAP. if type != base form is a variant
+            // key defines the EDID of keyword to use in modpanel as suggested material match
             // Variant ARMOs will be added as alternatives for all ARMOs with same key and type=base that match biped slots
             // Eventually: alternate biped slots to match
         <outfit>theOutfitKey</outfit> // allowed for ARMO. All ARMO with theOutfitKey will be a 'matching outfit'
-        <set +set_name="theSetName">#tier</set> // allowed ARMO, LVLI. For LVLI marks that form to be replaced by tiered set entries
+        <set +set_name="theSetName">#tier</set> // allowed ARMO, LVLI, OTFT. For LVLI, OTFT marks that form to be replaced by tiered set entries
             // For ARMO marks that form to be used in theSetName at tier #tier
-            // OTFT?
     </record>
 </mod>
 -->
@@ -21,7 +21,7 @@ and open the template in the editor.
 <lli_master>
     <mod ModName="Skyrim.esm">
         <record EDID="ArmorIronGauntlets" type="armor" master="Skyrim.esm">
-            <match type="base">ARMOR_IRON</match>
+            <match type="base" key="ArmorMaterialIron">ARMOR_IRON</match>
             <outfit>dienes_outfit_iron</outfit>
             <set set_name="bandit_heavy">0</set>
             <set set_name="bandit_boss">0</set>
