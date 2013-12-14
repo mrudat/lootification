@@ -21,16 +21,16 @@ import skyproc.*;
  */
 public abstract class SetupData {
 
-    String errorHeader;
-    private String curFile;
-    private String curMod;
-    private String curRecord;
+    protected String errorHeader;
+    protected String curFile;
+    protected String curMod;
+    protected String curRecord;
     
     private final HashMap<String, RecordData> dataMap;
     private final HashMap armorMap;
     private final HashMap weaponMap;
     private final Set tieredSet;
-    final Enum logKey; 
+    protected final Enum logKey; 
 
     private enum types {
 
@@ -56,7 +56,7 @@ public abstract class SetupData {
 
     };
 
-    private enum tags {
+    enum tags {
 
         match(new GRUP_TYPE[]{GRUP_TYPE.ARMO, GRUP_TYPE.WEAP}) {
             @Override
@@ -119,7 +119,7 @@ public abstract class SetupData {
                         String s = e.getTextContent();
                         if (s.contentEquals("")) {
                             //no set content
-                            throw new ParseException("Set tag empty");
+                            throw new ParseException("Set content empty");
                         }
                         int i = Integer.parseInt(s);
                         r.addSet(false, name, i);
@@ -147,7 +147,7 @@ public abstract class SetupData {
         public abstract void parse(SetupData setup, Element e, RecordData r) throws ParseException;
     };
 
-    static class ParseException extends Exception {
+    public static class ParseException extends Exception {
 
         ParseException(String s) {
             super(s);
@@ -164,7 +164,7 @@ public abstract class SetupData {
 
     abstract void setupStart(String logName) throws Exception;
 
-    void parseMaster(String fileName) throws Exception {
+    protected void parseMaster(String fileName) throws Exception {
         curFile = fileName;
         try {
             File master_File = new File(fileName);

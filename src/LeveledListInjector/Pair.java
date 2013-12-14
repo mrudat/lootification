@@ -8,7 +8,7 @@ package LeveledListInjector;
  *
  * @author David
  */
-public class Pair<L, R> {
+class Pair<L, R> {
 
     private L l;
     private R r;
