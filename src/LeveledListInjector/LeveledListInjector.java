@@ -272,25 +272,23 @@ public class LeveledListInjector implements SUM {
         
         SPProgressBarPlug.setStatus("Exporting XML");
         setupUser.panelChangesToXML();
-
-        FLST baseArmorKeysFLST = (FLST) merger.getMajor("LLI_BASE_ARMOR_KEYS", GRUP_TYPE.FLST);
-        FLST variantArmorKeysFLST = (FLST) merger.getMajor("LLI_VAR_ARMOR_KEYS", GRUP_TYPE.FLST);
+        SPProgressBarPlug.setStatus("Merging XML");
+        setupUser.panelChangesParsedData(modPanelData);
 
 
         SPProgressBarPlug.setStatus("Setting up armor matches");
-        ArmorTools.setupArmorMatches(baseArmorKeysFLST, variantArmorKeysFLST, merger);
-        SPProgressBarPlug.setStatus("Building base armors");
-        ArmorTools.buildArmorBases(merger, baseArmorKeysFLST);
+        ArmorTools.setMergeAndPatch(merger, patch);
+        ArmorTools.setupArmorMatches();
         SPProgressBarPlug.setStatus("Setting up armor sets");
-        ArmorTools.setupSets(merger, patch);
+        ArmorTools.setupMatchingOutfitsSets();
         SPProgressBarPlug.setStatus("Building armor variants");
-        ArmorTools.buildArmorVariants(merger, patch, baseArmorKeysFLST, variantArmorKeysFLST);
+        ArmorTools.buildArmorVariants();
         SPProgressBarPlug.setStatus("Setting up armor leveled lists");
-        ArmorTools.modLVLIArmors(merger, patch);
+        ArmorTools.modLVLIArmors();
         SPProgressBarPlug.setStatus("Processing outfit armors");
-        ArmorTools.buildOutfitsArmors(baseArmorKeysFLST, merger, patch);
+        ArmorTools.buildOutfitsArmors();
         SPProgressBarPlug.setStatus("Linking armor leveled lists");
-        ArmorTools.linkLVLIArmors(baseArmorKeysFLST, merger, patch);
+        ArmorTools.linkLVLIArmors();
 
         SPProgressBarPlug.setStatus("Setting up weapon matches");
         WeaponTools.setMergeAndPatch(merger, patch);

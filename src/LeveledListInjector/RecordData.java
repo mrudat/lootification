@@ -29,7 +29,7 @@ public class RecordData {
         String matchName;
     }
 
-    private class setInfo {
+    public class setInfo {
 
         private boolean isBase;
         private String setName;
@@ -38,6 +38,30 @@ public class RecordData {
         setInfo(boolean b, String s, int i) {
             isBase = b;
             setName = s;
+            tier = i;
+        }
+        
+        public boolean getBase() {
+            return isBase;
+        }
+        
+        public void setBase(boolean b){
+            isBase = b;
+        }
+        
+        public String getName(){
+            return setName;
+        }
+        
+        public void setName(String s) {
+            setName = s;
+        }
+        
+        public int getTier(){
+            return tier;
+        }
+        
+        public void setTier(int i){
             tier = i;
         }
     }
@@ -147,21 +171,21 @@ public class RecordData {
         }
     }
 
-    ArrayList<Pair<String, Boolean>> getSets() {
-        ArrayList<Pair<String, Boolean>> ret = null;
-        if (theSets != null) {
-            ret = new ArrayList<>();
-            for (setInfo set : theSets) {
-                String s = set.setName;
-                if (!(set.isBase)) {
-                    s = s + "_" + set.tier;
-                }
-                Pair<String, Boolean> p = new Pair<>(s, set.isBase);
-                ret.add(p);
-            }
-        }
+    ArrayList<setInfo> getSets() {
+        /*ArrayList<Pair<String, Boolean>> ret = null;
+         * if (theSets != null) {
+         * ret = new ArrayList<>();
+         * for (setInfo set : theSets) {
+         * String s = set.setName;
+         * if (!(set.isBase)) {
+         * s = s + "_" + set.tier;
+         * }
+         * Pair<String, Boolean> p = new Pair<>(s, set.isBase);
+         * ret.add(p);
+         * }
+         * }*/
 
-        return ret;
+        return theSets;
     }
 
     void toXML(Node recNode) {

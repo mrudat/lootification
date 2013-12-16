@@ -86,7 +86,6 @@ public class WeaponTools {
      * }
      * return hasKey;
      * }*/
-
     static void buildWeaponVariants() throws Exception {
 
         for (WEAP theWeap : merger.getWeapons()) {
@@ -157,7 +156,7 @@ public class WeaponTools {
     }
 
     static void linkLVLIWeapons() {
-        
+
         for (LVLI llist : merger.getLeveledItems()) {
             if (!llist.getEDID().startsWith(lli_prefix)) {
                 if (!llist.isEmpty()) {
@@ -170,7 +169,7 @@ public class WeaponTools {
                             boolean hasVar = weaponVariants.containsKey(obj.getForm());
                             if (hasVar) {
                                 String eid = lli_prefix + obj.getEDID();
-                                MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
+                                MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
                                 if (r != null) {
                                     llist.removeEntry(i);
                                     llist.addEntry(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
@@ -206,11 +205,10 @@ public class WeaponTools {
      * }
      * }
      * }*/
-
     static void setupWeaponMatches() throws Exception {
         KYWD axekey = (KYWD) merger.getMajor("WeapTypeBattleaxe", GRUP_TYPE.KYWD);
         KYWD hammerkey = (KYWD) merger.getMajor("WeapTypeWarhammer", GRUP_TYPE.KYWD);
-        
+
         HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>();
         // add all weapons to setup hashmap
         for (WEAP theWeap : merger.getWeapons()) {
@@ -265,14 +263,15 @@ public class WeaponTools {
                         } else {
                             ismatch = true;
                         }
-                        if (ismatch) {
-                            if (matches == null) {
-                                matches = new ArrayList<>();
-                                weaponMatches.put(theBase.getForm(), matches);
-                            }
-                            matches.add(theVar);
-                        }
                     }
+                    if (ismatch) {
+                        if (matches == null) {
+                            matches = new ArrayList<>();
+                            weaponMatches.put(theBase.getForm(), matches);
+                        }
+                        matches.add(theVar);
+                    }
+
                 }
             }
         }
@@ -306,7 +305,6 @@ public class WeaponTools {
         }
     }
 
-
     public static void modLVLIWeapons() {
         for (WEAP theWeap : merger.getWeapons()) {
             ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
@@ -320,8 +318,8 @@ public class WeaponTools {
                 varsList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
                 varsList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                 varsList.addEntry(theWeap.getForm(), 1, 1);
-                
-                for(WEAP w : vars) {
+
+                for (WEAP w : vars) {
                     varsList.addEntry(w.getForm(), 1, 1);
                 }
                 patch.addRecord(varsList);

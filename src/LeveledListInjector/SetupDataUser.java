@@ -151,4 +151,8 @@ public class SetupDataUser extends SetupData {
         result = new StreamResult(new File("lli_data_custom.xml"));
         transformer.transform(source, result);
     }
+
+    void panelChangesParsedData(HashMap<String, RecordData> modPanelData) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

@@ -12,7 +12,8 @@ and open the template in the editor.
             // Variant ARMOs will be added as alternatives for all ARMOs with same key and type=base that match biped slots
             // Eventually: alternate biped slots to match
         <outfit>theOutfitKey</outfit> // allowed for ARMO. All ARMO with theOutfitKey will be a 'matching outfit'
-        <set +set_name="theSetName">#tier</set> // allowed ARMO, LVLI, OTFT. For LVLI, OTFT marks that form to be replaced by tiered set entries
+        <set +set_name="theSetName">#tier</set> // allowed ARMO, LVLI, OTFT. 
+            // For LVLI, OTFT marks that form to be replaced by tiered set entries
             // For ARMO marks that form to be used in theSetName at tier #tier
     </record>
 </mod>
