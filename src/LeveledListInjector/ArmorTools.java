@@ -6,6 +6,10 @@ package LeveledListInjector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.TreeSet;
 import lev.LFlags;
 import skyproc.*;
 import skyproc.exceptions.BadParameter;
@@ -1710,12 +1714,75 @@ public class ArmorTools {
         }
     }
 
-    private static boolean addArrayIfBipedsMatchFlags(LVLI list, ArrayList<ARMO> armors, LFlags flags) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private static void addArrayIfBipedsMatchFlags(LVLI list, ArrayList<ARMO> armors, LFlags flags) {
+        int flagsInt = Integer.parseInt(flags.toString(), 2);
         // hashmap of flags, armors
-        // total keys of hashmap
-        // if total == flags
+        HashMap<LFlags, ArrayList<ARMO>> flagsMap = new HashMap<>();
+        // fill map
+        for (ARMO a : armors) {
+            LFlags f = new LFlags(4);
+            ARMO armor = a;
+            FormID template = a.getTemplate();
+            boolean templated = FormID.NULL.equals(template);
+            if (templated) {
+                armor = (ARMO) merger.getMajor(template, GRUP_TYPE.ARMO);
+            }
+            for (skyproc.genenums.FirstPersonFlags c : skyproc.genenums.FirstPersonFlags.values()) {
+                boolean armorFlag = armor.getBodyTemplate().get(BodyTemplate.BodyTemplateType.Biped, c);
+                if (armorFlag) {
+                    f.set(c.ordinal(), true);
+                }
+            }
+            ArrayList<ARMO> ar = flagsMap.get(f);
+            if (ar == null) {
+                ar = new ArrayList<>();
+                flagsMap.put(f, ar);
+            }
+            ar.add(a);
+        }
+
+        // permutation of keys of hashmap
+        TreeSet<TreeSet<LFlags>> flagSets = new TreeSet<>();
+        TreeSet<LFlags> temp = new TreeSet<>(flagsMap.keySet());
+        setsPermute(temp, flagSets);
+
+        // if a permutation == flags
+        for(TreeSet<LFlags> theSet : flagSets){
+            int setInt = 0;
+            boolean passed = true;
+            for (LFlags theFlag : theSet) {
+                int flagInt = Integer.parseInt(theFlag.toString(), 2);
+                if ((setInt & flagInt) == 0){
+                    setInt += flagInt;
+                }
+                else {
+                    passed = false;
+                }
+            }
+            if(passed && ((setInt ^ flagsInt) == 0) ){
+                //
+            }
+        }
         // make sublists of hashmap values (if needed)
         // add subLists / armors to list
+    }
+
+    static <E extends NavigableSet, F extends NavigableSet<E>> F setsPermute(E s, F sub) {
+        if (s.size() > 0) {
+            sub = setsPermute((E) s.tailSet(s, false), sub);
+
+            Set<E> expand = new TreeSet<>();
+            for (E elem : sub) {
+                E temp = (E) new TreeSet<>(elem);
+                temp.add(s);
+                expand.add(temp);
+            }
+
+            sub.addAll(expand);
+        } else {
+            sub.add((E) null);
+        }
+
+        return sub;
     }
 }
