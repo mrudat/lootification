@@ -4,12 +4,12 @@
  */
 package LeveledListInjector;
 
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.NavigableSet;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 import lev.LFlags;
 import skyproc.*;
 import skyproc.exceptions.BadParameter;
@@ -1603,7 +1603,7 @@ public class ArmorTools {
                 for (String s : sets) {
                     Integer count = names.get(s);
                     if (count == null) {
-                        count = new Integer(0);
+                        count = Integer.valueOf(0);
                         names.put(s, count);
                     }
                     count++;
@@ -1612,10 +1612,10 @@ public class ArmorTools {
         }
         String ret = "";
         Integer high = 0;
-        for (String s : names.keySet()) {
-            Integer c = names.get(s);
+        for (Entry<String, Integer> s : names.entrySet()) {
+            Integer c = s.getValue();
             if (c > high) {
-                ret = s;
+                ret = s.getKey();
                 high = c;
             }
         }
@@ -1650,7 +1650,7 @@ public class ArmorTools {
         HashMap<Integer, ArrayList<ARMO>> tiers = new HashMap();
 
         // put all armors into tiers
-        for (int lev = 1; lev < 34; lev = lev++) {
+        for (int lev = 1; lev < 34; lev++) {
             for (ARMO a : armors) {
                 RecordData aRec = LeveledListInjector.parsedData.get(a.getEDID());
                 ArrayList<RecordData.setInfo> sets = aRec.getSets();
@@ -1667,10 +1667,10 @@ public class ArmorTools {
             }
         }
         //seperate tiers into sets
-        HashMap<Integer, ArrayList<ArrayList<ARMO>>> tieredOutfits = new HashMap();
+        HashMap<Integer, ArrayList<Entry<String, ArrayList<ARMO>>>> tieredOutfits = new HashMap();
         for (int i : tiers.keySet()) {
             ArrayList<ARMO> tierArmors = tiers.get(i);
-            ArrayList<ArrayList<ARMO>> thisTier = new ArrayList<>();
+            ArrayList<Entry<String, ArrayList<ARMO>>> thisTier = new ArrayList<>();
             tieredOutfits.put(i, thisTier);
 
             HashMap<String, ArrayList<ARMO>> outfits = new HashMap<>();
@@ -1685,7 +1685,7 @@ public class ArmorTools {
                     out.add(a);
                 }
             }
-            for (ArrayList<ARMO> a : outfits.values()) {
+            for (Entry<String, ArrayList<ARMO>> a : outfits.entrySet()) {
                 thisTier.add(a);
             }
         }
@@ -1696,30 +1696,39 @@ public class ArmorTools {
             String tierName = name + "_" + String.valueOf(tier);
             LVLI subList = (LVLI) patch.getMajor(tierName, GRUP_TYPE.LVLI);
             if (subList == null) {
-                subList = new LVLI(tierName);
-                subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
-                subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
-                subList.set(LeveledRecord.LVLFlag.UseAll, false);
-                try {
-                    subList.setChanceNone(0);
-                } catch (BadParameter ex) {
-                }
+
                 //
-                for (ArrayList<ARMO> a : tieredOutfits.get(tier)) {
-                    addArrayIfBipedsMatchFlags(subList, a, flags);
+                ArrayList<FormID> subLists = new ArrayList<>();
+                for (Entry<String, ArrayList<ARMO>> a : tieredOutfits.get(tier)) {
+                    subLists.add(sublistFromArrayIfBipedsMatchFlags(a, flags, tierName));
+                }
+                if (!subLists.isEmpty()) {
+                    subList = new LVLI(tierName);
+                    subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+                    subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
+                    subList.set(LeveledRecord.LVLFlag.UseAll, false);
+                    try {
+                        subList.setChanceNone(0);
+                    } catch (BadParameter ex) {
+                    }
+                    for (FormID sub : subLists) {
+                        subList.addEntry(sub, lev, 1);
+                    }
                 }
             }
-
-            list.addEntry(subList.getForm(), lev, 1);
+            if (subList != null) {
+                list.addEntry(subList.getForm(), lev, 1);
+            }
         }
     }
 
-    private static void addArrayIfBipedsMatchFlags(LVLI list, ArrayList<ARMO> armors, LFlags flags) {
+    private static FormID sublistFromArrayIfBipedsMatchFlags(Entry<String, ArrayList<ARMO>> armorEntrys, LFlags flags, String tierName) {
         int flagsInt = Integer.parseInt(flags.toString(), 2);
+        int notFlags = ~flagsInt;
         // hashmap of flags, armors
-        HashMap<LFlags, ArrayList<ARMO>> flagsMap = new HashMap<>();
+        HashMap<Integer, ArrayList<ARMO>> flagsMap = new HashMap<>();
         // fill map
-        for (ARMO a : armors) {
+        for (ARMO a : armorEntrys.getValue()) {
             LFlags f = new LFlags(4);
             ARMO armor = a;
             FormID template = a.getTemplate();
@@ -1733,56 +1742,73 @@ public class ArmorTools {
                     f.set(c.ordinal(), true);
                 }
             }
-            ArrayList<ARMO> ar = flagsMap.get(f);
-            if (ar == null) {
-                ar = new ArrayList<>();
-                flagsMap.put(f, ar);
+            Integer intFlag = Integer.parseInt(f.toString(), 2);
+            if ((intFlag & notFlags) == 0) {
+                ArrayList<ARMO> ar = flagsMap.get(intFlag);
+                if (ar == null) {
+                    ar = new ArrayList<>();
+                    flagsMap.put(intFlag, ar);
+                }
+                ar.add(a);
             }
-            ar.add(a);
         }
 
         // permutation of keys of hashmap
-        TreeSet<TreeSet<LFlags>> flagSets = new TreeSet<>();
-        TreeSet<LFlags> temp = new TreeSet<>(flagsMap.keySet());
-        setsPermute(temp, flagSets);
+        Set<Set<Integer>> flagSets;
+        Set<Integer> temp = new HashSet<>(flagsMap.keySet());
+
+        // guava powerset 
+        flagSets = Sets.powerSet(temp);
 
         // if a permutation == flags
-        for(TreeSet<LFlags> theSet : flagSets){
+        Set<Set<Integer>> passedSets = new HashSet<>();
+        for (Set<Integer> theSet : flagSets) {
             int setInt = 0;
-            boolean passed = true;
-            for (LFlags theFlag : theSet) {
-                int flagInt = Integer.parseInt(theFlag.toString(), 2);
-                if ((setInt & flagInt) == 0){
-                    setInt += flagInt;
-                }
-                else {
-                    passed = false;
+            boolean conflict = false;
+            for (Integer theFlag : theSet) {
+
+                if ((setInt & theFlag) == 0) {
+                    setInt += theFlag;
+                } else {
+                    conflict = true;
+                    break;
                 }
             }
-            if(passed && ((setInt ^ flagsInt) == 0) ){
-                //
+            if ((!conflict) && ((setInt ^ flagsInt) == 0)) {
+                passedSets.add(theSet);
             }
         }
+
+        FormID retID = null;
         // make sublists of hashmap values (if needed)
         // add subLists / armors to list
-    }
-
-    static <E extends NavigableSet, F extends NavigableSet<E>> F setsPermute(E s, F sub) {
-        if (s.size() > 0) {
-            sub = setsPermute((E) s.tailSet(s, false), sub);
-
-            Set<E> expand = new TreeSet<>();
-            for (E elem : sub) {
-                E temp = (E) new TreeSet<>(elem);
-                temp.add(s);
-                expand.add(temp);
+        if (!passedSets.isEmpty()) {
+            String retEDID = armorEntrys.getKey() + flagsInt;
+            //test if ret exists
+            LVLI ret = new LVLI(retEDID);
+            retID = ret.getForm();
+            // set ret flags
+            for (Set<Integer> s : passedSets) {
+                for (Integer i : s) {
+                    ArrayList<ARMO> flagMatchArmors = flagsMap.get(i);
+                    if (flagMatchArmors != null) {
+                        if (flagMatchArmors.size() == 1) {
+                            ret.addEntry(flagMatchArmors.get(0).getForm(), 1, 1);
+                        } else {
+                            String subEDID = armorEntrys.getKey() + i.toString(); // overlap?
+                            // test if matchSublist exists 
+                            LVLI matchSublist = new LVLI(subEDID);
+                            // set lvli flags
+                            for (ARMO a : flagMatchArmors) {
+                                matchSublist.addEntry(a.getForm(), 1, 1);
+                            }
+                            ret.addEntry(matchSublist.getForm(), 1, 1);
+                        }
+                    }
+                }
             }
-
-            sub.addAll(expand);
-        } else {
-            sub.add((E) null);
         }
 
-        return sub;
+        return retID;
     }
 }

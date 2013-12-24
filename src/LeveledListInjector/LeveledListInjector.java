@@ -36,7 +36,7 @@ public class LeveledListInjector implements SUM {
     GRUP_TYPE[] importRequests = new GRUP_TYPE[]{
         GRUP_TYPE.LVLI, GRUP_TYPE.ARMO, GRUP_TYPE.WEAP, GRUP_TYPE.FLST, GRUP_TYPE.KYWD, GRUP_TYPE.OTFT
     };
-    public static String myPatchName = "LLI";
+    public static final String myPatchName = "LLI";
     public static String authorName = "Dienes";
     public static String version = "0.6.1";
     public static String welcomeText = "Lootifies weapons and armors";
@@ -269,6 +269,8 @@ public class LeveledListInjector implements SUM {
 
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
+        ArrayList<ModListing> mods = SPDatabase.getMods();
+            ArrayList<Mod> imods = SPDatabase.getImportedMods();
         
         SPProgressBarPlug.setStatus("Exporting XML");
         setupUser.panelChangesToXML();
