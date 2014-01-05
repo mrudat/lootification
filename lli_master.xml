@@ -6,7 +6,7 @@ and open the template in the editor.
 
 <!--
 <mod +ModName="thePlugin.esp">
-    <record +EDID="theEDID" +type:"[armor, weapon, leveledList, outfit]" -master="otherMod.esp">
+    <record +EDID="theEDID" +type="[armor, weapon, leveledList, outfit]" -master="otherMod.esp">
         <match -type="base" -key="theKeywordEDID">theMatchKey</match> // allowed for ARMO, WEAP. if type != base form is a variant
             // key defines the EDID of keyword to use in modpanel as suggested material match
             // Variant ARMOs will be added as alternatives for all ARMOs with same key and type=base that match biped slots
