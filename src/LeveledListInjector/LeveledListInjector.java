@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6.2";
+    public static String version = "0.6.3";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -364,8 +364,12 @@ public class LeveledListInjector implements SUM {
                 for (FormID form : keys.getKeywordRefs()) {
                     KYWD key = (KYWD) gearVariants.getMajor(form, GRUP_TYPE.KYWD);
                     if (key == null) {
-                        JOptionPane.showMessageDialog(null, armor.getEDID() + " has an invalid keyword reference. The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
+                        String error = armor.getEDID() 
+                                + " has an invalid keyword reference: "+ form 
+                                + " The patch will fail. Clean it in tes5edit and rerun the patcher.";
+                        Exception e = new Exception(error);
+                        JOptionPane.showMessageDialog(null, e.toString());
+                        throw e;
                     }
                 }
             }
@@ -375,8 +379,12 @@ public class LeveledListInjector implements SUM {
                 for (FormID form : keys.getKeywordRefs()) {
                     KYWD key = (KYWD) gearVariants.getMajor(form, GRUP_TYPE.KYWD);
                     if (key == null) {
-                        JOptionPane.showMessageDialog(null, weapon.getEDID() + " has an invalid keyword reference. The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
+                        String error = weapon.getEDID() 
+                                + " has an invalid keyword reference: "+ form 
+                                + " The patch will fail. Clean it in tes5edit and rerun the patcher.";
+                        Exception e = new Exception(error);
+                        JOptionPane.showMessageDialog(null, e.toString());
+                        throw e;
                     }
                 }
             }
@@ -387,8 +395,12 @@ public class LeveledListInjector implements SUM {
                     ARMO arm = (ARMO) gearVariants.getMajor(f, GRUP_TYPE.ARMO);
                     WEAP weapon = (WEAP) gearVariants.getMajor(f, GRUP_TYPE.WEAP);
                     if( (litem == null)&&(arm==null)&&(weapon==null) ){
-                        JOptionPane.showMessageDialog(null, o.getEDID() + " has an invalid entry. " + f.toString() + " The patch will fail. Clean it in tes5edit and rerun the patcher.");
-                        throw new Exception();
+                        String error = o.getEDID() 
+                                + " has an invalid entry: "+ f 
+                                + " The patch will fail. Clean it in tes5edit and rerun the patcher.";
+                        Exception e = new Exception(error);
+                        JOptionPane.showMessageDialog(null, e.toString());
+                        throw e;
                     }
                 }
             }
@@ -408,9 +420,7 @@ public class LeveledListInjector implements SUM {
                 }
             }
         } catch (Exception e) {
-            SPGlobal.logException(e);
-            JOptionPane.showMessageDialog(null, "There was an exception thrown during program execution: '" + e + "'  Check the debug logs or contact the author.");
-            SPGlobal.closeDebug();
+            throw new RuntimeException (e.getMessage());
         }
     }
 

@@ -140,7 +140,7 @@ public class WeaponTools {
             KYWD weaponKey = (KYWD) merger.getMajor(temp, GRUP_TYPE.KYWD);
             if (weaponHasKeyword(rec, weaponKey, merger)) {
                 hasKey = weaponKey;
-                continue;
+                break;
             }
         }
         return hasKey;

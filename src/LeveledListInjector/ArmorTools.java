@@ -52,6 +52,10 @@ public class ArmorTools {
 //        patch = p;
 //    }
     static void buildOutfitsArmors(FLST baseArmorKeysFLST, Mod merger, Mod patch) {
+        FormID curForm;
+        ARMO curARMO;
+        OTFT curOTFT;
+        
         FormID f = new FormID("107347", "Skyrim.esm");
         //SPGlobal.log("outfits glist", f.toString());
         LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
@@ -78,8 +82,16 @@ public class ArmorTools {
 
 
                 insertTieredArmors(subList, tierKey, bits, merger, patch);
+                try {
                 if (subList.getEntry(0).getLevel() > 1) {
                     subList.getEntry(0).setLevel(1);
+                }
+                } catch (RuntimeException e) {
+                    String error = e.getMessage() + "\nOutfit: " + lotft + " is coded to have a matching set but could not find any."
+                            + "\nYou are almost certainly not using a tesedit merged patch correctly.";
+                    RuntimeException ex = new RuntimeException(error);
+                    ex.setStackTrace(e.getStackTrace());
+                    throw ex;
                 }
                 lotft.addInventoryItem(subList.getForm());
 
@@ -529,6 +541,7 @@ public class ArmorTools {
         } catch (Exception e) {
             String error = "Armor: " + rec.getEDID() + ", from " + rec.getFormMaster().toString() + ", has unresolvable template entry: " + tmp.toString();
             SPGlobal.logSpecial(LeveledListInjector.lk.err, "Bad Data", error);
+            SPGlobal.logError("ERROR!", error);
             throw (e);
         }
             a = k.getKeywordRefs();
