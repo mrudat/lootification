@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "properties": {
+        "EDID": {
+            "type": "string",
+            "required": true
+        },
+        "Record Type": {"enum": ["armor"]},
+        "match info": {
+            "$ref": "matches.json#/definitions/matchInfo"
+        },
+        "tier info": {
+            "$ref": "matchingGear.json#/definitions/TierInfo"
+        }
+    },
+    "required": ["EDID", "Record Type"]
+}

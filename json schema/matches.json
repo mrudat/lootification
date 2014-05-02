@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "definitions": {
+        "matchInfo": {
+            "type": "object",
+            "properties": {
+                "Match As Base": {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/matchAsBase"}
+                    ]
+                },
+                "Match As Varient": {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/matchAsVarient"}
+                    ]
+                }
+            }
+        },
+        "matchAsBase": {
+            "type": "object",
+            "properties": {
+                "match Name": {
+                    "type": "string"
+                },
+                "keyword EDID": {
+                    "type": "string"
+                }
+            },
+            "required": ["match Name"]
+        },
+        "matchAsVarient": {
+            "type": "object",
+            "properties": {
+                "match Name": {
+                    "type": "string"
+                }
+            },
+            "required": ["match Name"]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "edid": {"type": "string"},
+        "record Type": {"enum": ["armor"]},
+        "match info": {
+            "$ref": "#/definitions/matchInfo"
+        }
+    },
+    "required": ["edid", "recordType"]
+
+}

@@ -31,12 +31,12 @@ public class OtherSettingsPanel extends SPSettingPanel {
     protected void initialize() {
 	super.initialize();
 
-	importOnStartup = new LCheckBox("Import Mods on Startup", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-	importOnStartup.tie(YourSaveFile.Settings.IMPORT_AT_START, LeveledListInjector.save, SUMGUI.helpPanel, true);
-	importOnStartup.setOffset(2);
-	importOnStartup.addShadow();
-	setPlacement(importOnStartup);
-	AddSetting(importOnStartup);
+//	importOnStartup = new LCheckBox("Import Mods on Startup", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
+//	importOnStartup.tie(YourSaveFile.Settings.IMPORT_AT_START, LeveledListInjector.save, SUMGUI.helpPanel, true);
+//	importOnStartup.setOffset(2);
+//	importOnStartup.addShadow();
+//	setPlacement(importOnStartup);
+//	AddSetting(importOnStartup);
        
         LootifyDragonborn = new LCheckBox("Lootify the Dragonborn DLC items", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
         LootifyDragonborn.tie(YourSaveFile.Settings.LOOTIFY_DRAGONBORN, LeveledListInjector.save, SUMGUI.helpPanel, true);

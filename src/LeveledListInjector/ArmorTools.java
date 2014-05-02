@@ -4,6 +4,8 @@
  */
 package LeveledListInjector;
 
+import LeveledListInjector.RecordData.MatchInfo;
+import LeveledListInjector.RecordData.TieredSet;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,13 +22,13 @@ import skyproc.exceptions.BadParameter;
  */
 public class ArmorTools {
 
-    private static HashMap<FormID, ArrayList<ARMO>> armorMatches = new HashMap<>();
-    private static HashMap<FormID, ArrayList<ARMO>> armorVariants = new HashMap<>();
-    private static HashMap<String, ArrayList<ARMO>> matchingOutfits = new HashMap<>(0);
-    private static HashMap<String, ArrayList<ARMO>> matchingSets = new HashMap<>(0);
+    private static final HashMap<FormID, ArrayList<ARMO>> armorMatches = new HashMap<>();
+    private static final HashMap<FormID, ArrayList<ARMO>> armorVariants = new HashMap<>();
+    private static final HashMap<String, ArrayList<ARMO>> matchingOutfits = new HashMap<>(0);
+    private static final HashMap<String, ArrayList<ARMO>> matchingSets = new HashMap<>(0);
     private static Mod merger;
     private static Mod patch;
-    private static String lli_prefix = LeveledListInjector.lli_prefix;
+    private static final String lli_prefix = LeveledListInjector.lli_prefix;
 
     public static void setMergeAndPatch(Mod m, Mod p) {
         merger = m;
@@ -38,12 +40,12 @@ public class ArmorTools {
 
         for (OTFT lotft : merger.getOutfits()) {
             String lotftName = lotft.getEDID();
-            RecordData rec = LeveledListInjector.parsedData.get(lotftName);
+            RecordDataOTFT rec = LeveledListInjector.parsedOTFT.get(lotftName);
 
             if (use) {
                 boolean tiered = false;
                 if (rec != null) {
-                    ArrayList<RecordData.setInfo> sets = rec.getSets();
+                    Set<RecordData.TieredSet> sets = rec.getTieredSets();
                     if (sets != null) {
                         tiered = true;
                     }
@@ -290,29 +292,29 @@ public class ArmorTools {
         HashMap<String, Pair<ArrayList<ARMO>, ArrayList<ARMO>>> setup = new HashMap<>();
         // add all weapons to setup hashmap
         for (ARMO theArmo : merger.getArmors()) {
-            String fullID = /*theWeap.getFormMaster().print() + "_" +*/ theArmo.getEDID();
-            RecordData rec = LeveledListInjector.parsedData.get(fullID);
+            String fullID = theArmo.getEDID();
+            RecordDataARMO rec = LeveledListInjector.parsedARMO.get(fullID);
             if (rec != null) {
-                ArrayList<Pair<Boolean, String>> matches = rec.getMatches();
+                Set<MatchInfo> matches = rec.getMatches();
                 //if match is defined in xml
                 if (matches != null) {
-                    for (Pair<Boolean, String> p : matches) {
-                        Pair<ArrayList<ARMO>, ArrayList<ARMO>> vars = setup.get(p.getVar());
+                    for (MatchInfo match : matches) {
+                        Pair<ArrayList<ARMO>, ArrayList<ARMO>> vars = setup.get(match.getMatchName());
                         // if MatchName is not yet entered in setup
                         if (vars == null) {
                             ArrayList<ARMO> bases = new ArrayList<>();
                             ArrayList<ARMO> alts = new ArrayList<>();
-                            if (p.getBase()) {
+                            if (match.getIsBase()) {
                                 bases.add(theArmo);
                             } else {
                                 alts.add(theArmo);
                             }
                             Pair<ArrayList<ARMO>, ArrayList<ARMO>> newVar = new Pair<>(bases, alts);
-                            setup.put(p.getVar(), newVar);
+                            setup.put(match.getMatchName(), newVar);
                         } // if MatchName is in setup already
                         else {
                             // theWeap declared as base
-                            if (p.getBase()) {
+                            if (match.getIsBase()) {
                                 vars.getBase().add(theArmo);
                             } // if theWeap declared as var
                             else {
@@ -530,9 +532,7 @@ public class ArmorTools {
                 }
             }
         }
-
-        // read the substring out from the matrix
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int x = a.length(), y = b.length(); x != 0 && y != 0;) {
             if (lengths[x][y] == lengths[x - 1][y]) {
                 x--;
@@ -552,8 +552,8 @@ public class ArmorTools {
     static void setupMatchingOutfitsSets() {
         for (ARMO armor : merger.getArmors()) {
             for (ARMO theArmo : merger.getArmors()) {
-                String fullID = /*theWeap.getFormMaster().print() + "_" +*/ theArmo.getEDID();
-                RecordData rec = LeveledListInjector.parsedData.get(fullID);
+                String fullID = theArmo.getEDID();
+                RecordDataARMO rec = LeveledListInjector.parsedARMO.get(fullID);
                 if (rec != null) {
                     for (String name : rec.getOutfits()) {
                         ArrayList<ARMO> outfit = matchingOutfits.get(name);
@@ -563,7 +563,7 @@ public class ArmorTools {
                         }
                         outfit.add(armor);
                     }
-                    for (RecordData.setInfo p : rec.getSets()) {
+                    for (RecordData.TieredSet p : rec.getTieredSets()) {
                         ArrayList<ARMO> a = matchingSets.get(p.getName());
                         if (a == null) {
                             a = new ArrayList<>();
@@ -1528,10 +1528,10 @@ public class ArmorTools {
      * list to patch
      */
     private static void insertTieredArmors(LVLI list, OTFT lotft, LFlags flags) {
-        RecordData otftRec = LeveledListInjector.parsedData.get(lotft.getEDID());
-        ArrayList<RecordData.setInfo> sets = otftRec.getSets();
-        for (RecordData.setInfo set : sets) {
-            String s = lli_prefix + set.getBase() + flags.toString();
+        RecordDataOTFT otftRec = LeveledListInjector.parsedOTFT.get(lotft.getEDID());
+        Set<TieredSet> sets = otftRec.getTieredSets();
+        for (TieredSet set : sets) {
+            String s = lli_prefix + set.getName() + flags.toString();
             LVLI subList = (LVLI) patch.getMajor(s, GRUP_TYPE.LVLI);
             if (subList == null) {
                 subList = new LVLI(s);
@@ -1597,9 +1597,9 @@ public class ArmorTools {
             if (!FormID.NULL.equals(temp)) {
                 a = (ARMO) merger.getMajor(temp, GRUP_TYPE.ARMO);
             }
-            RecordData rec = LeveledListInjector.parsedData.get(a.getEDID());
+            RecordDataARMO rec = LeveledListInjector.parsedARMO.get(a.getEDID());
             if (rec != null) {
-                ArrayList<String> sets = rec.getOutfits();
+                Set<String> sets = rec.getOutfits();
                 for (String s : sets) {
                     Integer count = names.get(s);
                     if (count == null) {
@@ -1631,9 +1631,9 @@ public class ArmorTools {
             if (!FormID.NULL.equals(temp)) {
                 a = (ARMO) merger.getMajor(temp, GRUP_TYPE.ARMO);
             }
-            RecordData rec = LeveledListInjector.parsedData.get(a.getEDID());
+            RecordDataARMO rec = LeveledListInjector.parsedARMO.get(a.getEDID());
             if (rec != null) {
-                ArrayList<String> sets = rec.getOutfits();
+                Set<String> sets = rec.getOutfits();
                 for (String s : sets) {
                     if (biggestSetName.equalsIgnoreCase(s)) {
                         ret.add(f);
@@ -1652,9 +1652,9 @@ public class ArmorTools {
         // put all armors into tiers
         for (int lev = 1; lev < 34; lev++) {
             for (ARMO a : armors) {
-                RecordData aRec = LeveledListInjector.parsedData.get(a.getEDID());
-                ArrayList<RecordData.setInfo> sets = aRec.getSets();
-                for (RecordData.setInfo s : sets) {
+                RecordDataARMO aRec = LeveledListInjector.parsedARMO.get(a.getEDID());
+                Set<TieredSet> sets = aRec.getTieredSets();
+                for (RecordData.TieredSet s : sets) {
                     if (s.getTier() == lev) {
                         ArrayList<ARMO> arr = tiers.get(lev);
                         if (arr == null) {
@@ -1675,7 +1675,7 @@ public class ArmorTools {
 
             HashMap<String, ArrayList<ARMO>> outfits = new HashMap<>();
             for (ARMO a : tierArmors) {
-                RecordData rec = LeveledListInjector.parsedData.get(a.getEDID());
+                RecordDataARMO rec = LeveledListInjector.parsedARMO.get(a.getEDID());
                 for (String s : rec.getOutfits()) {
                     ArrayList<ARMO> out = outfits.get(s);
                     if (out == null) {

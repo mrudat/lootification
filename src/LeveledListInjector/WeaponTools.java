@@ -4,8 +4,10 @@
  */
 package LeveledListInjector;
 
+import LeveledListInjector.RecordData.MatchInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import skyproc.*;
 import skyproc.exceptions.BadParameter;
 
@@ -15,11 +17,11 @@ import skyproc.exceptions.BadParameter;
  */
 public class WeaponTools {
 
-    private static HashMap<FormID, ArrayList<WEAP>> weaponMatches = new HashMap<>();
-    private static HashMap<FormID, ArrayList<WEAP>> weaponVariants = new HashMap<>();
+    private static final HashMap<FormID, ArrayList<WEAP>> weaponMatches = new HashMap<>();
+    private static final HashMap<FormID, ArrayList<WEAP>> weaponVariants = new HashMap<>();
     private static Mod merger;
     private static Mod patch;
-    private static String lli_prefix = LeveledListInjector.lli_prefix;
+    private static final String lli_prefix = LeveledListInjector.lli_prefix;
 
     public static void setMergeAndPatch(Mod m, Mod p) {
         merger = m;
@@ -187,24 +189,6 @@ public class WeaponTools {
         }
     }
 
-    /*static void InsertWeaponVariants(LVLI list, FormID base) {
-     * ArrayList<LeveledEntry> listEntries = list.getEntries();
-     * ArrayList<FormID> forms = new ArrayList<>(0);
-     * for (LeveledEntry e : listEntries) {
-     * FormID f = e.getForm();
-     * forms.add(f);
-     * }
-     * for (ArrayList a : weaponVariants) {
-     * if (a.contains(base)) {
-     * for (int i = 0; i < a.size(); i++) {
-     * FormID f = (FormID) a.get(i);
-     * if (!forms.contains(f)) {
-     * list.addEntry(new LeveledEntry(f, 1, 1));
-     * }
-     * }
-     * }
-     * }
-     * }*/
     static void setupWeaponMatches() throws Exception {
         KYWD axekey = (KYWD) merger.getMajor("WeapTypeBattleaxe", GRUP_TYPE.KYWD);
         KYWD hammerkey = (KYWD) merger.getMajor("WeapTypeWarhammer", GRUP_TYPE.KYWD);
@@ -212,29 +196,29 @@ public class WeaponTools {
         HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>();
         // add all weapons to setup hashmap
         for (WEAP theWeap : merger.getWeapons()) {
-            String fullID = /*theWeap.getFormMaster().print() + "_" +*/ theWeap.getEDID();
-            RecordData rec = LeveledListInjector.parsedData.get(fullID);
+            String fullID = theWeap.getEDID();
+            RecordDataWEAP rec = LeveledListInjector.parsedWEAP.get(fullID);
             if (rec != null) {
-                ArrayList<Pair<Boolean, String>> matches = rec.getMatches();
+                Set<MatchInfo> matches = rec.getMatches();
                 //if match is defined in xml
                 if (matches != null) {
-                    for (Pair<Boolean, String> p : matches) {
-                        Pair<ArrayList<WEAP>, ArrayList<WEAP>> vars = setup.get(p.getVar());
+                    for (MatchInfo match : matches) {
+                        Pair<ArrayList<WEAP>, ArrayList<WEAP>> vars = setup.get(match.getMatchName());
                         // if MatchName is not yet entered in setup
                         if (vars == null) {
                             ArrayList<WEAP> bases = new ArrayList<>();
                             ArrayList<WEAP> alts = new ArrayList<>();
-                            if (p.getBase()) {
+                            if (match.getIsBase()) {
                                 bases.add(theWeap);
                             } else {
                                 alts.add(theWeap);
                             }
                             Pair<ArrayList<WEAP>, ArrayList<WEAP>> newVar = new Pair<>(bases, alts);
-                            setup.put(p.getVar(), newVar);
+                            setup.put(match.getMatchName(), newVar);
                         } // if MatchName is in setup already
                         else {
                             // theWeap declared as base
-                            if (p.getBase()) {
+                            if (match.getIsBase()) {
                                 vars.getBase().add(theWeap);
                             } // if theWeap declared as var
                             else {
@@ -363,9 +347,7 @@ public class WeaponTools {
                 }
             }
         }
-
-        // read the substring out from the matrix
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int x = a.length(), y = b.length(); x != 0 && y != 0;) {
             if (lengths[x][y] == lengths[x - 1][y]) {
                 x--;

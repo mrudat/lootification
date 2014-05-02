@@ -1,0 +1,21 @@
+{
+    "plugin": {
+        "name": "Skyrim.esm",
+        "records": [
+            {"EDID": "ArmorIronGauntlets",
+                "type": "armor",
+                "match As Base": [
+                    {"match Name": "ARMOR_IRON", "keyword EDID": "ArmorMaterialIron"}
+                ],
+                "matching outfit": [
+                    {"outfit name": "dienes_outfit_iron"}
+                ],
+                "tiered set": [
+                    {"set name": "bandit_heavy", "set tier": "0"},
+                    {"set name": "bandit_boss", "set tier": "0"}
+                ]
+            }
+        ]
+    }
+
+}

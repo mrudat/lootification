@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "definitions": {
+        "TierInfo": {
+            "type": "object",
+            "properties": {
+                "Outfit Names": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "Outfit Name": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["Outfit Name"]
+                        }
+                    ]
+                },
+                "Tier Sets": {
+                    "type": "array",
+                    "items": [
+                        {"$ref": "#/definitions/tierInfo"}
+                    ]
+                }
+            }
+        },
+        "tierInfo": {
+            "type": "object",
+            "properties": {
+                "Tiered Set Name": {
+                    "type": "string"
+                },
+                "Tier Number": {
+                    "type": "number"
+                }
+            },
+            "required": ["Tiered Set Name", "Tier Number"]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "edid": {"type": "string"},
+        "record Type": {"enum": ["armor"]},
+        "tier info": {
+            "$ref": "#/definitions/TierInfo"
+        }
+    },
+    "required": ["edid", "recordType"]
+}

@@ -1,0 +1,112 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+
+    "type": "object",
+    "properties": {
+        "plugin": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "required": true
+                },
+                "records": {
+                    "type": "array",
+                    "id": "http://jsonschema.net/plugin/records",
+                    "required": false,
+                    "items":
+                            {
+                                "type": "object",
+                                "id": "http://jsonschema.net/plugin/records/0",
+                                "required": false,
+                                "properties": {
+                                    "EDID": {
+                                        "type": "string",
+                                        "id": "http://jsonschema.net/plugin/records/0/EDID",
+                                        "required": false
+                                    },
+                                    "match": {
+                                        "type": "array",
+                                        "id": "http://jsonschema.net/plugin/records/0/match",
+                                        "required": false,
+                                        "items": [
+                                            {
+                                                "type": "object",
+                                                "id": "http://jsonschema.net/plugin/records/0/match/0",
+                                                "required": false,
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "id": "http://jsonschema.net/plugin/records/0/match/0/type",
+                                                        "required": false
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "id": "http://jsonschema.net/plugin/records/0/match/1",
+                                                "required": false,
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string",
+                                                        "id": "http://jsonschema.net/plugin/records/0/match/1/key",
+                                                        "required": false
+                                                    },
+                                                    "keyword EDID": {
+                                                        "type": "string",
+                                                        "id": "http://jsonschema.net/plugin/records/0/match/1/keyword EDID",
+                                                        "required": false
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "matching outfit": {
+                                        "type": "array",
+                                        "items":
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "outfit name": {
+                                                            "type": "string",
+                                                            "required": true
+                                                        }
+                                                    }
+                                                }
+
+
+                                    },
+                                    "tiered set": {
+                                        "type": "array",
+                                        "items":
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "set name": {
+                                                            "type": "string",
+                                                            "required": true
+                                                        },
+                                                        "set tier": {
+                                                            "type": "integer",
+                                                            "required": true
+                                                        }
+                                                    }
+                                                }
+
+
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "id": "http://jsonschema.net/plugin/records/0/type",
+                                        "required": false
+                                    }
+                                }
+                            }
+
+
+                }
+            }
+        }
+    }
+}

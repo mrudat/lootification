@@ -3,9 +3,11 @@ package LeveledListInjector;
 import LeveledListInjector.YourSaveFile.Settings;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.JFrame;
@@ -38,7 +40,7 @@ public class LeveledListInjector implements SUM {
     };
     public static final String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6.1";
+    public static String version = "1.0.0 alpha 1";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -55,14 +57,15 @@ public class LeveledListInjector implements SUM {
     
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
     // Processing info holders
-    public static final HashMap<String, RecordData> parsedData = new HashMap<>(500); //key is ModName.esp_theEDID // for now just EDID
     public static final HashMap<String, RecordData> modPanelData = new HashMap<>();
     public static final String lli_prefix = "LLI_vars_"; // added as prefix to patcher created records
-    SetupDataMaster setupMaster;
-    SetupDataUser setupUser;
-    private static enum logKey {
-        xmlMaster, xmlUser;
-    };
+
+    // json hashmaps
+    public static final HashMap<String, RecordDataARMO> parsedARMO = new HashMap<>();
+    public static final HashMap<String, RecordDataWEAP> parsedWEAP = new HashMap<>();
+    public static final HashMap<String, RecordDataLVLI> parsedLVLI = new HashMap<>();
+    public static final HashMap<String, RecordDataOTFT> parsedOTFT = new HashMap<>();
+    
 
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
@@ -79,6 +82,8 @@ public class LeveledListInjector implements SUM {
             SPGlobal.closeDebug();
         }
     }
+    public static final Map<String, PluginData> plugins = new HashMap<>();
+    // change to map. Move to lli.java? so not overwriting changes
 
     @Override
     public String getName() {
@@ -229,17 +234,14 @@ public class LeveledListInjector implements SUM {
 
                         }
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                 }
             }
         };
         SUMGUI.startImport(r);
 
         SPProgressBarPlug.setStatus("Processing XML");
-        setupMaster = new SetupDataMaster(parsedData, armorMatches, weaponMatches, tieredSets, logKey.xmlMaster);
-        setupMaster.setupStart("xmlMasterFile_Errors");
-        setupUser = new SetupDataUser(parsedData, armorMatches, weaponMatches, tieredSets, logKey.xmlUser);
-        setupUser.setupStart("xmlUserFile_Errors");
+
 
     }
 
@@ -273,10 +275,10 @@ public class LeveledListInjector implements SUM {
             ArrayList<Mod> imods = SPDatabase.getImportedMods();
         
         SPProgressBarPlug.setStatus("Exporting XML");
-        setupUser.panelChangesToXML();
-        SPProgressBarPlug.setStatus("Merging XML");
-        setupUser.panelChangesParsedData(modPanelData);
 
+        SPProgressBarPlug.setStatus("Merging XML");
+
+        
 
         SPProgressBarPlug.setStatus("Setting up armor matches");
         ArmorTools.setMergeAndPatch(merger, patch);
