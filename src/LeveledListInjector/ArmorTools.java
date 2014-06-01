@@ -56,13 +56,13 @@ public class ArmorTools {
         ARMO curARMO;
         OTFT curOTFT;
         
-        FormID f = new FormID("107347", "Skyrim.esm");
+//        FormID f = new FormID("107347", "Skyrim.esm");
         //SPGlobal.log("outfits glist", f.toString());
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
         //SPGlobal.log("outfits glist", glist + "");
         //setupSets(merger, patch);
 
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
+//        glist.set(LeveledRecord.LVLFlag.UseAll, false);
         for (OTFT lotft : merger.getOutfits()) {
             String lotftName = lotft.getEDID();
             boolean tiered = isTiered(lotftName);
@@ -76,7 +76,7 @@ public class ArmorTools {
                 }
 
                 String bits = getBits(lotftName);
-                LVLI subList = (LVLI) patch.makeCopy(glist, "DienesLVLI" + lotftName + bits + "List");
+                LVLI subList = new LVLI("DienesLVLI" + lotftName + bits + "List");
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 String tierKey = getTierKey(lotftName);
 
@@ -125,7 +125,7 @@ public class ArmorTools {
                                         for (ARMO arm2 : b) {
                                             lotft.removeInventoryItem(arm2.getForm());
                                         }
-                                        LVLI newList = (LVLI) patch.makeCopy(glist, lvliName);
+                                        LVLI newList = new LVLI(lvliName);
                                         newList.set(LeveledRecord.LVLFlag.UseAll, true);
                                         newList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                                         newList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
@@ -160,7 +160,7 @@ public class ArmorTools {
                             String eid = "DienesLVLI" + obj.getEDID();
                             MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                             if (r == null) {
-                                LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                                LVLI subList = new LVLI(eid);
                                 InsertArmorVariants(subList, form);
                                 patch.addRecord(subList);
                                 lotft.removeInventoryItem(form);
@@ -232,9 +232,9 @@ public class ArmorTools {
     }
 
     static void linkLVLIArmors(FLST baseArmorKeysFLST, Mod merger, Mod patch) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
+//        FormID f = new FormID("107347", "Skyrim.esm");
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        glist.set(LeveledRecord.LVLFlag.UseAll, false);
 
         for (LVLI llist : merger.getLeveledItems()) {
             //SPGlobal.log("Link Armor List", llist.getEDID());
@@ -286,7 +286,7 @@ public class ArmorTools {
                             }
                             if (r == null) {
                                 //SPGlobal.log(obj.getEDID(), "new sublist needed");
-                                LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                                LVLI subList = new LVLI(eid);
                                 InsertArmorVariants(subList, entry.getForm());
                                 patch.addRecord(subList);
                                 llist.removeEntry(i);
@@ -846,8 +846,8 @@ public class ArmorTools {
     }
 
     static void addArmorFromArray(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        FormID f = new FormID("107347", "Skyrim.esm");
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
 
         ArrayList<ARMO> h = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorHelmet", GRUP_TYPE.KYWD), a, merger);
         ArrayList<ARMO> c = getAllWithKeyARMO((KYWD) merger.getMajor("ArmorCuirass", GRUP_TYPE.KYWD), a, merger);
@@ -864,7 +864,7 @@ public class ArmorTools {
             if (subList != null) {
                 list.addEntry(subList.getForm(), 1, 1);
             } else {
-                subList = (LVLI) patch.makeCopy(glist, name);
+                subList = new LVLI(name);//(LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 for (ARMO arm : h) {
                     subList.addEntry(arm.getForm(), 1, 1);
@@ -883,7 +883,7 @@ public class ArmorTools {
             if (subList != null) {
                 list.addEntry(subList.getForm(), 1, 1);
             } else {
-                subList = (LVLI) patch.makeCopy(glist, name);
+                subList = new LVLI(name); //(LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 for (ARMO arm : c) {
                     subList.addEntry(arm.getForm(), 1, 1);
@@ -902,7 +902,7 @@ public class ArmorTools {
             if (subList != null) {
                 list.addEntry(subList.getForm(), 1, 1);
             } else {
-                subList = (LVLI) patch.makeCopy(glist, name);
+                subList = new LVLI(name); //(LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 for (ARMO arm : g) {
                     subList.addEntry(arm.getForm(), 1, 1);
@@ -921,7 +921,7 @@ public class ArmorTools {
             if (subList != null) {
                 list.addEntry(subList.getForm(), 1, 1);
             } else {
-                subList = (LVLI) patch.makeCopy(glist, name);
+                subList = new LVLI(name); //(LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 for (ARMO arm : b) {
                     subList.addEntry(arm.getForm(), 1, 1);
@@ -940,7 +940,7 @@ public class ArmorTools {
             if (subList != null) {
                 list.addEntry(subList.getForm(), 1, 1);
             } else {
-                subList = (LVLI) patch.makeCopy(glist, name);
+                subList = new LVLI(name); //(LVLI) patch.makeCopy(glist, name);
                 subList.set(LeveledRecord.LVLFlag.UseAll, false);
                 for (ARMO arm : s) {
                     subList.addEntry(arm.getForm(), 1, 1);
@@ -954,9 +954,9 @@ public class ArmorTools {
     }
 
     static void addAlternateSets(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
-        FormID f = new FormID("107347", "Skyrim.esm");
+//        FormID f = new FormID("107347", "Skyrim.esm");
         //SPGlobal.log("outfits glist", f.toString());
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
 
         KYWD k = null;
         ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
@@ -1025,7 +1025,7 @@ public class ArmorTools {
                             list.addEntry(list2.getForm(), 1, 1);
                             patch.addRecord(list);
                         } else {
-                            LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
+                            LVLI subList = new LVLI(lvliName); //(LVLI) patch.makeCopy(glist, lvliName);
                             subList.set(LeveledRecord.LVLFlag.UseAll, false);
                             addArmorByBit(subList, p.getVar(), String.valueOf(c), merger);
                             patch.addRecord(subList);
@@ -1049,9 +1049,9 @@ public class ArmorTools {
     }
 
     static void addAlternateOutfits(LVLI list, ArrayList<ARMO> a, Mod merger, Mod patch) {
-        FormID f = new FormID("107347", "Skyrim.esm");
+//        FormID f = new FormID("107347", "Skyrim.esm");
         //SPGlobal.log("outfits glist", f.toString());
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
 
         KYWD k = null;
         ArrayList<Pair<KYWD, ArrayList<ARMO>>> varSets = new ArrayList<>(0);
@@ -1139,7 +1139,7 @@ public class ArmorTools {
                             list.addEntry(list2.getForm(), 1, 1);
                             patch.addRecord(list);
                         } else {
-                            LVLI subList = (LVLI) patch.makeCopy(glist, lvliName);
+                            LVLI subList = new LVLI(lvliName); //(LVLI) patch.makeCopy(glist, lvliName);
                             addArmorByBit(subList, p.getVar(), String.valueOf(c), merger);
                             patch.addRecord(subList);
                             list.addEntry(subList.getForm(), 1, 1);
@@ -1162,8 +1162,8 @@ public class ArmorTools {
     }
 
     static void insertTieredArmors(LVLI list, String keyPrefix, String bits, Mod merger, Mod patch) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        FormID f = new FormID("107347", "Skyrim.esm");
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
         boolean changed = false;
 
         if (keyPrefix.contains("Boss") || keyPrefix.contains("Thalmor")) {
@@ -1183,7 +1183,7 @@ public class ArmorTools {
                         LVLI subList = (LVLI) patch.getMajor(edid, GRUP_TYPE.LVLI);
                         if (subList == null) {
                             //SPGlobal.logError("LLI Error:", "Could not find LVLI " + edid);
-                            subList = (LVLI) patch.makeCopy(glist, edid);
+                            subList = new LVLI(edid); //(LVLI) patch.makeCopy(glist, edid);
                             subList.set(LeveledRecord.LVLFlag.UseAll, false);
                             patch.addRecord(subList);
                         }
@@ -1203,7 +1203,7 @@ public class ArmorTools {
                                 changed = true;
                             }
                         } else {
-                            LVLI set = (LVLI) patch.makeCopy(glist, setListName);
+                            LVLI set = new LVLI(setListName); //(LVLI) patch.makeCopy(glist, setListName);
                             set.set(LeveledRecord.LVLFlag.UseAll, true);
                             set.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                             set.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
@@ -1223,7 +1223,7 @@ public class ArmorTools {
                     }
                 }
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Thalmor_Tier_9"))) {
-                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    LVLI subList = new LVLI(edid); //(LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
                     subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                     subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
@@ -1241,7 +1241,7 @@ public class ArmorTools {
                     changed = true;
                 }
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Necromancer_Tier_0"))) {
-                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    LVLI subList = new LVLI(edid); //(LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
                     subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                     subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);
@@ -1255,7 +1255,7 @@ public class ArmorTools {
                     changed = true;
                 }
                 if ((array.isEmpty()) && (edid.contentEquals("DienesLVLI_Warlock_Tier_0"))) {
-                    LVLI subList = (LVLI) patch.makeCopy(glist, edid);
+                    LVLI subList = new LVLI(edid); //(LVLI) patch.makeCopy(glist, edid);
                     subList.set(LeveledRecord.LVLFlag.UseAll, true);
                     subList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
                     subList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, false);

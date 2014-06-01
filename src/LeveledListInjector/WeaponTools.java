@@ -274,9 +274,9 @@ public class WeaponTools {
     }
 
     static void linkLVLIWeapons(FLST baseWeaponKeysFLST) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
+//        FormID f = new FormID("107347", "Skyrim.esm");
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        glist.set(LeveledRecord.LVLFlag.UseAll, false);
 
         for (LVLI llist : merger.getLeveledItems()) {
             if (!llist.getEDID().startsWith("DienesLVLI")) {
@@ -293,7 +293,8 @@ public class WeaponTools {
                                 String eid = "DienesLVLI" + obj.getEDID();
                                 MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                                 if (r == null) {
-                                    LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                                    LVLI subList = new LVLI(eid);
+                                    subList.set(LeveledRecord.LVLFlag.UseAll, false);
                                     InsertWeaponVariants(subList, entry.getForm());
                                     patch.addRecord(subList);
                                     llist.removeEntry(i);
@@ -351,9 +352,9 @@ public class WeaponTools {
     }
 
     static void buildOutfitWeapons(FLST baseWeaponKeysFLST) {
-        FormID f = new FormID("107347", "Skyrim.esm");
-        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
-        glist.set(LeveledRecord.LVLFlag.UseAll, false);
+//        FormID f = new FormID("107347", "Skyrim.esm");
+//        LVLI glist = (LVLI) merger.getMajor(f, GRUP_TYPE.LVLI);
+//        glist.set(LeveledRecord.LVLFlag.UseAll, false);
 
         for (OTFT lotft : merger.getOutfits()) {
             ArrayList<FormID> a = lotft.getInventoryList();
@@ -368,7 +369,8 @@ public class WeaponTools {
                         String eid = "DienesLVLI" + weapon.getEDID();
                         MajorRecord r = merger.getMajor(eid, GRUP_TYPE.LVLI);
                         if (r == null) {
-                            LVLI subList = (LVLI) patch.makeCopy(glist, eid);
+                            LVLI subList = new LVLI(eid);
+                            subList.set(LeveledRecord.LVLFlag.UseAll, false);
                             InsertWeaponVariants(subList, form);
                             patch.addRecord(subList);
                             lotft.removeInventoryItem(form);

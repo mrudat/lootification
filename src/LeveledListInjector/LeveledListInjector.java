@@ -75,7 +75,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6.3";
+    public static String version = "0.6.4";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -104,6 +104,19 @@ public class LeveledListInjector implements SUM {
         try {
             SPGlobal.createGlobalLog();
             SPGlobal.newSpecialLog(lk.err, "lli_crash.txt");
+            boolean found = false;
+            for(String s: args){
+                if (s.equalsIgnoreCase("-NOBOSS")){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                String[] temp = new String[(args.length+1)];
+                System.arraycopy(args, 0, temp, 0, args.length);
+                temp[args.length] = "-NOBOSS";
+                args = temp;
+            }
             SUMGUI.open(new LeveledListInjector(), args);
         } catch (Exception e) {
             // If a major error happens, print it everywhere and display a message box.
