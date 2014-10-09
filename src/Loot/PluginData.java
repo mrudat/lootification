@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package LeveledListInjector;
+package Loot;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -15,12 +15,11 @@ import skyproc.*;
 /**
  *
  * @author David Tynan
- * @param <T>
  */
-public class PluginData<T extends RecordData> {
+public class PluginData {
     
     private final String pluginName;
-    private final Map<GRUP_TYPE, Set<T>> GRUPMap = new HashMap<>();
+    private final Map<GRUP_TYPE, Set<RecordData>> GRUPMap = new HashMap<>();
 
     public PluginData(String pluginName) {
         this.pluginName = pluginName;
@@ -34,7 +33,7 @@ public class PluginData<T extends RecordData> {
         this.pluginName = theMod.print();
     }
     
-    public Map<GRUP_TYPE, Set<T>> getGRUPMap() {
+    public Map<GRUP_TYPE, Set<RecordData>> getGRUPMap() {
         return GRUPMap;
     }
 
@@ -42,8 +41,8 @@ public class PluginData<T extends RecordData> {
         return pluginName;
     }
     
-    public void addRecord(T r){
-        Set<T> GRUPSet = GRUPMap.get(r.getType());
+    public void addRecord(RecordData r){
+        Set GRUPSet = GRUPMap.get(r.getType());
         if (GRUPSet == null) {
             GRUPSet = new LinkedHashSet<>();
             GRUPMap.put(r.getType(), GRUPSet);
@@ -51,17 +50,17 @@ public class PluginData<T extends RecordData> {
         GRUPSet.add(r);
     }
     
-    public void removeRecord(T r){
-        Set<T> GRUPSet = GRUPMap.get(r.getType());
+    public void removeRecord(RecordData r){
+        Set GRUPSet = GRUPMap.get(r.getType());
         if (GRUPSet != null) {
             GRUPSet.remove(r);
         }
     }
     
-    public T getRecord(String edid, GRUP_TYPE g){
-        Set<T> GRUPSet = GRUPMap.get(g);
+    public RecordData getRecord(String edid, GRUP_TYPE g){
+        Set<RecordData> GRUPSet = GRUPMap.get(g);
         if (GRUPSet != null) {
-            for (T rec : GRUPSet){
+            for (RecordData rec : GRUPSet){
                 if (rec.getEDID().equalsIgnoreCase(edid)) {
                     return rec;
                 }
@@ -70,9 +69,9 @@ public class PluginData<T extends RecordData> {
         return null;
     }
     
-    public T getRecord(String edid){
+    public RecordData getRecord(String edid){
         for (GRUP_TYPE g : GRUPMap.keySet()){
-            T rec = getRecord(edid, g);
+            RecordData rec = getRecord(edid, g);
             if (rec != null){
                 return rec;
             }

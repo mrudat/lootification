@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package LeveledListInjector;
+package Loot;
 
 //import lev.gui.LCheckBox;
 //import lev.gui.LTextPane;
@@ -25,17 +25,17 @@ public class WelcomePanel extends SPSettingPanel {
     LComboBox<String> test;
 
     public WelcomePanel(SPMainMenuPanel parent_) {
-        super(parent_, LeveledListInjector.myPatchName, LeveledListInjector.headerColor);
+        super(parent_, LLI.myPatchName, LLI.headerColor);
     }
 
     @Override
     protected void initialize() {
         super.initialize();
 
-        introText = new LTextPane(settingsPanel.getWidth() - 40, 200, LeveledListInjector.settingsColor);
-        introText.setText(LeveledListInjector.welcomeText);
+        introText = new LTextPane(settingsPanel.getWidth() - 40, 200, LLI.settingsColor);
+        introText.setText(LLI.welcomeText);
         introText.setEditable(false);
-        introText.setFont(LeveledListInjector.settingsFont);
+        introText.setFont(LLI.settingsFont);
         introText.setCentered();
         setPlacement(introText);
         Add(introText);

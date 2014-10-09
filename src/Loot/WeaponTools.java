@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package LeveledListInjector;
+package Loot;
 
-import LeveledListInjector.RecordData.MatchInfo;
+import Loot.RecordData.MatchInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class WeaponTools {
     private static final HashMap<FormID, ArrayList<WEAP>> weaponVariants = new HashMap<>();
     private static Mod merger;
     private static Mod patch;
-    private static final String lli_prefix = LeveledListInjector.lli_prefix;
+    private static final String lli_prefix = LLI.lli_prefix;
 
     public static void setMergeAndPatch(Mod m, Mod p) {
         merger = m;
@@ -197,7 +197,7 @@ public class WeaponTools {
         // add all weapons to setup hashmap
         for (WEAP theWeap : merger.getWeapons()) {
             String fullID = theWeap.getEDID();
-            RecordDataWEAP rec = LeveledListInjector.parsedWEAP.get(fullID);
+            RecordDataWEAP rec = LLI.parsedWEAP.get(fullID);
             if (rec != null) {
                 Set<MatchInfo> matches = rec.getMatches();
                 //if match is defined in xml

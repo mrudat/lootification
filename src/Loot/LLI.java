@@ -1,6 +1,6 @@
-package LeveledListInjector;
+package Loot;
 
-import LeveledListInjector.YourSaveFile.Settings;
+import Loot.YourSaveFile.Settings;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import skyproc.gui.SUMGUI;
  *
  * @author David Tynan
  */
-public class LeveledListInjector implements SUM {
+public class LLI implements SUM {
 
     /*
      * The important functions to change are:
@@ -55,11 +55,13 @@ public class LeveledListInjector implements SUM {
     public static final HashMap<String, ArrayList<ARMO>> modOutfits = new HashMap<>();
     public static Mod gearVariants;
     
-    public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
+//    public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
     // Processing info holders
     public static final HashMap<String, RecordData> modPanelData = new HashMap<>();
     public static final String lli_prefix = "LLI_vars_"; // added as prefix to patcher created records
 
+    public static final JsonHandler jsonHandler = new JsonHandler();
+    public static final Map<String, PluginData> plugins = new HashMap<>();
     // json hashmaps
     public static final HashMap<String, RecordDataARMO> parsedARMO = new HashMap<>();
     public static final HashMap<String, RecordDataWEAP> parsedWEAP = new HashMap<>();
@@ -73,7 +75,7 @@ public class LeveledListInjector implements SUM {
     public static void main(String[] args) {
         try {
             SPGlobal.createGlobalLog();
-            SUMGUI.open(new LeveledListInjector(), args);
+            SUMGUI.open(new LLI(), args);
         } catch (Exception e) {
             // If a major error happens, print it everywhere and display a message box.
             System.err.println(e.toString());
@@ -82,8 +84,6 @@ public class LeveledListInjector implements SUM {
             SPGlobal.closeDebug();
         }
     }
-    public static final Map<String, PluginData> plugins = new HashMap<>();
-    // change to map. Move to lli.java? so not overwriting changes
 
     @Override
     public String getName() {
@@ -107,7 +107,7 @@ public class LeveledListInjector implements SUM {
 
     @Override
     public boolean importAtStart() {
-        return true;
+        return false;
     }
 
     @Override
@@ -125,13 +125,13 @@ public class LeveledListInjector implements SUM {
         settingsMenu.setWelcomePanel(new WelcomePanel(settingsMenu));
         settingsMenu.addMenu(new OtherSettingsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
-        for (Mod m : activeMods) {
-            ModPanel panel = new ModPanel(settingsMenu, m);
-            modPanels.add(panel);
-            settingsMenu.addMenu(panel);
-        }
+//        for (Mod m : activeMods) {
+//            ModPanel panel = new ModPanel(settingsMenu, m);
+//            modPanels.add(panel);
+//            settingsMenu.addMenu(panel);
+//        }
 
-        settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
+//        settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
         settingsMenu.updateUI();
 
@@ -205,6 +205,14 @@ public class LeveledListInjector implements SUM {
     @Override
     public void onStart() throws Exception {
 
+        for(ModListing mListing : SPImporter.getActiveModList() ){
+            Mod aMod = SPDatabase.getMod(mListing);
+            activeMods.add(aMod);
+        }
+        
+        jsonHandler.startUp();
+        
+        /*
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -241,8 +249,9 @@ public class LeveledListInjector implements SUM {
         SUMGUI.startImport(r);
 
         SPProgressBarPlug.setStatus("Processing XML");
+*/
 
-
+        // need to load json files
     }
 
     // This function runs right as the program is about to close.
@@ -274,11 +283,8 @@ public class LeveledListInjector implements SUM {
         ArrayList<ModListing> mods = SPDatabase.getMods();
             ArrayList<Mod> imods = SPDatabase.getImportedMods();
         
-        SPProgressBarPlug.setStatus("Exporting XML");
-
-        SPProgressBarPlug.setStatus("Merging XML");
-
-        
+        SPProgressBarPlug.setStatus("JSON to internals");
+        jsonHandler.pluginsToMaps();
 
         SPProgressBarPlug.setStatus("Setting up armor matches");
         ArmorTools.setMergeAndPatch(merger, patch);

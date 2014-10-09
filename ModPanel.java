@@ -36,8 +36,8 @@ public class ModPanel extends SPSettingPanel {
             label = l;
             rec = LeveledListInjector.modPanelData.get(a.getEDID());
             if (rec == null) {
-                rec = new RecordData(a.getEDID(), myMod.getName(), GRUP_TYPE.ARMO);
-                LeveledListInjector.modPanelData.put(a.getEDID(), rec);
+//                rec = new RecordData(a.getEDID(), myMod.getName(), GRUP_TYPE.ARMO);
+//                LeveledListInjector.modPanelData.put(a.getEDID(), rec);
             }
 
         }
@@ -46,7 +46,7 @@ public class ModPanel extends SPSettingPanel {
         public void actionPerformed(ActionEvent e) {
             String pressed = (String) box.getSelectedItem();
             if ((pressed.compareTo("None") == 0) && (newKey != null)) {
-                rec.removeMatch(false, newKey);
+//                rec.removeMatch(false, newKey);
 
                 newKey = null;
                 box.clearHighlight();

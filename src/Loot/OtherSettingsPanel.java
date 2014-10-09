@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package LeveledListInjector;
+package Loot;
 
 import lev.gui.LCheckBox;
 import lev.gui.LComboBox;
@@ -24,7 +24,7 @@ public class OtherSettingsPanel extends SPSettingPanel {
     
 
     public OtherSettingsPanel(SPMainMenuPanel parent_) {
-	super(parent_, "Other Settings", LeveledListInjector.headerColor);
+	super(parent_, "Other Settings", LLI.headerColor);
     }
 
     @Override
@@ -38,18 +38,18 @@ public class OtherSettingsPanel extends SPSettingPanel {
 //	setPlacement(importOnStartup);
 //	AddSetting(importOnStartup);
        
-        LootifyDragonborn = new LCheckBox("Lootify the Dragonborn DLC items", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        LootifyDragonborn.tie(YourSaveFile.Settings.LOOTIFY_DRAGONBORN, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        LootifyDragonborn = new LCheckBox("Lootify the Dragonborn DLC items", LLI.settingsFont, LLI.settingsColor);
+        LootifyDragonborn.tie(YourSaveFile.Settings.LOOTIFY_DRAGONBORN, LLI.save, SUMGUI.helpPanel, true);
         setPlacement(LootifyDragonborn);
         AddSetting(LootifyDragonborn);
         
-        SkipInactiveMods = new LCheckBox("Don't process inactive mods", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        SkipInactiveMods.tie(YourSaveFile.Settings.SKIP_INACTIVE_MODS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        SkipInactiveMods = new LCheckBox("Don't process inactive mods", LLI.settingsFont, LLI.settingsColor);
+        SkipInactiveMods.tie(YourSaveFile.Settings.SKIP_INACTIVE_MODS, LLI.save, SUMGUI.helpPanel, true);
         setPlacement(SkipInactiveMods);
         AddSetting(SkipInactiveMods);
         
-        UseMatchingOutfits = new LCheckBox("Match outfits when possible", LeveledListInjector.settingsFont, LeveledListInjector.settingsColor);
-        UseMatchingOutfits.tie(YourSaveFile.Settings.USE_MATCHING_OUTFITS, LeveledListInjector.save, SUMGUI.helpPanel, true);
+        UseMatchingOutfits = new LCheckBox("Match outfits when possible", LLI.settingsFont, LLI.settingsColor);
+        UseMatchingOutfits.tie(YourSaveFile.Settings.USE_MATCHING_OUTFITS, LLI.save, SUMGUI.helpPanel, true);
         setPlacement(UseMatchingOutfits);
         AddSetting(UseMatchingOutfits);
 
