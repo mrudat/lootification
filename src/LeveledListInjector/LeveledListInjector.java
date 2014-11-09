@@ -14,9 +14,17 @@ import skyproc.gui.SPMainMenuPanel;
 import skyproc.gui.SUM;
 import skyproc.gui.SUMGUI;
 import LeveledListInjector.YourSaveFile.Settings;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.util.List;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -75,7 +83,7 @@ public class LeveledListInjector implements SUM {
     };
     public static String myPatchName = "LLI";
     public static String authorName = "Dienes";
-    public static String version = "0.6.5";
+    public static String version = "0.6.6";
     public static String welcomeText = "Lootifies weapons and armors";
     public static String descriptionToShowInSUM = "Lootify weapons and armor.";
     public static Color headerColor = new Color(66, 181, 184);  // Teal
@@ -92,6 +100,7 @@ public class LeveledListInjector implements SUM {
     public static boolean listify = false;
     public static ArrayList<Pair<String, Node>> lootifiedMods = new ArrayList<>(0);
     public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
+    private static String finishedSound = "";
     
     public static enum lk {
         err;
@@ -106,17 +115,12 @@ public class LeveledListInjector implements SUM {
             SPGlobal.newSpecialLog(lk.err, "lli_crash.txt");
             boolean found = false;
             for(String s: args){
-                if (s.equalsIgnoreCase("-NOBOSS")){
-                    found = true;
+                if (s.startsWith("-DoneSound=")){
+                    finishedSound = s.substring(11);
                     break;
                 }
             }
-            if (!found){
-                String[] temp = new String[(args.length+1)];
-                System.arraycopy(args, 0, temp, 0, args.length);
-                temp[args.length] = "-NOBOSS";
-                args = temp;
-            }
+
             SUMGUI.open(new LeveledListInjector(), args);
         } catch (Exception e) {
             // If a major error happens, print it everywhere and display a message box.
@@ -440,6 +444,14 @@ public class LeveledListInjector implements SUM {
     // This function runs right as the program is about to close.
     @Override
     public void onExit(boolean patchWasGenerated) throws Exception {
+        if (!finishedSound.isEmpty()){
+            try {
+                File soundFile = new File(finishedSound);
+                playClip(soundFile);
+            } catch (IOException | InterruptedException | LineUnavailableException | UnsupportedAudioFileException ex){
+                SPGlobal.log("OnExit", "Could not play sound: " + ex);
+            }
+        }
     }
 
     // Add any mods that you REQUIRE to be present in order to patch.
@@ -910,6 +922,41 @@ public class LeveledListInjector implements SUM {
 
         public outOfOrderMaster(String message) {
             super(message);
+        }
+    }
+    
+        private static void playClip(File clipFile) throws IOException,
+            UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
+        class AudioListener implements LineListener {
+
+            private boolean done = false;
+
+            @Override
+            public synchronized void update(LineEvent event) {
+                LineEvent.Type eventType = event.getType();
+                if (eventType == LineEvent.Type.STOP || eventType == LineEvent.Type.CLOSE) {
+                    done = true;
+                    notifyAll();
+                }
+            }
+
+            public synchronized void waitUntilDone() throws InterruptedException {
+                while (!done) {
+                    wait();
+                }
+            }
+        }
+        AudioListener listener = new AudioListener();
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(clipFile)) {
+            Clip clip = AudioSystem.getClip();
+            clip.addLineListener(listener);
+            clip.open(audioInputStream);
+            try {
+                clip.start();
+                listener.waitUntilDone();
+            } finally {
+                clip.close();
+            }
         }
     }
 }
