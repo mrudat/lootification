@@ -9,9 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +76,7 @@ public class JsonHandler {
             return plugin;
         } catch (IOException ex) {
             Logger.getLogger(JsonHandler.class.getName()).log(Level.SEVERE, null, ex);
+            SPGlobal.logException(ex);
         }
         return null;
     }
@@ -121,5 +124,20 @@ public class JsonHandler {
                 }
             }
         }
+    }
+    
+    public void writeFile(PluginData thePlugin){
+        String name = thePlugin.getPluginName()+".json";
+        File old = new File("PluginData/" + name);
+        if(old.exists()){
+            old.renameTo(new File("PluginData/" + name + ".bak"));
+        }
+        try (Writer writer = new FileWriter("PluginData/" + name)){
+            writer.write(gson.toJson(thePlugin));
+        } catch (IOException ex) {
+            SPGlobal.logException(ex);
+            Logger.getLogger(JsonHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 }

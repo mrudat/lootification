@@ -54,7 +54,7 @@ public class LLI implements SUM {
     public static final Set<String> tieredSets = new TreeSet<>();
     public static final HashMap<String, ArrayList<ARMO>> modOutfits = new HashMap<>();
     public static Mod gearVariants;
-    
+
 //    public static ArrayList<ModPanel> modPanels = new ArrayList<>(0);
     // Processing info holders
     public static final HashMap<String, RecordData> modPanelData = new HashMap<>();
@@ -67,8 +67,9 @@ public class LLI implements SUM {
     public static final HashMap<String, RecordDataWEAP> parsedWEAP = new HashMap<>();
     public static final HashMap<String, RecordDataLVLI> parsedLVLI = new HashMap<>();
     public static final HashMap<String, RecordDataOTFT> parsedOTFT = new HashMap<>();
-    
 
+    boolean imported = false;
+    
     // Do not write the bulk of your program here
     // Instead, write your patch changes in the "runChangesToPatch" function
     // at the bottom
@@ -125,14 +126,15 @@ public class LLI implements SUM {
         settingsMenu.setWelcomePanel(new WelcomePanel(settingsMenu));
         settingsMenu.addMenu(new OtherSettingsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
 
+        settingsMenu.setBackgroundPicture(OtherSettingsPanel.class.getResource("Please Wait.jpg"));
+        
+        settingsMenu.addMenu(new Loot.gui.TempGUI(settingsMenu));
 //        for (Mod m : activeMods) {
 //            ModPanel panel = new ModPanel(settingsMenu, m);
 //            modPanels.add(panel);
 //            settingsMenu.addMenu(panel);
 //        }
-
 //        settingsMenu.addMenu(new OutfitsPanel(settingsMenu), false, save, Settings.OTHER_SETTINGS);
-
         settingsMenu.updateUI();
 
         return settingsMenu;
@@ -205,52 +207,67 @@ public class LLI implements SUM {
     @Override
     public void onStart() throws Exception {
 
-        for(ModListing mListing : SPImporter.getActiveModList() ){
-            Mod aMod = SPDatabase.getMod(mListing);
-            activeMods.add(aMod);
-        }
-        
-        jsonHandler.startUp();
-        
-        /*
         Runnable r = new Runnable() {
+
             @Override
             public void run() {
-                try {
-                    ArrayList<ModListing> activeModListing = SPImporter.getActiveModList();
-                    ArrayList<Mod> allMods = new ArrayList<>();
-                    for (ModListing listing : activeModListing) {
-                        Mod newMod = new Mod(listing);
-                        allMods.add(newMod);
-                    }
+                for (Mod aMod : SPDatabase.getImportedMods()) {
+                    if (!skipForUI(aMod.getName())) {
+                        int numArmors = aMod.getArmors().size();
+                        int numWeapons = aMod.getWeapons().size();
 
-                    gearVariants = new Mod(getName() + "MergerTemp", false);
-                    gearVariants.addAsOverrides(SPGlobal.getDB());
-
-                    for (Mod m : allMods) {
-                        String modName = m.getName();
-
-                        if (!(modName.contentEquals("Skyrim.esm") || modName.contentEquals("HearthFires.esm")
-                                || modName.contentEquals("Update.esm") || modName.contentEquals("Dragonborn.esm")
-                                || modName.contentEquals("Dawnguard.esm"))) {
-                            int numArmors = m.getArmors().size();
-                            int numWeapons = m.getWeapons().size();
-
-                            if (numArmors > 0 || numWeapons > 0) {
-                                activeMods.add(m);
-                            }
-
+                        if (numArmors > 0 || numWeapons > 0) {
+                            activeMods.add(aMod);
                         }
                     }
-                } catch (IOException e) {
+
                 }
+                imported = true;
             }
+
         };
-        SUMGUI.startImport(r);
+        skyproc.gui.SUMGUI.startImport(r);
 
-        SPProgressBarPlug.setStatus("Processing XML");
-*/
+        // jsonHandler.startUp();
 
+        /*
+         Runnable r = new Runnable() {
+         @Override
+         public void run() {
+         try {
+         ArrayList<ModListing> activeModListing = SPImporter.getActiveModList();
+         ArrayList<Mod> allMods = new ArrayList<>();
+         for (ModListing listing : activeModListing) {
+         Mod newMod = new Mod(listing);
+         allMods.add(newMod);
+         }
+
+         gearVariants = new Mod(getName() + "MergerTemp", false);
+         gearVariants.addAsOverrides(SPGlobal.getDB());
+
+         for (Mod m : allMods) {
+         String modName = m.getName();
+
+         if (!(modName.contentEquals("Skyrim.esm") || modName.contentEquals("HearthFires.esm")
+         || modName.contentEquals("Update.esm") || modName.contentEquals("Dragonborn.esm")
+         || modName.contentEquals("Dawnguard.esm"))) {
+         int numArmors = m.getArmors().size();
+         int numWeapons = m.getWeapons().size();
+
+         if (numArmors > 0 || numWeapons > 0) {
+         activeMods.add(m);
+         }
+
+         }
+         }
+         } catch (IOException e) {
+         }
+         }
+         };
+         SUMGUI.startImport(r);
+
+         SPProgressBarPlug.setStatus("Processing XML");
+         */
         // need to load json files
     }
 
@@ -281,8 +298,8 @@ public class LLI implements SUM {
         Mod merger = new Mod(getName() + "Merger", false);
         merger.addAsOverrides(SPGlobal.getDB());
         ArrayList<ModListing> mods = SPDatabase.getMods();
-            ArrayList<Mod> imods = SPDatabase.getImportedMods();
-        
+        ArrayList<Mod> imods = SPDatabase.getImportedMods();
+
         SPProgressBarPlug.setStatus("JSON to internals");
         jsonHandler.pluginsToMaps();
 
@@ -312,6 +329,10 @@ public class LLI implements SUM {
         SPProgressBarPlug.setStatus("Linking weapon leveled lists");
         WeaponTools.linkLVLIWeapons();
 
+    }
+
+    private boolean skipForUI(String name) {
+        return false;
     }
 
 }

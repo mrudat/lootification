@@ -1,0 +1,231 @@
+{
+  "pluginName": "Skyrim.esm",
+  "GRUPMap": {
+    "WEAP": [
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronDagger",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "FFRiften13ArkayDagger",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "weapPickaxe",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronTwoHBluntAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "ExecutionerAxe",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "dunHaltedStreamPoachersAxe",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHBlunt",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "CWDummyMaceSons",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHBlunt",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "CWDummyMaceImperial",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHBlunt",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "DummyMace",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronTwoHBluntAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "dunPinewoodGroveWoodsmansFriend",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronBow",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "LongBow",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHBlunt",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronMace",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronTwoHBluntAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronWarhammer",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronTwoHBluntAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronBattleaxe",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronDagger",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronDagger",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHAxe",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronWarAxe",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronTwoHSword",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronGreatsword",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      },
+      {
+        "theOutfits": [],
+        "theSets": [],
+        "theMatches": [
+          {
+            "isBase": true,
+            "matchName": "IronOneHSword",
+            "keywordEDID": "WeapMaterialIron"
+          }
+        ],
+        "EDID": "IronSword",
+        "masterMod": "Skyrim.esm",
+        "type": "WEAP"
+      }
+    ]
+  }
+}

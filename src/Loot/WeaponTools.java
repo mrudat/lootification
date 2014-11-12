@@ -7,6 +7,7 @@ package Loot;
 import Loot.RecordData.MatchInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.Set;
 import skyproc.*;
 import skyproc.exceptions.BadParameter;
@@ -47,13 +48,13 @@ public class WeaponTools {
                     ret = baseName.replace(gcs, name);
                 }
             }
-        }
+        } // else { // should get enchantment name if not templated
 
         return ret;
 
     }
 
-    static boolean weaponHasKeyword(WEAP rec, KYWD varKey, Mod m) {
+    public static boolean weaponHasKeyword(WEAP rec, KYWD varKey, Mod m) {
         ArrayList<FormID> a;
         boolean hasKey = false;
         WEAP replace = rec;
@@ -65,10 +66,12 @@ public class WeaponTools {
         a = k.getKeywordRefs();
         for (FormID temp : a) {
             KYWD refKey = (KYWD) m.getMajor(temp, GRUP_TYPE.KYWD);
+            if (refKey != null) {
             //SPGlobal.log("formid", temp.toString());
-            //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (refKey.equals(varKey)));
-            if (varKey.equals(refKey)) {
-                hasKey = true;
+                //SPGlobal.log("KYWD compare", refKey.getEDID() + " " + varKey.getEDID() + " " + (refKey.equals(varKey)));
+                if (varKey.equals(refKey)) {
+                    hasKey = true;
+                }
             }
         }
         return hasKey;
@@ -99,35 +102,38 @@ public class WeaponTools {
 
             ArrayList<WEAP> matches = weaponMatches.get(lookup);
 
-            if (matches != null) {
-                // theWeap is a base weapon and has matches
-                ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
-                if (vars != null) {
-                    throw new Exception("Variants already defined");
+            if (matches == null) {
+                break;
+            }
+            // theWeap is a base weapon and has matches
+            ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
+            if (vars != null) {
+                Exception e = new Exception("Variants already defined for " + theWeap);
+                SPGlobal.logException(e);
+                break;
+            }
+
+            vars = new ArrayList<>();
+            weaponVariants.put(theWeap.getForm(), vars);
+
+            FormID enchantment = theWeap.getEnchantment();
+            if (enchantment.isNull()) {
+                for (WEAP w : matches) {
+                    vars.add(w);
                 }
+            } else {
+                for (WEAP w : matches) {
+                    String name = generateWeaponName(w, theWeap);
+                    String newEdid = generateWeaponEDID(w, theWeap);
+                    WEAP weaponDupe = (WEAP) patch.makeCopy(w, "LLI_WEAP" + newEdid);
 
-                vars = new ArrayList<>();
-                weaponVariants.put(theWeap.getForm(), vars);
+                    weaponDupe.setEnchantment(enchantment);
+                    weaponDupe.setEnchantmentCharge(theWeap.getEnchantmentCharge());
+                    weaponDupe.setTemplate(w.getForm());
+                    weaponDupe.setName(name);
 
-                FormID enchantment = theWeap.getEnchantment();
-                if (enchantment.isNull()) {
-                    for (WEAP w : matches) {
-                        vars.add(w);
-                    }
-                } else {
-                    for (WEAP w : matches) {
-                        String name = generateWeaponName(w, theWeap);
-                        String newEdid = generateWeaponEDID(w, theWeap);
-                        WEAP weaponDupe = (WEAP) patch.makeCopy(w, "DienesWEAP" + newEdid);
-
-                        weaponDupe.setEnchantment(enchantment);
-                        weaponDupe.setEnchantmentCharge(theWeap.getEnchantmentCharge());
-                        weaponDupe.setTemplate(w.getForm());
-                        weaponDupe.setName(name);
-
-                        vars.add(weaponDupe);
-                        patch.addRecord(weaponDupe);
-                    }
+                    vars.add(weaponDupe);
+                    patch.addRecord(weaponDupe);
                 }
             }
         }
@@ -153,6 +159,7 @@ public class WeaponTools {
                 }
             }
         }
+        // else { // should get from json for name of enchantment if not templated
 
         return ret;
     }
@@ -160,32 +167,35 @@ public class WeaponTools {
     static void linkLVLIWeapons() {
 
         for (LVLI llist : merger.getLeveledItems()) {
-            if (!llist.getEDID().startsWith(lli_prefix)) {
-                if (!llist.isEmpty()) {
-                    boolean changed = false;
-                    for (int i = 0; i < llist.numEntries(); i++) {
-                        LeveledEntry entry = llist.getEntry(i);
-                        WEAP obj = (WEAP) merger.getMajor(entry.getForm(), GRUP_TYPE.WEAP);
-                        if (obj != null) {
-
-                            boolean hasVar = weaponVariants.containsKey(obj.getForm());
-                            if (hasVar) {
-                                String eid = lli_prefix + obj.getEDID();
-                                MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
-                                if (r != null) {
-                                    llist.removeEntry(i);
-                                    llist.addEntry(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
-                                    changed = true;
-                                    i = -1;
-                                }
-                            }
+            if (llist.getEDID().startsWith(lli_prefix)) {
+                break;
+            }
+            if (llist.isEmpty()) {
+                break;
+            }
+            boolean changed = false;
+            ArrayList<LeveledEntry> entries = llist.getEntries();
+            ListIterator<LeveledEntry> ittr = entries.listIterator();
+            while (ittr.hasNext()) {
+                LeveledEntry entry = ittr.next();
+                WEAP obj = (WEAP) merger.getMajor(entry.getForm(), GRUP_TYPE.WEAP);
+                if (obj != null) {
+                    boolean hasVar = weaponVariants.containsKey(obj.getForm());
+                    if (hasVar) {
+                        String eid = lli_prefix + obj.getEDID();
+                        MajorRecord r = patch.getMajor(eid, GRUP_TYPE.LVLI);
+                        if (r != null) {
+                            ittr.remove();
+                            ittr.add(new LeveledEntry(r.getForm(), entry.getLevel(), entry.getCount()));
+                            changed = true;
                         }
-                    }
-                    if (changed) {
-                        patch.addRecord(llist);
                     }
                 }
             }
+            if (changed) {
+                patch.addRecord(llist);
+            }
+
         }
     }
 
@@ -193,38 +203,41 @@ public class WeaponTools {
         KYWD axekey = (KYWD) merger.getMajor("WeapTypeBattleaxe", GRUP_TYPE.KYWD);
         KYWD hammerkey = (KYWD) merger.getMajor("WeapTypeWarhammer", GRUP_TYPE.KYWD);
 
-        HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>();
+        HashMap<String, Pair<ArrayList<WEAP>, ArrayList<WEAP>>> setup = new HashMap<>(); // match name , pair of (list of base weapons , list of variant weapons )
+
         // add all weapons to setup hashmap
         for (WEAP theWeap : merger.getWeapons()) {
             String fullID = theWeap.getEDID();
             RecordDataWEAP rec = LLI.parsedWEAP.get(fullID);
-            if (rec != null) {
-                Set<MatchInfo> matches = rec.getMatches();
-                //if match is defined in xml
-                if (matches != null) {
-                    for (MatchInfo match : matches) {
-                        Pair<ArrayList<WEAP>, ArrayList<WEAP>> vars = setup.get(match.getMatchName());
-                        // if MatchName is not yet entered in setup
-                        if (vars == null) {
-                            ArrayList<WEAP> bases = new ArrayList<>();
-                            ArrayList<WEAP> alts = new ArrayList<>();
-                            if (match.getIsBase()) {
-                                bases.add(theWeap);
-                            } else {
-                                alts.add(theWeap);
-                            }
-                            Pair<ArrayList<WEAP>, ArrayList<WEAP>> newVar = new Pair<>(bases, alts);
-                            setup.put(match.getMatchName(), newVar);
-                        } // if MatchName is in setup already
-                        else {
-                            // theWeap declared as base
-                            if (match.getIsBase()) {
-                                vars.getBase().add(theWeap);
-                            } // if theWeap declared as var
-                            else {
-                                vars.getVar().add(theWeap);
-                            }
-                        }
+            if (rec == null) {
+                break;
+            }
+            Set<MatchInfo> matches = rec.getMatches();
+            //if match is defined in xml
+            if (matches == null) {
+                break;
+            }
+            for (MatchInfo match : matches) {
+                Pair<ArrayList<WEAP>, ArrayList<WEAP>> vars = setup.get(match.getMatchName());
+                // if MatchName is not yet entered in setup
+                if (vars == null) {
+                    ArrayList<WEAP> bases = new ArrayList<>();
+                    ArrayList<WEAP> alts = new ArrayList<>();
+                    if (match.getIsBase()) {
+                        bases.add(theWeap);
+                    } else {
+                        alts.add(theWeap);
+                    }
+                    Pair<ArrayList<WEAP>, ArrayList<WEAP>> newVar = new Pair<>(bases, alts);
+                    setup.put(match.getMatchName(), newVar);
+                } // if MatchName is in setup already
+                else {
+                    // theWeap declared as base
+                    if (match.getIsBase()) {
+                        vars.getBase().add(theWeap);
+                    } // if theWeap declared as var
+                    else {
+                        vars.getVar().add(theWeap);
                     }
                 }
             }
@@ -236,12 +249,14 @@ public class WeaponTools {
                 ArrayList<WEAP> matches = weaponMatches.get(theBase.getForm());
                 for (WEAP theVar : p.getVar()) {
                     boolean ismatch = false;
+                    // check if their weapon types are the same
                     if (theBase.getWeaponType().equals(theVar.getWeaponType())) {
                         // check if 2h axe or hammer
                         if (theBase.getWeaponType().equals(WEAP.WeaponType.TwoHBluntAxe)) {
                             // check if both have same keyword
-                            if ((weaponHasKeyword(theBase, axekey, merger) && weaponHasKeyword(theVar, axekey, merger))
-                                    || (weaponHasKeyword(theBase, hammerkey, merger) && weaponHasKeyword(theVar, hammerkey, merger))) {
+                            if (weaponHasKeyword(theBase, axekey, merger) && weaponHasKeyword(theVar, axekey, merger)) {
+                                ismatch = true;
+                            } else if (weaponHasKeyword(theBase, hammerkey, merger) && weaponHasKeyword(theVar, hammerkey, merger)) {
                                 ismatch = true;
                             }
                         } else {
@@ -255,7 +270,6 @@ public class WeaponTools {
                         }
                         matches.add(theVar);
                     }
-
                 }
             }
         }
@@ -270,7 +284,7 @@ public class WeaponTools {
 
                 WEAP weapon = (WEAP) merger.getMajor(form, GRUP_TYPE.WEAP);
                 if (weapon != null) {
-                    boolean isBase = weaponMatches.containsKey(weapon.getForm());
+                    boolean isBase = weaponMatches.containsKey(form);
 
                     if (isBase) {
                         String eid = lli_prefix + weapon.getEDID();
@@ -292,24 +306,27 @@ public class WeaponTools {
     public static void modLVLIWeapons() {
         for (WEAP theWeap : merger.getWeapons()) {
             ArrayList<WEAP> vars = weaponVariants.get(theWeap.getForm());
-            if (vars != null) {
-                LVLI varsList = new LVLI(lli_prefix + theWeap.getEDID());
-                try {
-                    varsList.setChanceNone(0);
-                } catch (BadParameter e) {
-                }
-                varsList.set(LeveledRecord.LVLFlag.UseAll, false);
-                varsList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
-                varsList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
-                varsList.addEntry(theWeap.getForm(), 1, 1);
-
-                for (WEAP w : vars) {
-                    varsList.addEntry(w.getForm(), 1, 1);
-                }
-                patch.addRecord(varsList);
+            if (vars == null) {
+                break;
             }
-        }
+            if (vars.isEmpty()) {
+                break;
+            }
+            LVLI varsList = new LVLI(lli_prefix + theWeap.getEDID());
+            try {
+                varsList.setChanceNone(0);
+            } catch (BadParameter e) {
+            }
+            varsList.set(LeveledRecord.LVLFlag.UseAll, false);
+            varsList.set(LeveledRecord.LVLFlag.CalcForEachItemInCount, true);
+            varsList.set(LeveledRecord.LVLFlag.CalcAllLevelsEqualOrBelowPC, false);
+            varsList.addEntry(theWeap.getForm(), 1, 1);
 
+            for (WEAP w : vars) {
+                varsList.addEntry(w.getForm(), 1, 1);
+            }
+            patch.addRecord(varsList);
+        }
     }
 
     private static String longestCommonSubstring(String S1, String S2) {
@@ -337,7 +354,6 @@ public class WeaponTools {
         int[][] lengths = new int[a.length() + 1][b.length() + 1];
 
         // row 0 and column 0 are initialized to 0 already
-
         for (int i = 0; i < a.length(); i++) {
             for (int j = 0; j < b.length(); j++) {
                 if (a.charAt(i) == b.charAt(j)) {
